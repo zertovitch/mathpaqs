@@ -11,7 +11,7 @@
 --
 -- Legal licensing note:
 
---  Copyright (c) 2009 Gautier de Montmollin
+--  Copyright (c) 2009..2010 Gautier de Montmollin
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,8 @@
 ------------
 -- Changes
 --
+-- 09-Nov-2010: Fixed a bug in Gaussian copula (the last element of an odd
+--                number of dependent variables was wrongly simulated)
 -- 17-Jul-2009: U(0,1) Random generator is provided by the user
 -- 16-Apr-2009: Evolutive object hierachy implemented
 --    Jan-2009: Copula type as rigid record type

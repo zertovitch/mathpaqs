@@ -37,7 +37,7 @@ package body Copulas is
         if z < c.dim_dep then
           u2:= r(z+1);
         else
-          u2:= r(z);
+          u2:= Real(Random(gen)); -- Fix 9-Nov-2010; was := u1 !!
         end if;
         Box_Muller(u1,u2, n1,n2);
         r(z):= n1;
