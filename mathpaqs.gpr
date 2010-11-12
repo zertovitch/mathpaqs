@@ -1,0 +1,57 @@
+-- This is a GNAT, GCC or GNAT Programming Studio (GPS) project file
+-- for Mathpaqs ( http://sf.net/projects/mathpaqs/ )
+-- Build me with "gnatmake -P mathpaqs.gpr", or open me with GPS
+--
+project Mathpaqs is
+
+   for Source_Dirs use (".");
+   for Exec_Dir use ".";
+   type Build_Mode_Type is
+      ("Debug");
+   Build_Mode : Build_Mode_Type := external ("Build_Mode", "Debug");
+
+   case Build_Mode is
+
+      when "Debug" =>
+         for Main use ("test_copulas.adb");
+         for Object_Dir use "obj_debg";
+         for Source_Dirs use ("./**");
+   end case;
+
+   package Compiler is
+
+      case Build_Mode is
+
+         when "Debug" =>
+            for Default_Switches ("ada") use ("-gnat05", "-gnatwal", "-gnatVa", "-gnato", "-g", "-fno-inline", "-fstack-check", "-gnatec../debug.pra");
+      end case;
+   end Compiler;
+
+   package Linker is
+
+      case Build_Mode is
+
+         when "Debug" =>
+            for Default_Switches ("ada") use ("-g");
+      end case;
+   end Linker;
+
+   package Binder is
+
+      case Build_Mode is
+
+         when "Debug" =>
+            for Default_Switches ("ada") use ("-E");
+      end case;
+   end Binder;
+
+   package Builder is
+      for Default_Switches ("ada") use ("-j2", "-C");
+   end Builder;
+
+   package Ide is
+      for Default_Switches ("adacontrol") use ("-f", "verif.aru");
+   end Ide;
+
+end Mathpaqs;
+
