@@ -1,30 +1,33 @@
 ------------------------------------------------------------------------------
---  File:            fraceucl.ads
+--  File:            frac_euclid.ads
 --  Description:     Generic package, gives back the field of quotients of an
---                   euclidean ring (i.e. with division, allows *reduction* )
---  Date/version:    22.12.1996
---  Author:          Gautier.deMontmollin@Maths.UniNe.CH
+--                     euclidean ring (i.e. a ring with division; this allows
+--                     for *reduction* of fractions)
+--  Date/version:    22-Dec-1996
+--  Author:          Gautier de Montmollin
+--                   http://gautiersblog.blogspot.com/
 ------------------------------------------------------------------------------
 
 generic                              -- to provide:
-          type ring_elt is private;                  -- ring element type 
+          type ring_elt is private;                  -- ring element type
           zero, one: ring_elt;                       -- 0 and 1 elements
 
           with function "-" (a:ring_elt) return ring_elt;    -- unary oper.
           with function "+" (a,b:ring_elt) return ring_elt;  -- binary oper.
           with function "-" (a,b:ring_elt) return ring_elt;
           with function "*" (a,b:ring_elt) return ring_elt;
-          with function "/" (a,b:ring_elt) return ring_elt; 
+          with function "/" (a,b:ring_elt) return ring_elt;
                         -- returns the quotient:  a= b*q + r
                         -- q:quotient, r:rest
 
 package Frac_euclid is
   type frac_elt is record a,b:ring_elt; end record;     -- define fraction
 
-  frac_0: constant frac_elt:= (zero,one); 
-  frac_1: constant frac_elt:= (one,one); 
+  frac_0: constant frac_elt:= (zero,one);
+  frac_1: constant frac_elt:= (one,one);
 
   function Reduction(f: frac_elt) return frac_elt;
+  pragma Inline(Reduction);
 
   function "+" (f: frac_elt) return frac_elt;                 -- unary oper.
   function "-" (f: frac_elt) return frac_elt;

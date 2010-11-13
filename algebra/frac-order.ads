@@ -1,12 +1,13 @@
 ------------------------------------------------------------------------------
---  File:            fracorde.ads
---  Description:     Supplement of generic package 'Frac' to provide an
---                   order relation from one of the ring
---  Date/version:    22.12.1996
---  Author:          Gautier.deMontmollin@Maths.UniNe.CH
+--  File:            frac-order.ads
+--  Description:     Child of the generic package 'Frac' which provides an
+--                    order relation derived from the ring's order relation
+--  Date/version:    22-Dec-1996
+--  Author:          Gautier de Montmollin
+--                   http://gautiersblog.blogspot.com/
 ------------------------------------------------------------------------------
 
-generic with function "<" (a,b:ring_elt) return boolean;   -- order relation 
+generic with function "<" (a,b: ring_elt) return boolean;   -- order relation
 
 package Frac.Order is
 

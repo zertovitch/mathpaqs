@@ -16,14 +16,14 @@ package body Frac_Euclid is
     if f.a = zero then return (zero,one); end if;
     p:= GCD(f.a,f.b);
     return (f.a/p, f.b/p); 
-  end;
+  end Reduction;
   
   function Auto_Red(f: frac_elt) return frac_elt is
+  pragma Inline(Auto_Red);
   begin
     if auto_reduce then return Reduction(f); else return f; end if;
-  end;
+  end Auto_Red;
 
-  pragma Inline(Reduction, Auto_Red);
 
   function "+" (f: frac_elt) return frac_elt is begin return f; end;
 

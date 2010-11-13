@@ -1,13 +1,14 @@
 ------------------------------------------------------------------------------
 --  File:            Frac.ads          (possibly extracted from MATHPAQS.ZIP)
---  Description:     Generic package, gives back the field of quotients of an
---                   integral domain
---  Date/version:    22.12.1996
---  Author:          Gautier.deMontmollin@Maths.UniNe.CH
+--  Description:     Generic package, gives back the field of quotients of
+--                     an integral domain
+--  Date/version:    22-Dec-1996
+--  Author:          Gautier de Montmollin
+--                   http://gautiersblog.blogspot.com/
 ------------------------------------------------------------------------------
 
 generic                              -- to provide:
-          type ring_elt is private;                  -- ring element type 
+          type ring_elt is private;                  -- ring element type
           zero, one: ring_elt;                       -- 0 and 1 elements
 
           with function "-" (a:ring_elt) return ring_elt;    -- unary oper.
@@ -17,8 +18,8 @@ generic                              -- to provide:
 package Frac is
   type frac_elt is record a,b:ring_elt; end record;        -- define fraction
 
-  frac_0: constant frac_elt:= (zero,one); 
-  frac_1: constant frac_elt:= (one,one); 
+  frac_0: constant frac_elt:= (zero,one);
+  frac_1: constant frac_elt:= (one,one);
 
   function "+" (f: frac_elt) return frac_elt;                 -- unary oper.
   function "-" (f: frac_elt) return frac_elt;
