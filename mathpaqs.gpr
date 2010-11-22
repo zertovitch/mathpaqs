@@ -13,9 +13,10 @@ project Mathpaqs is
    case Build_Mode is
 
       when "Debug" =>
-         for Main use ("test_copulas.adb", "test_cholesky.adb", "test_ert.adb", "gnat_int.adb", "test_rsa.adb", "test_u_rand.adb", "test_sparse.adb");
+         for Main use ("test_copulas.adb", "test_cholesky.adb", "test_ert.adb", "gnat_int.adb", "test_rsa.adb",
+           "test_u_rand.adb", "test_sparse.adb", "fractal.adb");
          for Object_Dir use "obj_debg";
-         for Source_Dirs use ("algebra", "edp", "eds", "lin_alg", "multi", "numerics", "probas", "random", "lin_alg/sparse", "stats");
+         for Source_Dirs use (".", "algebra", "edp", "eds", "lin_alg", "multi", "numerics", "probas", "random", "lin_alg/sparse", "stats", "graph");
    end case;
 
    package Compiler is

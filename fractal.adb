@@ -1,3 +1,12 @@
+-- Display Sierpinski and Barnsley fractals with various levels
+--
+-- Output: a PostScript (.ps) file.
+--
+-- Authors: Stéphane Perret and Gautier de Montmollin
+--
+-- March 2009
+-- This procedure was made in around one 1/2 hour...
+
 with Graph; use Graph;
 
 with Ada.Numerics.Elementary_Functions;
@@ -43,7 +52,6 @@ procedure Fractal is
     return res;
   end;
 
-
   type Affine is record
     M: Matrix22;
     v: Vector;
@@ -88,41 +96,41 @@ procedure Fractal is
 
   -- Napperons
 
-  procedure Plot_Sierp(d:device_type; n:string) is
-    triangle: Figure:= ((0.0,0.0), (0.5, Sqrt(3.0)/2.0), (1.0,0.0));
-    M: Matrix22:= ((0.5,0.0),(0.0,0.5));
-    v1: Vector:= (0.0,0.0);
-    v2: Vector:= (0.5,0.0);
-    v3: Vector:= (0.25,Sqrt(3.0)/4.0);
-    transformation: Affine_array:=
+  procedure Plot_Sierpinski(d:device_type; n:string) is
+    triangle: constant Figure:= ((0.0,0.0), (0.5, Sqrt(3.0)/2.0), (1.0,0.0));
+    M: constant Matrix22:= ((0.5,0.0),(0.0,0.5));
+    v1: constant Vector:= (0.0,0.0);
+    v2: constant Vector:= (0.5,0.0);
+    v3: constant Vector:= (0.25,Sqrt(3.0)/4.0);
+    transformation: constant Affine_array:=
       ( (M,v1), (M,v2), (M,v3) );
   begin
     Plot( triangle, transformation, d, n);
-  end Plot_sierp;
+  end Plot_sierpinski;
 
   -- Fougère
 
   procedure Plot_Barnsley(d:device_type; n:string) is
-    triangle: Figure:= 0.1 * ((0.0,0.0), (0.5, Sqrt(3.0)/2.0), (1.0,0.0));
-    M1: Matrix22:= ((0.849, 0.037),
-                    (-0.037, 0.849));
-    M2: Matrix22:= ((0.197, -0.226),
-                    (0.226, 0.197));
-    M3: Matrix22:= ((-0.150, 0.283),
-                    (0.260, 0.237));
-    M4: Matrix22:= ((0.0, 0.0),
-                    (0.0, 0.16));
-    v1: Vector:= (0.075, 0.1830);
-    v2: Vector:= (0.4, 0.049);
-    v3: Vector:= (0.575, -0.0840);
-    v4: Vector:= (0.5, 0.0);
-    transformation: Affine_array:=
+    triangle: constant Figure:= 0.1 * ((0.0,0.0), (0.5, Sqrt(3.0)/2.0), (1.0,0.0));
+    M1: constant Matrix22:= ((0.849, 0.037),
+                            (-0.037, 0.849));
+    M2: constant Matrix22:= ((0.197, -0.226),
+                             (0.226, 0.197));
+    M3: constant Matrix22:= ((-0.150, 0.283),
+                             (0.260, 0.237));
+    M4: constant Matrix22:= ((0.0, 0.0),
+                             (0.0, 0.16));
+    v1: constant Vector:= (0.075, 0.1830);
+    v2: constant Vector:= (0.4, 0.049);
+    v3: constant Vector:= (0.575, -0.0840);
+    v4: constant Vector:= (0.5, 0.0);
+    transformation: constant Affine_array:=
       ( (M1,v1), (M2,v2), (M3,v3), (M4,v4) );
   begin
     Plot( triangle, transformation, d, n);
   end Plot_Barnsley;
 
 begin
-  Plot_sierp(PostScript, "sierpinski.ps");
+  Plot_sierpinski(PostScript, "sierpinski.ps");
   Plot_barnsley(PostScript, "barnsley.ps");
 end;

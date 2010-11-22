@@ -7,14 +7,14 @@ package body Graph.PostScript_driver is
   -- *******
   -- Interne: primitives PS. But: economiser de la place au mieux!
 
-  colonne: Natural;
+  colonne: Natural:= 0;
 
   procedure PsPS(s:String) is  -- SANS saut
   begin
     Put(dev_file(PostScript),s);
     colonne:= colonne + s'length;
   end;
- 
+
   procedure PesPS(s:String) is  -- separation, SANS saut
   begin
     if colonne>0 then
@@ -76,7 +76,7 @@ package body Graph.PostScript_driver is
 
   -- Chainage de lignes
   last_x_PS, last_y_PS: integer;
-  
+
   chainage_ouvert: Boolean;
 
   procedure PS_Prolog is
@@ -103,7 +103,7 @@ package body Graph.PostScript_driver is
     PlPS("save");
     PlPS("2.0 setlinewidth");
     -- Ajout 8-Dec-2001 a cause du chainage (nouveau) et des
-    -- problemes d'angle entre 2 segments consecutifs ('E' Triscript) 
+    -- problemes d'angle entre 2 segments consecutifs ('E' Triscript)
     PlPS("0 setlinejoin");
       -- CF PLRM, ch. 8.2 :
       --  0 Miter join. Subjet to miter limit
@@ -117,7 +117,7 @@ package body Graph.PostScript_driver is
       -->   1.0 cuts off miters at all angles, so that bevels are
       --    always produced even whenmiters are specified.
       --The default value of the miter limit is 10.0.
-    
+
     PlPS("30 780 translate");
     if dev_mode(PostScript) >= PS_landscape_10_pt then
       PlPS("540 0 translate 90 rotate");
@@ -171,7 +171,7 @@ package body Graph.PostScript_driver is
     end if;
     chainage_ouvert:= False;
   end;
-  
+
   procedure PS_Dot(x,y: Integer) is
   begin
     Termine_serie_lignes;
@@ -206,9 +206,9 @@ package body Graph.PostScript_driver is
   end;
 
   procedure PS_Write(x,y: Integer; s:String) is
-    procedure chPS(c:character) is 
-    begin 
-      if c='(' or c=')' then PesoPS("(\"&c&") s");  
+    procedure chPS(c:character) is
+    begin
+      if c='(' or c=')' then PesoPS("(\"&c&") s");
                         else PesoPS('('&c&") s"); end if;
     end;
   begin
@@ -242,7 +242,7 @@ package body Graph.PostScript_driver is
       when White         => rgb:= (  99,  99,  99);
 
       when 100 .. 100 + 99_99_99 => -- RGB code, 0..99 scale
-        rgb:= (  (c-100) / 1_00_00, 
+        rgb:= (  (c-100) / 1_00_00,
                 ((c-100) / 1_00) mod 1_00,
                  (c-100)         mod 1_00 );
 
