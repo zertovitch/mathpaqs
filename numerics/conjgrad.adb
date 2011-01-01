@@ -1,5 +1,4 @@
 with Ada.Numerics.Generic_Elementary_Functions;
-with Ada.Text_IO; -- for debugging
 
 package body ConjGrad is
 
@@ -9,14 +8,125 @@ package body ConjGrad is
   -- package rio is new Ada.Text_IO.float_io(real);
   -- package iio is new Ada.Text_IO.integer_io(index);
 
+  procedure ChoTri(diag,diagl:        vector;
+                   d,dl      : in out vector;
+                   kminor    :    out Index) is
+
+  --     compute the cholesky decomposition of a tridiagonal symetric
+  --     positive definite matrix
+  --
+  --     the matrix is defined by its main diagonal diag,
+  --     its lower (or upper) diagonal diagl
+  --
+  --     d is the diagonal of the decomposed matrix
+  --     dl is the lower diag of the decomposed matrix
+  --
+  --     neq is the number of equations
+  --     kminor error parameter
+  --        kminor = 0 : no error
+  --        kminor = k>0 : a k-minor is singular
+
+      eps: constant:= 1.0e-14;
+      neq: constant Index:= diag'Last;
+      j: Index;
+
+  begin
+      if diag(1) <= eps then
+        kminor:= 1;
+        return;
+      end if;
+      d(1):= sqrt(diag(1));
+
+      for i in 2..neq loop
+        j:= i-1;
+        dl(j):= diagl(j)/d(j);
+        d(i) := diag(i) - dl(j)*dl(j);
+        if d(i) <= eps then
+          kminor:= i;
+          return;
+        end if;
+        d(i):= sqrt(d(i));
+      end loop;
+  end ChoTri;
+
+  procedure TriPr( A: Any_matrix; precd,precl,precu: in out vector) is
+  --     computes the cholesky or lu decomposition of the tridiagonal part of A
+
+      kminor: Index;
+
+  begin
+    for i in 1..Rows(A) loop
+      precd(i) := Get( A, i,i );
+      if i > 2 then
+        precl(i) := Get( A, i,i-1 );  --   u
+        precu(i) := Get( A, i-1,i );  -- l d
+      end if;
+    end loop;
+
+    if Defined_symmetric(A) then
+      ChoTri( precd,precl, precd,precl, kminor);
+    else
+      raise Constraint_Error;
+    end if;
+
+    if kminor > 0 then raise tridiagonal_singularity; end if;
+  end TriPr;
+
+  -- 12-Oct-2001: precondition calculee au debut des methodes au lieu
+  --              d'etre importee.
+
+  procedure Prepare_Precondition(
+              A    : Any_matrix;
+              precond: t_precond;   -- kind of preconditioning
+              precd: in out vector;    -- diagonal of precondition matrix
+              precl: in out vector;    -- lower diag. of tridiag. precond. matrix
+              precu: in out vector     -- upper diagonal, if asymmetric
+            ) is
+    N: constant index:= Rows(A);
+  begin
+    case precond is
+      when    none =>  null;
+      when    diag =>  for i in 1..N loop
+                         precd(i):= 1.0 / Get(A, i,i);
+                       end loop;
+      when tridiag =>  TriPr( A, precd,precl,precu );
+    end case;
+  end Prepare_Precondition;
+
+   procedure SolTri(d,dl,r: vector; u: in out vector) is
+    --     solve the tridiagonal linear system a.u = r
+    --     neq: number of equations
+    --     d :  main diagonal of matrix l, the cholesky decomposition of a
+    --     dl: lower diagonal of matrix l, the cholesky decomposition of a
+    --     r : second member
+    --     u : solution
+    --
+    --     this routine uses the cholesky decomposition of the matrix a
+    --
+   begin
+--
+--     forward substitution
+--
+      u(1):= r(1)/d(1);
+      for j in 2..d'Last loop
+        u(j):= (r(j) - dl(j-1)*u(j-1))/d(j);
+      end loop;
+--
+--     back substitution
+--
+      u(d'Last):= r(d'Last)/d(d'Last);
+      for j in reverse 1..d'Last-1 loop
+        u(j) := (u(j) - dl(j)*u(j+1))/d(j);
+      end loop;
+
+   end SolTri;
 
    procedure CG ( A : in Any_matrix;
                   b : vector;
-                  x : in out vector;    -- input:  1st approx;
-                                        -- output: solution of Ax=b
+                  x : in out vector;    -- * input:  1st approx;
+                                        -- * output: solution of Ax=b
                   tol: real;            -- tolerance
                   precond: t_precond;   -- kind of preconditioning
-                  precd, precl: vector; -- diag. & lower diag. of precond.
                   itmax: index;         -- maximum number of iterations
                   ite: out index        -- last iteration
                 ) is
@@ -25,9 +135,11 @@ package body ConjGrad is
 
       r,s,q : vector(1 .. neq); -- vecteurs de travail
 
-      r20, rs, rsold, r2, qaq, alpha, beta : real;
+      rs, rsold, qaq, alpha, beta : real;
 
-      tol2: constant real:= tol * tol;
+      -- tol2: constant real:= tol * tol;
+
+      precd, precl, precu: vector( x'Range );
 
 -------------------------------------------------------------------------
 --     resolution d'un systeme lineaire symetrique defini positif
@@ -79,10 +191,11 @@ package body ConjGrad is
 
      end soltri;
 
-   begin
---
---     initialisation
---
+   begin -- CG
+      iteration_at_failure:= 0;
+
+      Prepare_Precondition(A,precond,precd,precl,precu);
+
       for i in 1..neq loop
          s(i) := 0.0;
       end loop;
@@ -93,14 +206,11 @@ package body ConjGrad is
          r(i) := b(i) - s(i);   -- r:= b - s
       end loop;
 
-      r20 := 0.0;
-      for i in 1..neq loop
-         r20 := r20 + r(i) * r(i);
-      end loop;
 --
 --     iterations
 --
       for ite_cnt in 1..itmax loop
+         iteration_at_failure:= ite_cnt;
          ite:= ite_cnt;
 
          case precond is
@@ -147,13 +257,16 @@ package body ConjGrad is
             r(i) := r(i) - alpha * s(i);   -- r:= r - alpha*a*q
          end loop;
 
-         r2 := 0.0;
-         for i in 1..neq loop
-            r2 := r2 + r(i) * r(i);
-         end loop;
+--         r2 := 0.0;
+--         for i in 1..neq loop
+--            r2 := r2 + r(i) * r(i);
+--         end loop;
 
-         if  r2 / r20 < tol2 then return; end if;
+--         if  r2 / r20 < tol2 then return; end if;
          --if  sqrt(r2 / r20) < tol then return; end if;
+
+         if  sqrt(r*r) < tol then return; end if;
+         -- 30-Nov-2001: critere absolu, comme bicgstab
 
       end loop;
 
@@ -161,15 +274,14 @@ package body ConjGrad is
 
    end CG;
 
-   procedure BiCGStab ( A : in Any_matrix;
+   procedure BiCGStab ( A : in Any_matrix; -- (not "in" - GNAT optm pblm)
                         b : vector;
-                        x : in out vector;    -- input:  1st approx;
-                                              -- output: solution of Ax=b
+                        x : in out vector;    -- * input:  1st approx;
+                                              -- * output: solution of Ax=b
                         eps_rho  : real;      -- minimal step allowed
                         tol_omega: real;      -- tolerance
                         tol      : real;      -- tolerance
                         precond: t_precond;   -- kind of preconditioning
-                        precd, precl: vector; -- diag. & lower diag. of precond.
                         itmax: index;         -- maximum number of iterations
                         ite: out index        -- last iteration
                       ) is
@@ -196,9 +308,13 @@ package body ConjGrad is
 
       tol2: constant real:= tol * tol;
 
-      ite_dbg: index:= 0;
+      precd, precl, precu: vector( x'Range );
 
-   begin
+   begin -- BiCGStab
+      iteration_at_failure:= 0;
+
+      Prepare_Precondition(A,precond,precd,precl,precu);
+
       Mult( A, x, s);  -- s:= A*x
 
 -- put_line("b"&integer'image(b'length));
@@ -215,7 +331,7 @@ package body ConjGrad is
       Copy( r, v );  --  "
 
       for ite_cnt in 1..itmax loop -- Main iteration loop
-         ite_dbg:= ite_cnt;
+         iteration_at_failure:= ite_cnt;
          ite:=     ite_cnt;
 
          rho := r * r_tild;
@@ -299,11 +415,12 @@ package body ConjGrad is
 
        raise not_converging;
 
-    exception
-      when others =>
-        Ada.Text_IO.Put("Exception occured in BiCGStab at iteration " &
-            index'Image(ite_dbg) & '/' & index'Image(itmax) );
-        raise;
+    -- exception
+    --  when others =>
+    --    Put("Exception occured in BiCGStab at iteration " &
+    --        index'image(ite_dbg) & '/' & index'image(itmax) );
+    --    raise;
+
     end BiCGStab;
 
 end ConjGrad;

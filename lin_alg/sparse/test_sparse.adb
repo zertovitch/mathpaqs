@@ -29,16 +29,18 @@ procedure Test_Sparse is
 
   package Methodes_Gradient is
     new ConjGrad (
-           Real       => Real,
-           index      => Integer,
-           Vector     => Vector,
-           Any_matrix => Spa.CRS_matrix,
-           Rows       => Spa.rows,
-           Copy       => Spa.Copy,
-           "*"        => Spa."*",
-           Add_scaled => Spa.Add_scaled,
-           Scale      => Spa.Scale,
-           Mult       => Spa.Mult
+           Real              => Real,
+           index             => Integer,
+           Vector            => Vector,
+           Any_matrix        => Spa.CRS_matrix,
+           Get               => Spa.Get,
+           Rows              => Spa.Rows,
+           Defined_symmetric => Spa.Defined_symmetric,
+           Copy              => Spa.Copy,
+           "*"               => Spa."*",
+           Add_scaled        => Spa.Add_scaled,
+           Scale             => Spa.Scale,
+           Mult              => Spa.Mult
         );
 
   use Spa, Methodes_Gradient;
@@ -52,7 +54,7 @@ procedure Test_Sparse is
   itmax: constant := 10 * neq;
   nnz_estim: constant:= neq * 5;
   A: constant p_CRS_matrix:= new CRS_matrix( neq+1, nnz_estim );
-  x, b, precd, precl: constant p_Vector:= new Vector(1..neq);
+  x, b: constant p_Vector:= new Vector(1..neq);
   tmp: Real;
   na: Natural;
   nite: Natural;
@@ -142,7 +144,7 @@ procedure Test_Sparse is
 
     BiCGStab(A.all,b.all,x.all, 1.0e-20, 1.0e-12, 1.0e-12,
              none,
-             precd.all, precl.all, itmax, nite
+             itmax, nite
     );
 
     T2 := Clock; -- CPU_Clock;
