@@ -93,43 +93,16 @@ package body ConjGrad is
     end case;
   end Prepare_Precondition;
 
-   procedure SolTri(d,dl,r: vector; u: in out vector) is
-    --     solve the tridiagonal linear system a.u = r
-    --     neq: number of equations
-    --     d :  main diagonal of matrix l, the cholesky decomposition of a
-    --     dl: lower diagonal of matrix l, the cholesky decomposition of a
-    --     r : second member
-    --     u : solution
-    --
-    --     this routine uses the cholesky decomposition of the matrix a
-    --
-   begin
---
---     forward substitution
---
-      u(1):= r(1)/d(1);
-      for j in 2..d'Last loop
-        u(j):= (r(j) - dl(j-1)*u(j-1))/d(j);
-      end loop;
---
---     back substitution
---
-      u(d'Last):= r(d'Last)/d(d'Last);
-      for j in reverse 1..d'Last-1 loop
-        u(j) := (u(j) - dl(j)*u(j+1))/d(j);
-      end loop;
-
-   end SolTri;
-
-   procedure CG ( A : in Any_matrix;
-                  b : vector;
-                  x : in out vector;    -- * input:  1st approx;
-                                        -- * output: solution of Ax=b
-                  tol: real;            -- tolerance
-                  precond: t_precond;   -- kind of preconditioning
-                  itmax: index;         -- maximum number of iterations
-                  ite: out index        -- last iteration
-                ) is
+  procedure CG ( A : in Any_matrix;
+                 b : vector;
+                 x : in out vector;    -- * input:  1st approx;
+                                       -- * output: solution of Ax=b
+                 tol: real;            -- tolerance
+                 precond: t_precond;   -- kind of preconditioning
+                 itmax: index;         -- maximum number of iterations
+                 ite: out index        -- last iteration
+               )
+  is
 
       neq :   constant index:= Rows(A);
 
@@ -163,7 +136,7 @@ package body ConjGrad is
 --     ite: nombre d'iterations effectuees, si ite >= neq, erreur
 --     r,s,q: vecteur de travail de longueur neq
 
-     procedure soltri (d, dl, r: vector; u: in out vector) is
+     procedure SolTri (d, dl, r: vector; u: in out vector) is
      --     solve the tridiagonal linear system a.u = r
      --     d: main diagonal of matrix l, the cholesky decomposition of a
      --     dl: lower diagonal of matrix l, the cholesky decomposition of a
@@ -189,7 +162,7 @@ package body ConjGrad is
           u(j) := (u(j) - dl(j) * u(j + 1)) / d(j);
         end loop;
 
-     end soltri;
+     end SolTri;
 
    begin -- CG
       iteration_at_failure:= 0;
@@ -300,7 +273,7 @@ package body ConjGrad is
 --     ite: nombre d'iterations effectuees
 
       rhoold: real:= 1.0;
-      rho, alpha, beta, omega, r20: real;
+      rho, alpha, beta, omega: real;
 
       neq: constant index:= Rows(A);
 
@@ -323,7 +296,7 @@ package body ConjGrad is
       Copy( b, r );                -- r:= b;
       Add_scaled( -1.0, s, r);     -- r:= b - s
 
-      r20 := r * r;
+      -- r20 := r * r;
       Copy( r, r_tild ); -- r_tild:= r;
 
       alpha:= 0.0;   -- just to calm down GNAT's warnings

@@ -4,7 +4,8 @@
 --                     Compressed Row Storage (CRS) format
 --                     doc. @ http://www.netlib.org/
 --
---  Date / Version:  21-Nov-2010 ; 8-Jun-2001 ; ... ; 29-Mar-1999
+--  Date / Version:  01-Jan-2011 ; 21-Nov-2010 ;
+--                   08-Jun-2001 ; ... ; 29-Mar-1999
 --
 --  Author:          Olivier Besson, Universite de Neuchatel & Cray research
 --                   Olivier.Besson (at) UniNe.ch
@@ -19,9 +20,9 @@
 with Ada.Unchecked_Deallocation;
 
 generic
-  type real is digits <>;
-  type index is range <>;
-  type vector is array(index range <>) of real;
+  type Real is digits <>;
+  type Index is range <>;
+  type Vector is array(Index range <>) of Real;
 
 package Sparse is
 

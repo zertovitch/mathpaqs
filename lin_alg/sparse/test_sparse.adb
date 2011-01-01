@@ -62,16 +62,16 @@ procedure Test_Sparse is
   function nnz(n1, n2, neq: Natural) return Natural is
     -- determination de la structure de la matrice
     na: Natural:= 0;
-    begin
-      for m in 1..neq loop
-         if  m > n1  then na := na + 1; end if;
-         if  m > 1   then na := na + 1; end if;
-         na := na + 1;
-         if  m + 1 <= neq   then na := na + 1; end if;
-         if  m + n1 <= neq  then na := na + 1; end if;
-      end loop;
-      return na;
-   end ;
+  begin
+    for m in 1..neq loop
+       if  m > n1  then na := na + 1; end if;
+       if  m > 1   then na := na + 1; end if;
+       na := na + 1;
+       if  m + 1 <= neq   then na := na + 1; end if;
+       if  m + n1 <= neq  then na := na + 1; end if;
+    end loop;
+    return na;
+ end nnz;
 
   begin
     Put("dim:"); Put(neq); New_Line;

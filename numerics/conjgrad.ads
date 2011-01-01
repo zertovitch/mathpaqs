@@ -3,7 +3,8 @@
 --  Description:     Conjugate gradient iterative methods for Ax=b
 --                   Generic package (independent of matrix type)
 --
---  Date / Version:  21-Nov-2010 ; 30-Nov-2001 ; 8-Jun-2001 ; 29-Mar-1999
+--  Date / Version:  01-Jan-2011 ; 21-Nov-2010 ;
+--                   30-Nov-2001 ; 08-Jun-2001 ; 29-Mar-1999
 --
 --  Author:          Olivier Besson, Universite de Neuchatel & Cray research
 --                   Olivier.Besson (at) UniNe.ch
@@ -12,14 +13,14 @@
 --                   http://gautiersblog.blogspot.com/
 --
 ------------------------------------------------------------------------------
--- 01-Jan-2010 : merged with 30-Nov-2001 version
+-- 01-Jan-2011 : merged with 30-Nov-2001 version
 -- 12-Oct-2001 : preconditioner fully managed by CG/BiCGStab algorithms
 
 generic
 
-  type real is digits <>;
-  type index is range <>;
-  type vector is array(index range <>) of real;
+  type Real is digits <>;
+  type Index is range <>;
+  type Vector is array(Index range <>) of Real;
 
   type Any_matrix (<>) is private;
   -- NB: 2 syntaxes for instanciating that as unconstrained type :
