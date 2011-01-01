@@ -11,13 +11,13 @@ package body SparseB is
   procedure Copy( u: in vector; v: out vector ) is
   begin
     -- v:= u(v'range);      -- Variante (A) < 1-May-2001.
-    
+
     for i in v'Range loop   -- Variante (B)
       v(i):= u(i);
     end loop;
-    
+
     -- Hansbo problem 100x100x800, IBM Thinkpad 500 Mhz, GNAT 3.13p
-    
+
     -- (A) >>>> STILS_TMQ1 : 5394 sec. =~  89 min.
     -- (B) >>>> STILS_TMQ1 : 2000 sec. =~  33 min.  --> 37%
   end;
@@ -30,14 +30,14 @@ package body SparseB is
     end loop;
     return uv;
   end;
-                                             
+
   procedure Add_scaled( factor: real; u: in vector; v: in out vector ) is
   begin
     for i in u'Range loop
       v(i):= v(i) + factor * u(i);
     end loop;
   end;
- 
+
   procedure Scale( factor: real; u: in out vector ) is
   begin
     for i in u'Range loop

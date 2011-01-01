@@ -6,7 +6,7 @@
 --  Date / Version:  21-Nov-2010 ; 8-Jun-2001 ; 29-Mar-1999
 --
 --  Author:          Olivier Besson, Universite de Neuchatel & Cray research
---                   Olivier.Besson@UniNe.ch
+--                   Olivier.Besson (at) UniNe.ch
 --
 --  Ada version:     Gautier de Montmollin
 --                   http://gautiersblog.blogspot.com/

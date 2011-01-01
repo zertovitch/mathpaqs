@@ -4,16 +4,19 @@
 --                     Compressed Row Storage (CRS) format
 --                     doc. @ http://www.netlib.org/
 --
---  Date / Version:  21-Nov-2010 ; 8-Jun-2001 ; 19-Apr-2001 ; ... ; 29-Mar1999
+--  Date / Version:  21-Nov-2010 ; 8-Jun-2001 ; ... ; 29-Mar-1999
 --
 --  Author:          Olivier Besson, Universite de Neuchatel & Cray research
---                   Olivier.Besson@UniNe.ch
+--                   Olivier.Besson (at) UniNe.ch
 --
---  Ada version:     Gautier.deMontmollin@Winterthur.ch
+--  Ada version:     Gautier de Montmollin
+--                   http://gautiersblog.blogspot.com/
 --
 --  NB: From 8-Jun-2001 version, (bi)conjugate gradient algorithms
 --      are detached in a package independent of matrix type
 ------------------------------------------------------------------------------
+
+with Ada.Unchecked_Deallocation;
 
 generic
   type real is digits <>;
@@ -39,9 +42,11 @@ package Sparse is
      nnz       : index:= nnz_max;       -- must be in [ 1..nnz_max ]
    end record;
 
-   -- Access (pointer) type to matrix:
+   -- Access (pointer) to matrix for dynamic allocation/deallocation:
 
    type p_CRS_matrix is access CRS_matrix;
+
+   procedure Dispose is new Ada.Unchecked_Deallocation(CRS_matrix,p_CRS_matrix);
 
    -- Just returns the symmetric indicator, no verification
 
