@@ -60,12 +60,14 @@ package Discrete_Random_Simulation is
 
   generic
     discrete_random_mode: Discrete_random_simulation_mode;
+	-- ^ this parameter is generic only for performance purposes
+	--   (and you don't want to use more than one method, do you ?)
   function Index(
     U01 : Real; -- Probability value, assumed to be unform in [0,1]
     Fx  : Cumulative_distribution_function -- CDF
   )
   return Natural;
 
-  pragma Inline(Index);
+  pragma Inline(Index); -- for performance
 
 end Discrete_Random_Simulation;
