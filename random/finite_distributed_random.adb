@@ -1,12 +1,15 @@
-function Finite_distributed_random(proba: Proba_array) return Thing is
-  -- subtype AF01 is A_float range 0.0 .. 1.0;
-  U: constant A_float:= Uniform_random;
+function Finite_distributed_random(
+  proba         : Proba_array; -- Contains the probability for each element
+  uniform_random: A_float      -- Uniformily distributed float in [0,1]
+)
+return Thing
+is
   p: A_float:= 0.0;
   Probabilities_dont_sum_up_to_1: exception;
 begin
   for th in Thing loop
-    p:= p + A_float(proba(th));
-    if U < p then
+    p:= p + proba(th);
+    if uniform_random < p then
       return th;
     end if;
   end loop;

@@ -14,16 +14,15 @@ procedure Test_Finite_distributed_random is
   end;
 
   type ABC is (a,b,c);
-  
+
   type Proba_array is array(ABC) of Float;
 
   function ABC_Rand is new
     Finite_distributed_random(
       A_float        => Float,
       Thing          => ABC,
-      Proba_array    => Proba_array,
-      Uniform_random => URand);
-  
+      Proba_array    => Proba_array);
+
   procedure Test( tirages: Positive; proba: Proba_array ) is
     sample: array(ABC) of Natural;
     res: ABC;
@@ -32,7 +31,7 @@ procedure Test_Finite_distributed_random is
     Ada.Numerics.Float_Random.Reset(G);
     sample:= (others => 0);
     for i in 1..tirages loop
-      res:= ABC_Rand( proba );
+      res:= ABC_Rand( proba, URand );
       sample(res):= sample(res) + 1;
     end loop;
     for x in ABC loop
@@ -44,7 +43,7 @@ procedure Test_Finite_distributed_random is
     end loop;
     New_Line;
   end Test;
-  
+
 begin
   --  Test( 1000, (A=> 0.0123, B=> 0.0456, C=> 0.04287) ); (sum /= 1)
   Test(     100_000, (A=> 0.50, B=> 0.25, C=> 0.25) );
