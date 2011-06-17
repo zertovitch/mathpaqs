@@ -32,6 +32,22 @@ package body Generic_Random_Functions is
     end if;
   end Normal_CDF;
 
+  function Poisson(lambda: Real) return Natural is
+    L, p: Real; k: Integer;
+  begin
+    -- Algo in
+    -- http://en.wikipedia.org/wiki/Poisson_distribution#Generating_Poisson-distributed_random_variables
+    L:= exp(-lambda);
+    k:= -1;
+    p:= 1.0;
+    loop
+      k:= k + 1;
+      p:= p * U;
+      exit when p <= L;
+    end loop;
+    return k;
+  end Poisson;
+
   procedure Box_Muller(u1,u2: in Real; n1,n2: out Real) is
     phi, z, r: Real;
   begin
