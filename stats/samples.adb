@@ -42,8 +42,8 @@ package body Samples is
       s.histogram(pos):= s.histogram(pos) + 1;
       s.total_occurences:= s.total_occurences + 1;
     else
-      Raise_Exception 
-       (value_out_of_sample_range'Identity, 
+      Raise_Exception
+       (value_out_of_sample_range'Identity,
         "Value = " & Real'Image(value) &
         "; Sample.min = " & Real'Image(s.min) &
         "; Sample.max = " & Real'Image(s.max) &
@@ -64,6 +64,7 @@ package body Samples is
     q_idx: Integer:= m.level'First;
     cumul_samples, new_cumul_samples: Natural;
     truncated_mu: array(s.histogram'Range) of Real;
+    sub_histo_idx: Real range 0.0..1.0;
   begin
     if s.total_occurences = 0 then
       raise no_occurence;
@@ -98,12 +99,10 @@ package body Samples is
         if s.histogram(i) = 0 then
           raise Unexpected_case;
         end if;
-        -- Linear interoplation
-        m.VaR(q_idx):=
-          s.min + f *
-            (Real(i-1) +
-              (ql-Real(cumul_samples)) / Real(s.histogram(i))
-            );
+        -- Linear interoplation for gaining extra precision
+        -- Rationale: the quantile level can be in the middle of an histogram
+        sub_histo_idx:= (ql-Real(cumul_samples)) / Real(s.histogram(i));
+        m.VaR(q_idx):= s.min + f * (Real(i-1) + sub_histo_idx);
         -- TailVaR(q) = E(X|X>VaR(q)) = E_Q(X)
         -- where probability measure
         -- Q(A) = P(A|X>VaR(q)) = P(A and X>VaR(q)) / P(X>VaR(q))
@@ -112,7 +111,15 @@ package body Samples is
           -- q = 100%, {X>VaR(q)} is empty, then TailVaR is undefined
           m.TailVar(q_idx):= 0.0;
         else
-          m.TailVar(q_idx):= truncated_mu(i) / prob_bigger;
+          if i = s.histogram'First then
+            m.TailVar(q_idx):= truncated_mu(i) / prob_bigger;
+          else -- Extra precision, like for VaR
+            m.TailVar(q_idx):=
+              (truncated_mu(i-1) * (1.0-sub_histo_idx) +
+               truncated_mu(i)   * sub_histo_idx
+              )
+              / prob_bigger;
+          end if;
         end if;
         q_idx:= q_idx + 1;
         if q_idx <= m.level'Last then
