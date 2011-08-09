@@ -28,6 +28,8 @@ package body Samples is
     s.bins_r:= Real(s.bins);
     s.bins_inv:= 1.0 / s.bins_r;
     s.factor:= (s.bins_r - eps) / (max-min);
+    s.sum:= 0.0;
+    s.sum_sq:= 0.0;
     s.initialized:= True;
   end Initialize;
 
@@ -37,6 +39,8 @@ package body Samples is
     if not s.initialized then
       raise sample_not_initialized;
     end if;
+    s.sum:= s.sum + value;
+    s.sum_sq:= s.sum_sq + value*value;
     pos:= 1 + Integer(Real'Floor(s.factor * (value - s.min)));
     if pos in s.histogram'Range then
       s.histogram(pos):= s.histogram(pos) + 1;
@@ -59,7 +63,7 @@ package body Samples is
     m: in out Measure -- "in" are the quantile levels (m.level)
   )
   is
-    f, value, samples, sxi, sxi2, mu, s2,
+    f, value, samples, sxi, mu, s2,
     inv_n, inv_nm1, n, ql, new_ql, prob_bigger: Real;
     q_idx: Integer:= m.level'First;
     cumul_samples, new_cumul_samples: Natural;
@@ -85,14 +89,10 @@ package body Samples is
       sxi:= sxi + samples * value;
       truncated_mu(i):= inv_n * sxi;
     end loop;
-    sxi:= 0.0;
-    sxi2:= 0.0;
     cumul_samples:= 0;
     for i in s.histogram'Range loop
       value:= s.min + f * Real(i);
       samples:= Real(s.histogram(i)); -- # of points for this value
-      sxi:= sxi + samples * value;
-      sxi2:= sxi2 + samples * (value**2);
       new_cumul_samples:= cumul_samples + s.histogram(i);
       while q_idx <= m.level'Last and then Real(new_cumul_samples) >= ql loop
         -- With the cumulative samples, we got past at least one quantile level
@@ -132,8 +132,8 @@ package body Samples is
       end loop;
       cumul_samples:= new_cumul_samples;
     end loop;
-    mu:= inv_n * sxi;
-    s2:= inv_nm1 * (sxi2 - n * mu*mu); -- unbiased estimator for variance
+    mu:= inv_n * s.sum;
+    s2:= inv_nm1 * (s.sum_sq - n * mu*mu); -- unbiased estimator for variance
     if s2 < 0.0 then
       -- cure small numerical inaccuracies in case of zero variance
       -- i.e. all value in the same bin, e.g. a constant random variable

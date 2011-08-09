@@ -13,8 +13,11 @@ project Mathpaqs is
    case Build_Mode is
 
       when "Debug" =>
-         for Main use ("test_copulas.adb", "test_cholesky.adb", "test_ert.adb", "gnat_int.adb", "test_rsa.adb",
-           "test_u_rand.adb", "test_sparse.adb", 
+         for Main use (
+           "test_copulas.adb", "test_samples.adb", "test_u_rand.adb", -- proba / stat
+           "test_sparse.adb", "test_cholesky.adb", -- lin algebra
+           "test_ert.adb", -- algebra
+           "gnat_int.adb", "test_rsa.adb", -- multiple precision integers
            "fractal.adb", "biomorph.adb",
            "champ_vt.adb", "arenstorf.adb"
            );

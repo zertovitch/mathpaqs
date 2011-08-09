@@ -8,7 +8,7 @@
 --
 -- Legal licensing note:
 
---  Copyright (c) 2007..2009 Gautier de Montmollin
+--  Copyright (c) 2007..2011 Gautier de Montmollin
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -37,8 +37,6 @@ generic
   type Quantile_table is array(Positive range <>) of Real;
 
 package Samples is
-
-  type Histogram_type is array(Natural range <>) of Natural;
 
   ------------------------
   -- Random sample type --
@@ -105,14 +103,17 @@ package Samples is
 
 private
 
+  type Histogram_type is array(Natural range <>) of Natural;
+
   type Sample(bins: Positive) is record
     histogram       : Histogram_type(1..bins);
     min, max        : Real;
     width_inv       : Real;
-    total_occurences: Natural:= 0;
+    total_occurences: Natural;
     bins_r          : Real;
     bins_inv        : Real;
     factor          : Real;
+    sum, sum_sq     : Real;
     initialized     : Boolean:= False;
   end record;
 
