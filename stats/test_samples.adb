@@ -20,6 +20,10 @@ procedure Test_Samples is
     0.9999
    );
 
+  -- R:
+  -- quantile(t, c(0.0, 0.0001, 0.001, 0.01, ...))
+  -- write.csv2(quantile(t, c(0.0, 0.0001, 0.001, 0.01, ...)),file="quant.csv")
+
   m: RS.Measure(level'Last);
 
   package RIO is new Ada.Text_IO.Float_IO(Real);
@@ -60,6 +64,8 @@ begin
   Create(f, Out_File, "test_samples.csv");
   --
   Title("=== Trivial test 1: add only 0 as occurence");
+  -- R:
+  -- t <- sample(c(0),1000,TRUE)
   RS.Initialize(s, 0.0, 1000.0);
   for i in 1..10_000 loop
     RS.Add_occurence(s, 0.0);
@@ -78,6 +84,8 @@ begin
   Display_Measure(m);
   --
   Title("=== Easy test 3: discrete uniform, 2 points");
+  -- R:
+  -- t <- sample(c(-10,10),100000,TRUE)
   RS.Initialize(s, -10.0, 10.0);
   for i in 1..100_000 loop
     RS.Add_occurence(s, -10.0);
@@ -88,6 +96,8 @@ begin
   Display_Measure(m);
   --
   Title("=== Easy test 4: uniform");
+  -- R:
+  -- t <- runif(100000,-10,10)
   RS.Initialize(s, -10.0, 10.0);
   for i in 0..large_1 loop
     RS.Add_occurence(s, 20.0 * Real(i) / Real(large_1) - 10.0);
