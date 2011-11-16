@@ -49,14 +49,20 @@ package body U_Rand is
     procedure Randomize (Gen : out Generator) is
       use Ada.Calendar;
       Day_Seconds: constant Day_Duration:= Seconds(Clock);
-      Hour, Min, Sec, Cent : Integer;
+      All_Sec, Hour, Min, Sec, Cent : Integer;
     begin
-      Sec := Integer(Day_Seconds);
-      Cent:= Integer(100.0 * (Day_Seconds-Duration(Sec)));
-      Hour:= Sec/3600 + 1;
-      Min := (Sec/60) rem 60 + 1;
-      Sec := Sec rem 60 + 1;
-      Start (Gen, New_I => Hour, New_J => Min, New_K => Sec, New_L => Cent);
+      All_Sec := Integer(Float'Floor(Float(Day_Seconds)));
+      Cent:= Integer(100.0 * (Day_Seconds-Duration(All_Sec)));
+      Hour:= All_Sec/3600;
+      Min := (All_Sec/60) rem 60;
+      Sec := All_Sec rem 60;
+      Start(
+        Gen,
+        New_I => Hour + 1,
+        New_J => Min + 1,
+        New_K => Sec + 1,
+        New_L => Cent
+      );
     end Randomize;
 
     type Pointer is access all Generator;

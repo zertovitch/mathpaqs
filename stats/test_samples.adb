@@ -1,4 +1,5 @@
 with Samples;
+with Generic_Random_Functions, U_Rand;
 
 with Ada.Text_IO;                       use Ada.Text_IO;
 
@@ -8,6 +9,10 @@ procedure Test_Samples is
   type Quantile_table is array(Positive range <>) of Real;
 
   package RS is new Samples(Real, Quantile_table);
+
+  package GRF is new Generic_Random_Functions(Real);
+  package RUR is new U_Rand(Real);
+  Gen: RUR.Generator;
 
   s: RS.Sample(10_000);
 
@@ -31,10 +36,12 @@ procedure Test_Samples is
 
   f: File_Type;
 
+  sep: constant Character:= ';';
+
   procedure Title(t: String) is
   begin
     Put_Line(t);
-    Put_Line(f, t);
+    Put_Line(f, t & sep & "------------");
   end Title;
 
   procedure Display_Measure(m: RS.Measure) is
@@ -50,20 +57,21 @@ procedure Test_Samples is
       New_Line;
       --
       Put(f, m.VaR(i));
-      Put(f, ';');
+      Put(f, sep);
       Put(f, m.level(i));
       New_Line(f);
     end loop;
   end Display_Measure;
 
   large_1: constant:= 100_000;
+  u, u1, u2, n1, n2: Real;
 
 begin
   m.level:= level;
   -- Output file for further study, graphics,...
   Create(f, Out_File, "test_samples.csv");
   --
-  Title("=== Trivial test 1: add only 0 as occurence");
+  Title("=== Trivial test: add only 0 as occurence");
   -- R:
   -- t <- sample(c(0),1000,TRUE)
   RS.Initialize(s, 0.0, 1000.0);
@@ -74,7 +82,7 @@ begin
   Put_Line("Mean should be zero, std dev should be zero.");
   Display_Measure(m);
   --
-  Title("=== Trivial test 2: add only 0.123 as occurence");
+  Title("=== Trivial test: add only 0.123 as occurence");
   RS.Initialize(s, 0.0, 1000.0); -- !! narrow it
   for i in 1..100_000 loop
     RS.Add_occurence(s, 0.0123);
@@ -83,7 +91,7 @@ begin
   Put_Line("Mean should be 0.0123, std dev should be zero.");
   Display_Measure(m);
   --
-  Title("=== Easy test 3: discrete uniform, 2 points");
+  Title("=== Easy test: Discrete Uniform, 2 points");
   -- R:
   -- t <- sample(c(-10,10),100000,TRUE)
   RS.Initialize(s, -10.0, 10.0);
@@ -92,18 +100,35 @@ begin
     RS.Add_occurence(s,  10.0);
   end loop;
   RS.Get_measures(s,m);
-  Put_Line("Mean should be zero, std dev should be 10.");
+  Put_Line("Mean should be zero, std dev should converge to 10.");
   Display_Measure(m);
   --
-  Title("=== Easy test 4: uniform");
+  Title("=== Easy test: Uniform");
   -- R:
   -- t <- runif(100000,-10,10)
   RS.Initialize(s, -10.0, 10.0);
   for i in 0..large_1 loop
-    RS.Add_occurence(s, 20.0 * Real(i) / Real(large_1) - 10.0);
+    u:= Real(i) / Real(large_1);
+    RS.Add_occurence(s, 20.0 * u - 10.0);
   end loop;
   RS.Get_measures(s,m);
-  Put_Line("Mean should be zero, std dev should be 10/sqrt(3) ~= 5.77350269.");
+  Put_Line("Mean should converge to zero, std dev should converge to 10/sqrt(3) ~= 5.77350269.");
+  Display_Measure(m);
+  --
+  Title("=== Easy test: Normal");
+  -- R:
+  -- t <- runif(100000,-10,10)
+  RS.Initialize(s, -100.0, 100.0);
+  RS.Add_occurence(s, -100.0); -- !!
+  RUR.Reset(Gen);
+  for i in 1..1_000_000 loop
+    u1:= RUR.Random(Gen);
+    u2:= RUR.Random(Gen);
+    GRF.Box_Muller(u1,u2,n1,n2);
+    RS.Add_occurence(s, n1);
+  end loop;
+  RS.Get_measures(s,m);
+  Put_Line("Mean should converge to zero, std dev should converge to 1.");
   Display_Measure(m);
   --
   Close(f);
