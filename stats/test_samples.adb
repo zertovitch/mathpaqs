@@ -28,13 +28,14 @@ procedure Test_Samples is
   -- R:
   -- quantile(t, c(0.0, 0.0001, 0.001, 0.01, ...))
   -- write.csv2(quantile(t, c(0.0, 0.0001, 0.001, 0.01, ...)),file="quant.csv")
+  -- ^ this is written in the R commands file
 
   m: RS.Measure(level'Last);
 
   package RIO is new Ada.Text_IO.Float_IO(Real);
   use RIO;
 
-  f: File_Type;
+  f, r_commands: File_Type;
 
   sep: constant Character:= ';';
 
@@ -70,6 +71,15 @@ begin
   m.level:= level;
   -- Output file for further study, graphics,...
   Create(f, Out_File, "test_samples.csv");
+  Create(r_commands, Out_File, "r_commands.txt");
+  Put(r_commands, "write.csv2(quantile(t, c(");
+  for i in m.level'Range loop
+    Put(r_commands, m.level(i));
+    if i < m.level'Last then
+      Put(r_commands, ',');
+    end if;
+  end loop;
+  Put_Line(r_commands, ")),file=""quant.csv"")");
   --
   Title("=== Trivial test: add only 0 as occurence");
   -- R:
@@ -117,7 +127,7 @@ begin
   --
   Title("=== Easy test: Normal");
   -- R:
-  -- t <- runif(100000,-10,10)
+  -- t <- rnorm(1000000,0,1)
   RS.Initialize(s, -100.0, 100.0);
   RS.Add_occurence(s, -100.0); -- !!
   RUR.Reset(Gen);
@@ -132,4 +142,5 @@ begin
   Display_Measure(m);
   --
   Close(f);
+  Close(r_commands);
 end Test_Samples;
