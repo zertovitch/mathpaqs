@@ -89,23 +89,28 @@ package body Samples is
       sxi:= sxi + samples * value;
       truncated_mu(i):= inv_n * sxi;
     end loop;
+    --
     cumul_samples:= 0;
     for i in s.histogram'Range loop
       value:= s.min + f * Real(i);
       samples:= Real(s.histogram(i)); -- # of points for this value
       new_cumul_samples:= cumul_samples + s.histogram(i);
-      while q_idx <= m.level'Last and then Real(new_cumul_samples) >= ql loop
+      while q_idx <= m.level'Last and then ql <= Real(new_cumul_samples) loop
         -- With the cumulative samples, we got past at least one quantile level
         if s.histogram(i) = 0 then
           raise Unexpected_case;
         end if;
-        -- Linear interoplation for gaining extra precision
-        -- Rationale: the quantile level can be in the middle of an histogram
-        sub_histo_idx:= (ql-Real(cumul_samples)) / Real(s.histogram(i));
+        -- Linear interpolation, for regaining a bit of the precision lost
+        -- by having histogram points instead of all exact values of the
+        -- statistic.
+        -- Rationale: the quantile level * number of observations (ql)
+        -- can be in the middle of an histogram count.
+        sub_histo_idx:= (ql - Real(cumul_samples)) / Real(s.histogram(i));
         m.VaR(q_idx):= s.min + f * (Real(i-1) + sub_histo_idx);
         -- TailVaR(q) = E(X|X>VaR(q)) = E_Q(X)
-        -- where probability measure
-        -- Q(A) = P(A|X>VaR(q)) = P(A and X>VaR(q)) / P(X>VaR(q))
+        --
+        -- Probability measure Q is defined by
+        -- Q(A) = P(A | X>VaR(q)) = P(A and X>VaR(q)) / P(X>VaR(q))
         prob_bigger:= (1.0 - m.level(q_idx));
         if Almost_zero(prob_bigger) then
           -- q = 100%, {X>VaR(q)} is empty, then TailVaR is undefined
