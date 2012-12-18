@@ -26,7 +26,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      OUTPUT : THE REAL VECTOR  X
     --
-    --      METHOD : GUASS-JORDAN ELIMINATION USING MAXIMUM ELEMENT
+    --      METHOD : GAUSS-JORDAN ELIMINATION USING MAXIMUM ELEMENT
     --               FOR PIVOT.
     --
     --      EXCEPTION : MATRIX_DATA_ERROR IF 'A' IS SINGULAR
@@ -39,7 +39,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --      revised 10/8/88 for nested generics
     --      revised 8/8/90 for ISO NRG proposed standard packages interface
 
-    N : INTEGER := A'LENGTH(1) ;          -- NUMBER OF EQUATIONS
+    N : constant INTEGER := A'LENGTH(1) ; -- NUMBER OF EQUATIONS
     X : REAL_VECTOR ( 1 .. N ) ;          -- RESULT BEING COMPUTED
     B : REAL_MATRIX ( 1 .. N , 1 .. N + 1 ) ;  -- WORKING MATRIX
     ROW : array ( 1 .. N ) of INTEGER ;   -- ROW INTERCHANGE INDICIES
@@ -129,7 +129,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      OUTPUT : THE REAL MATRIX  X
     --
-    --      METHOD : GUASS-JORDAN ELIMINATION USING MAXIMUM ELEMENT
+    --      METHOD : GAUSS-JORDAN ELIMINATION USING MAXIMUM ELEMENT
     --               FOR PIVOT.
     --
     --      USAGE  :     X := LINEAR_EQUATIONS ( A , Y ) ;
@@ -138,8 +138,8 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --                  ARRAY_INDEX_ERROR IF 'A' IS NOT SQUARE OR
     --                                       ROWS OF 'Y' /= ROWS OF 'A'
 
-    N : INTEGER := A'LENGTH(1) ;               -- NUMBER OF EQUATIONS
-    M : INTEGER := Y'LENGTH(2) ;               -- NUMBER OF SOLUTIONS REQUESTED
+    N : constant INTEGER := A'LENGTH(1) ;      -- NUMBER OF EQUATIONS
+    M : constant INTEGER := Y'LENGTH(2) ;      -- NUMBER OF SOLUTIONS REQUESTED
     X : REAL_MATRIX ( 1 .. N , 1 .. M ) ;      -- RESULT BEING COMPUTED
     B : REAL_MATRIX ( 1 .. N , 1 .. N + M ) ;  -- WORKING MATRIX
     ROW : array ( 1 .. N ) of INTEGER ;        -- ROW INTERCHANGE INDICIES
@@ -230,7 +230,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      OUTPUT : THE REAL VALUE   D
     --
-    --      METHOD : GUASS-JORDAN ELIMINATION USING MAXIMUM ELEMENT
+    --      METHOD : GAUSS-JORDAN ELIMINATION USING MAXIMUM ELEMENT
     --               FOR PIVOT.
     --
     --      USAGE  :     D := DETERMINANT ( A ) ;
@@ -239,7 +239,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      WRITTEN BY : JON SQUIRE , 28 MAY 1983
 
-    N : INTEGER := A'LENGTH(1) ;           -- NUMBER OF ROWS
+    N : constant INTEGER := A'LENGTH(1) ;  -- NUMBER OF ROWS
     D : REAL := 1.0 ;                      -- DETERMINANT
     B : REAL_MATRIX ( 1 .. N , 1 .. N ) ;  -- WORKING MATRIX
     ROW : array ( 1 .. N ) of INTEGER ;    -- ROW INTERCHANGE INDICIES
@@ -301,7 +301,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     end loop ;
     return D * B ( ROW( N ) , N) ;
   exception
-    when CONSTRAINT_ERROR | NUMERIC_ERROR => -- catches overflow
+    when CONSTRAINT_ERROR => -- catches overflow
       return 0.0 ;
   end DETERMINANT ;
 
@@ -314,7 +314,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      OUTPUT : THE INVERSE OF MATRIX  A
     --
-    --      METHOD : GUASS-JORDAN ELIMINATION USING MAXIMUM ELEMENT
+    --      METHOD : GAUSS-JORDAN ELIMINATION USING MAXIMUM ELEMENT
     --               FOR PIVOT.
     --
     --      EXCEPTION : MATRIX_DATA_ERROR RAISED IF INVERSE CAN NOT BE COMPUTED
@@ -325,7 +325,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      WRITTEN BY : JON SQUIRE , 3 FEB 1983
 
-    N : INTEGER := A'LENGTH ;                 -- SIZE OF MATRIX
+    N : constant INTEGER := A'LENGTH ;        -- SIZE OF MATRIX
     AA : REAL_MATRIX ( 1 .. N , 1 .. N ) ;    -- WORKING MATRIX
     TEMP : REAL_VECTOR ( 1 .. N ) ;           -- TEMPORARY FOR UNSCRAMBLING ROWS
     ROW , COL : array ( 1 .. N ) of INTEGER ; -- ROW,COLUMN INTERCHANGE INDICIES
@@ -440,7 +440,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      OUTPUT : THE INVERSE OF MATRIX  A, IN PLACE
     --
-    --      METHOD : GUASS-JORDAN ELIMINATION USING MAXIMUM ELEMENT
+    --      METHOD : GAUSS-JORDAN ELIMINATION USING MAXIMUM ELEMENT
     --               FOR PIVOT.
     --
     --      EXCEPTION : MATRIX_DATA_ERROR RAISED IF INVERSE CAN NOT BE COMPUTED
@@ -448,7 +448,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      SAMPLE USE :  INVERSE ( SOME_MATRIX ) ;
 
-    N : INTEGER := A'LENGTH ;                 -- SIZE OF MATRIX
+    N : constant INTEGER := A'LENGTH ;        -- SIZE OF MATRIX
     AA : REAL_MATRIX ( 1 .. N , 1 .. N ) ;    -- WORKING MATRIX
     ROW , COL : array ( 1 .. N ) of INTEGER ; -- ROW,COLUMN INTERCHANGE INDICIES
     TEMP : REAL_VECTOR ( 1 .. N ) ;           -- TEMP ARRAY FOR UNSCRAMBLING
@@ -577,7 +577,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      WRITTEN BY : JON SQUIRE , 11/30/88
 
-    N : INTEGER := A'LENGTH ;                  -- NUMBER OF EQUATIONS
+    N : constant INTEGER := A'LENGTH ;         -- NUMBER OF EQUATIONS
     X : REAL_VECTOR ( 1 .. N ) ;               -- RESULT BEING COMPUTED
     Z : REAL_VECTOR ( 1 .. N ) ;               -- TEMPORARY IN BACK SUB
     YY : REAL_VECTOR ( 1 .. N ) ;              -- TEMPORARY IN BACK SUB
@@ -809,12 +809,12 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     KK    : INTEGER;
     TEMP  : REAL;
     BIG   : REAL;
-    OFAL1 : INTEGER := L'FIRST(1) - A'FIRST(1) ;
-    OFAL2 : INTEGER := L'FIRST(2) - A'FIRST(2) ;
-    OFAU1 : INTEGER := U'FIRST(1) - A'FIRST(1) ;
-    OFAU2 : INTEGER := U'FIRST(2) - A'FIRST(2) ;
-    OFAA2 : INTEGER := A'FIRST(2) - A'FIRST(1) ;
-    OFAP  : INTEGER := P'FIRST - A'FIRST(1) ;
+    OFAL1 : constant INTEGER := L'FIRST(1) - A'FIRST(1) ;
+    OFAL2 : constant INTEGER := L'FIRST(2) - A'FIRST(2) ;
+    OFAU1 : constant INTEGER := U'FIRST(1) - A'FIRST(1) ;
+    OFAU2 : constant INTEGER := U'FIRST(2) - A'FIRST(2) ;
+    OFAA2 : constant INTEGER := A'FIRST(2) - A'FIRST(1) ;
+    OFAP  : constant INTEGER := P'FIRST - A'FIRST(1) ;
   begin
     if A'Length(1) /= A'Length(2) or
        A'Length(1) /= L'Length(1) or
@@ -895,10 +895,10 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     X : REAL_VECTOR ( Y'RANGE ) ;
     B : REAL_VECTOR ( Y'RANGE ) ;
     SUM : REAL ;
-    OFYL1 : INTEGER := L'FIRST(1) - Y'FIRST ;
-    OFYL2 : INTEGER := L'FIRST(2) - Y'FIRST ;
-    OFYU1 : INTEGER := U'FIRST(1) - Y'FIRST ;
-    OFYU2 : INTEGER := U'FIRST(2) - Y'FIRST ;
+    OFYL1 : constant INTEGER := L'FIRST(1) - Y'FIRST ;
+    OFYL2 : constant INTEGER := L'FIRST(2) - Y'FIRST ;
+    OFYU1 : constant INTEGER := U'FIRST(1) - Y'FIRST ;
+    OFYU2 : constant INTEGER := U'FIRST(2) - Y'FIRST ;
   begin
     if L'Length(1) /= L'Length(2) or
        L'Length(1) /= U'Length(1) or
@@ -951,15 +951,15 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --                  MATRIX_DATA_ERROR  RAISED IF 'A' IS SINGULAR
     --
 
-    N : INTEGER := A'LENGTH(1) ;              -- SIZE OF MATRIX
+    N : constant INTEGER := A'LENGTH(1) ;     -- SIZE OF MATRIX
     AA : REAL_MATRIX ( 1 .. N , 1 .. N ) ;    -- WORKING MATRIX
     C  : REAL_VECTOR ( 1 .. N ) ;
     D  : REAL_VECTOR ( 1 .. N ) ;
     SCALE, SIGMA, SUM, TAU : REAL ;
-    OFAQ1 : INTEGER := Q'FIRST(1) - 1 ;
-    OFAQ2 : INTEGER := Q'FIRST(2) - 1 ;
-    OFAR1 : INTEGER := R'FIRST(1) - 1 ;
-    OFAR2 : INTEGER := R'FIRST(2) - 1 ;
+    OFAQ1 : constant INTEGER := Q'FIRST(1) - 1 ;
+    OFAQ2 : constant INTEGER := Q'FIRST(2) - 1 ;
+    OFAR1 : constant INTEGER := R'FIRST(1) - 1 ;
+    OFAR2 : constant INTEGER := R'FIRST(2) - 1 ;
   begin
     if N /= A'LENGTH(2) or N /= R'LENGTH(1) or N /= R'LENGTH(2) or
        N /= Q'LENGTH(1) or N /= Q'LENGTH(2) then
@@ -1046,10 +1046,10 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
 
     X : REAL_VECTOR ( Y'RANGE ) ;
     SUM : REAL ;
-    OFYQ1 : INTEGER := Q'FIRST(1) - Y'FIRST ;
-    OFYQ2 : INTEGER := Q'FIRST(2) - Y'FIRST ;
-    OFYR1 : INTEGER := R'FIRST(1) - Y'FIRST ;
-    OFYR2 : INTEGER := R'FIRST(2) - Y'FIRST ;
+    OFYQ1 : constant INTEGER := Q'FIRST(1) - Y'FIRST ;
+    OFYQ2 : constant INTEGER := Q'FIRST(2) - Y'FIRST ;
+    OFYR1 : constant INTEGER := R'FIRST(1) - Y'FIRST ;
+    OFYR2 : constant INTEGER := R'FIRST(2) - Y'FIRST ;
   begin
     if Y'LENGTH /= R'LENGTH(1) or Y'LENGTH /= R'LENGTH(2) or
        Y'LENGTH /= Q'LENGTH(1) or Y'LENGTH /= Q'LENGTH(2) then
@@ -1074,8 +1074,8 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
                                UU : in out REAL_MATRIX ;
                                VV : in out REAL_MATRIX ;
                                WW : in out REAL_VECTOR ) is
-    M:Integer := A'length(1);
-    N:Integer := A'length(2);
+    M: constant Integer := A'length(1);
+    N: constant Integer := A'length(2);
     U:Real_Matrix(1..M,1..N) := A;
     V:Real_Matrix(1..N,1..N);
     W:Real_Vector(1..N);
@@ -1389,8 +1389,8 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
                       V : REAL_MATRIX ;
                       W : REAL_VECTOR ;
                       Y : REAL_VECTOR ) return REAL_VECTOR is
-    M:Integer := U'length(1);
-    N:Integer := U'length(2);
+    M: constant Integer := U'length(1);
+    N: constant Integer := U'length(2);
     S:Real;
     X:Real_Vector(1..N);
     Tmp:Real_Vector(1..N);
