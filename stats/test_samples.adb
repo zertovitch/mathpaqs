@@ -14,6 +14,9 @@ procedure Test_Samples is
   package RUR is new U_Rand(Real);
   Gen: RUR.Generator;
 
+  function Uni01 return Real is begin return RUR.Random(Gen); end;
+  function Poisson is new GRF.Poisson(Uni01);
+
   s: RS.Sample(10_000);
 
   level: constant Quantile_table:=
@@ -146,20 +149,29 @@ begin
   Put_Line("Mean should converge to zero, std dev should converge to 10/sqrt(3) ~= 5.77350269.");
   Display_Measure(m);
   --
-  Title("=== Easy test: Normal(0, 1)");
+  Title("=== Random test: Normal(0, 1)");
   -- R:
   -- t <- rnorm(1000000,0,1)
   RS.Initialize(s, -100.0, 100.0);
   RS.Add_occurence(s, -100.0); -- !!
   RUR.Reset(Gen);
   for i in 1..1_000_000 loop
-    u1:= RUR.Random(Gen);
-    u2:= RUR.Random(Gen);
+    u1:= Uni01;
+    u2:= Uni01;
     GRF.Box_Muller(u1,u2,n1,n2);
     RS.Add_occurence(s, n1);
   end loop;
   RS.Get_measures(s,m);
   Put_Line("Mean should converge to zero, std dev should converge to 1.");
+  Display_Measure(m);
+  --
+  Title("=== Random test: Poisson(lambda = 0.54321)");
+  RS.Initialize(s, 0.0, 100.0);
+  RUR.Reset(Gen);
+  for i in 1..1_000_000 loop
+    RS.Add_occurence(s, Real(Poisson(0.54321)));
+  end loop;
+  RS.Get_measures(s,m);
   Display_Measure(m);
   --
   Title("=== Fuzzy discrete sample");
