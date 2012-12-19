@@ -8,7 +8,7 @@
 --
 -- Legal licensing note:
 
---  Copyright (c) 2007..2011 Gautier de Montmollin
+--  Copyright (c) 2007..2012 Gautier de Montmollin
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,10 @@ generic
 
   type Real is digits <>;
   type Quantile_table is array(Positive range <>) of Real;
+  -- Try to correct sample bin location error compared to actual occurence
+  -- value, by locating the quantile boundary *within* the histogram.
+  -- It improves accuracy, but may look bad with discrete variables.
+  use_sub_histogram_index: Boolean;
 
 package Samples is
 
@@ -81,9 +85,10 @@ package Samples is
     --
     -- level(i): probability level p_i
     level   : Quantile_table(1..quantile_levels);
-    -- VaR(i) such that P(X<VaR(i)) = p_i (x-value of the cumulative prob. F)
+    -- VaR(i) such that P(X<VaR(i)) = p_i
+    -- It is actually the x-value of the cumulative density function F
     VaR     : Quantile_table(1..quantile_levels);
-    -- TailVar(i) = E(X|X>VaR(i))
+    -- TailVaR(i) = E(X|X>=VaR(i))
     TailVaR : Quantile_table(1..quantile_levels);
   end record;
 

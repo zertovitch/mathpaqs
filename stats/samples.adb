@@ -68,7 +68,7 @@ package body Samples is
     q_idx: Integer:= m.level'First;
     cumul_samples, new_cumul_samples: Natural;
     truncated_mu: array(s.histogram'Range) of Real;
-    sub_histo_idx: Real range 0.0..1.0;
+    sub_histo_idx: Real range 0.0..1.0:= 0.0;
   begin
     if s.total_occurences = 0 then
       raise no_occurence;
@@ -105,15 +105,19 @@ package body Samples is
         -- statistic.
         -- Rationale: the quantile level * number of observations (ql)
         -- can be in the middle of an histogram count.
-        sub_histo_idx:= (ql - Real(cumul_samples)) / Real(s.histogram(i));
+        -- Contra: with discrete probabilities, this technique shows counter-
+        -- intuitive results.
+        if use_sub_histogram_index then
+          sub_histo_idx:= (ql - Real(cumul_samples)) / Real(s.histogram(i));
+        end if;
         m.VaR(q_idx):= s.min + f * (Real(i-1) + sub_histo_idx);
-        -- TailVaR(q) = E(X|X>VaR(q)) = E_Q(X)
+        -- TailVaR(q) = E(X|X>=VaR(q)) = E_Q(X)
         --
         -- Probability measure Q is defined by
-        -- Q(A) = P(A | X>VaR(q)) = P(A and X>VaR(q)) / P(X>VaR(q))
+        -- Q(A) = P(A | X>=VaR(q)) = P(A and X>=VaR(q)) / P(X>=VaR(q))
         prob_bigger:= (1.0 - m.level(q_idx));
         if Almost_zero(prob_bigger) then
-          -- q = 100%, {X>VaR(q)} is empty, then TailVaR is undefined
+          -- q = 100%, {X>=VaR(q)} is empty, then TailVaR is undefined
           m.TailVar(q_idx):= 0.0;
         else
           if i = s.histogram'First then

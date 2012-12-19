@@ -8,7 +8,7 @@ procedure Test_Samples is
   type Real is digits 14;
   type Quantile_table is array(Positive range <>) of Real;
 
-  package RS is new Samples(Real, Quantile_table);
+  package RS is new Samples(Real, Quantile_table, True);
 
   package GRF is new Generic_Random_Functions(Real);
   package RUR is new U_Rand(Real);
