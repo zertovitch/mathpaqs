@@ -1,6 +1,6 @@
 -- This is a GNAT, GCC or GNAT Programming Studio (GPS) project file
 -- for Mathpaqs ( http://sf.net/projects/mathpaqs/ )
--- Build me with "gnatmake -P mathpaqs.gpr", or open me with GPS
+-- Build me with "gnatmake -P mathpaqs", or open me with GPS
 --
 project Mathpaqs is
 
@@ -14,10 +14,15 @@ project Mathpaqs is
 
       when "Debug" =>
          for Main use (
-           "test_copulas.adb", "test_samples.adb", "test_u_rand.adb", -- proba / stat
-           "test_sparse.adb", "test_cholesky.adb", -- lin algebra
-           "test_ert.adb", -- algebra
-           "gnat_int.adb", "test_rsa.adb", -- multiple precision integers
+           -- *** Proba / stat
+           "test_copulas.adb", "test_samples.adb", "test_u_rand.adb",
+           "test_poisson.adb",
+           -- *** Linear algebra
+           "test_sparse.adb", "test_cholesky.adb",
+           -- *** Algebra
+           "test_ert.adb",
+           -- *** Multiple precision integers
+           "gnat_int.adb", "test_rsa.adb",
            "fractal.adb", "biomorph.adb",
            "champ_vt.adb", "arenstorf.adb"
            );

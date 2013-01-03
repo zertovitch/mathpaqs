@@ -33,17 +33,22 @@ package body Generic_Random_Functions is
   end Normal_CDF;
 
   function Poisson(lambda: Real) return Natural is
-    L, p: Real; k: Integer;
+    lower_limit, product: Real;
+    k: Integer;
   begin
-    -- Algo in
+    -- Algo found in:
     -- http://en.wikipedia.org/wiki/Poisson_distribution#Generating_Poisson-distributed_random_variables
-    L:= exp(-lambda);
+    -- referring to:
+    -- Knuth (whom else ?!), The Art of Computer Programming,
+    -- Volume 2, Seminumerical algorithms, 3.4.1. Numerical Distributions,
+    -- F. Important integer-valued distributions.
+    lower_limit:= exp(-lambda);
     k:= -1;
-    p:= 1.0;
+    product:= 1.0;
     loop
       k:= k + 1;
-      p:= p * U;
-      exit when p <= L;
+      product:= product * U;
+      exit when product <= lower_limit;
     end loop;
     return k;
   end Poisson;

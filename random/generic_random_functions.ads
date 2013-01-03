@@ -8,7 +8,7 @@
 --
 -- Legal licensing note:
 
---  Copyright (c) 2010..2011 Gautier de Montmollin
+--  Copyright (c) 2010..2013 Gautier de Montmollin
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -43,9 +43,15 @@ generic
 
 package Generic_Random_Functions is
 
-  --------------------------------------------------
-  -- Inverse CDF's and other simulation functions --
-  --------------------------------------------------
+  -----------------------------------------------------------------------------
+  -- ======================================================================= --
+  -- 1. Inverse Cumulative Distribution Functions and other simulation tools --
+  -- ======================================================================= --
+  -----------------------------------------------------------------------------
+
+  -------------------------------------
+  -- 1.1 Continuous random variables --
+  -------------------------------------
 
   ----------------------
   -- Normal variables --
@@ -55,8 +61,12 @@ package Generic_Random_Functions is
   -- independent N(0,1) normal variables from
   -- a pair of independent U(0,1) uniform variables
   --
-  procedure Box_Muller(u1,u2: in Real; n1,n2: out Real);
-  pragma inline(Box_Muller);
+  procedure Box_Muller(u1, u2: in Real; n1, n2: out Real);
+  pragma Inline(Box_Muller);
+
+  -----------------------------------
+  -- 1.2 Discrete random variables --
+  -----------------------------------
 
   -----------------------
   -- Poisson variables --
@@ -64,18 +74,28 @@ package Generic_Random_Functions is
 
   -- lambda is the frequency. E(N) = lambda when N ~ Poisson(lambda)
   -- U is meant to be an U(0,1) uniform generator
-  -- !! This method is suboptimal, since the random generator
-  -- is called several times.
-  -- Ideally it should be called once and passed as a Real variable.
+  -- NB: This method is suboptimal, since the random generator
+  -- is called one or more times. Ideally U should be called once and passed
+  -- as a Real variable to the Poisson function.
   --
   generic
     with function U return Real;
   function Poisson(lambda: Real) return Natural;
-  pragma inline(Poisson);
+  pragma Inline(Poisson);
 
-  -----------
-  -- CDF's --
-  -----------
+  ------------------------------------------
+  -- ==================================== --
+  -- 2. Cumulative Distribution Functions --
+  -- ==================================== --
+  ------------------------------------------
+
+  -------------------------------------
+  -- 2.1 Continuous random variables --
+  -------------------------------------
+
+  ----------------------
+  -- Normal variables --
+  ----------------------
 
   function Normal_CDF(x: Real) return Real;
 
