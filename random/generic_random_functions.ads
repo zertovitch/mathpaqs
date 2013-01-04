@@ -1,7 +1,10 @@
 --------------------------------
 -- Generic_Random_Functions
 --
--- Functions facilitating computations with various random distributions
+-- Functions facilitating computations with various random distributions.
+-- These functions can be called by more elaborate object-oriented
+-- random distribution classes with CDF, Inverse_CDF, or Simulate methods.
+-- The purpose here is a direct, "ad-hoc" utility.
 -------------
 --
 -- Author: G. de Montmollin, February 2010 and later
@@ -49,13 +52,13 @@ package Generic_Random_Functions is
   -- ======================================================================= --
   -----------------------------------------------------------------------------
 
-  -------------------------------------
-  -- 1.1 Continuous random variables --
-  -------------------------------------
+  -----------------------------------------
+  -- 1.1 Continuous random distributions --
+  -----------------------------------------
 
-  ----------------------
-  -- Normal variables --
-  ----------------------
+  --------------------------
+  -- Normal distributions --
+  --------------------------
 
   -- Box-Muller: returns a pair of
   -- independent N(0,1) normal variables from
@@ -64,13 +67,20 @@ package Generic_Random_Functions is
   procedure Box_Muller(u1, u2: in Real; n1, n2: out Real);
   pragma Inline(Box_Muller);
 
-  -----------------------------------
-  -- 1.2 Discrete random variables --
-  -----------------------------------
+  --------------------------
+  -- Pareto distributions --
+  --------------------------
 
-  -----------------------
-  -- Poisson variables --
-  -----------------------
+  function Pareto_inverse_CDF(u: Real; threshold, alpha: Real) return Real;
+  pragma Inline(Pareto_inverse_CDF);
+
+  ---------------------------------------
+  -- 1.2 Discrete random distributions --
+  ---------------------------------------
+
+  ---------------------------
+  -- Poisson distributions --
+  ---------------------------
 
   -- lambda is the frequency. E(N) = lambda when N ~ Poisson(lambda)
   -- U is meant to be an U(0,1) uniform generator
@@ -89,13 +99,13 @@ package Generic_Random_Functions is
   -- ==================================== --
   ------------------------------------------
 
-  -------------------------------------
-  -- 2.1 Continuous random variables --
-  -------------------------------------
+  -----------------------------------------
+  -- 2.1 Continuous random distributions --
+  -----------------------------------------
 
-  ----------------------
-  -- Normal variables --
-  ----------------------
+  --------------------------
+  -- Normal distributions --
+  --------------------------
 
   function Normal_CDF(x: Real) return Real;
 
