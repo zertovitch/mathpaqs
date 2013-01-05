@@ -71,8 +71,13 @@ package Generic_Random_Functions is
   -- Pareto distributions --
   --------------------------
 
-  function Pareto_inverse_CDF(u: Real; threshold, alpha: Real) return Real;
+  function Pareto_inverse_CDF(q, threshold, minus_inv_alpha: Real) return Real;
   pragma Inline(Pareto_inverse_CDF);
+
+  -- q = 1-p where p is the CDF value.
+  -- minus_inv_alpha = -1 / alpha
+  -- For simulating Pareto, you can pass a uniformly generated u~U(0,1) as q,
+  -- instead of 1-u, since 1-u is U(0,1) too.
 
   ---------------------------------------
   -- 1.2 Discrete random distributions --

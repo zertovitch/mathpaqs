@@ -1,16 +1,12 @@
+-- Test Pareto, eventually truncated
+
+with Generic_Random_Functions;
+with U_Rand;
+with Samples;
+
 with Ada.Calendar;                      use Ada.Calendar;
 with Ada.Text_IO;                       use Ada.Text_IO;
-
 with Ada.Numerics.Generic_Elementary_Functions;
-
-with Ada.Numerics.Float_Random;
--- GNAT is using http://fr.wikipedia.org/wiki/Blum_Blum_Shub
--- The generator is not appropriate for use in simulations,
--- only for cryptography, because it is very slow.
---
-with U_Rand;
-
-with Samples;
 
 procedure Test_Pareto is
 
@@ -22,10 +18,7 @@ procedure Test_Pareto is
   package Real_U_Rand is new U_Rand(Real);
 
   -- *** Choice of a random generator: A.N.F_R, or U_Rand (faster), or...:
-  package RRand renames
-    Ada.Numerics.Float_Random;
-    -- Real_U_Rand;
-
+  package RRand renames Real_U_Rand;
   use RRand;
 
   package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
@@ -33,6 +26,9 @@ procedure Test_Pareto is
 
   -- function Pow (X, Y : Long_Float) return Long_Float is
   -- pragma Import (C, Pow, "pow");
+
+  package RRF is new Generic_Random_Functions(Real);
+  use RRF;
 
   type Quantile_table is array(Positive range <>) of Real;
 
@@ -79,66 +75,77 @@ procedure Test_Pareto is
   iter: constant:= 40_000_000;
   bins: constant:= 10_000;
 
-  retention: constant:= 5_000_000.0;
-  exposure : constant:= 5_000_000.0;
+  minimum: constant:= 5_000_000.0;
+  maximum: constant:= 10_000_000.0;
 
-  k    : constant:=  1_000_000.0;
-  alpha: constant:=  0.8;
+  threshold: constant:=  1_000_000.0;
+  alpha    : constant:=  0.8;
 
-  package My_Samples is new Samples(Real, Quantile_table);
+  package My_Samples is new Samples(Real, Quantile_table, True);
   use My_Samples;
 
-  samp: Sample(bins);
-  meas: Measure(quantiles'Last);
+  samp_X, samp_Y: Sample(bins);
+  meas_X, meas_Y: Measure(quantiles'Last);
 
   U, -- uniform
-  X, -- ground-up
-  Y  -- to layer
+  X, -- Pareto
+  Y  -- Truncated
   : Real;
 
   gen: Generator;
 
   T0, T1: Time;
 
-  sum: Real;
+  sum_X, sum_Y: Real:= 0.0;
 
 begin
   Put_Line("Start");
   T0:= Clock;
   Reset(gen, 1);
-  if only_mean then
-    sum:= 0.0;
-  else
-    Initialize(samp, 0.0, exposure);
+  if not only_mean then
+    Initialize(samp_X, minimum, maximum);
+    Initialize(samp_Y, minimum, maximum);
   end if;
   for i in 1..iter loop
     U:= Real(Random(gen));
-    -- X:= k * Pow(U, (-1.0/alpha));
-    -- X:= k * (U ** (-1.0/alpha));
-    -- Y:= Real'Min(exposure, Real'Max(0.0, X - retention));
-    Y:= U * exposure;
+    X:= Pareto_inverse_CDF(
+      q               => U,
+      threshold       => threshold,
+      minus_inv_alpha => -1.0 / alpha
+    );
+    Y:= Real'Min(maximum, Real'Max(minimum, X));
     if only_mean then
-      sum:= sum + Y;
+      sum_X:= sum_X + X;
+      sum_Y:= sum_Y + Y;
     else
-      Add_occurence(samp, Y);
+      Add_occurence(samp_X, X);
+      Add_occurence(samp_Y, Y);
     end if;
   end loop;
   if only_mean then
-    sum:= sum / Real(iter);
+    sum_X:= sum_X / Real(iter);
+    sum_Y:= sum_Y / Real(iter);
   else
-    meas.level:= quantiles;
-    Get_Measures(samp, meas);
+    meas_X.level:= quantiles;
+    meas_Y.level:= quantiles;
+    Get_Measures(samp_X, meas_X);
+    Get_Measures(samp_Y, meas_Y);
   end if;
   T1:= Clock;
   --
   Put_Line("Duration in seconds;" & Duration'Image((T1-T0)));
   --
   if only_mean then
-    Put_Line("Mean;" & Real'Image(sum));
+    Put_Line("Mean;" & Real'Image(sum_X) & Real'Image(sum_Y));
   else
-    Put_Line("Mean;" & Real'Image(meas.mean));
+    Put_Line("Mean;" & Real'Image(meas.mean_X) & Real'Image(meas.mean_Y));
     for q in quantiles'Range loop
-      Put_Line(Integer'Image(q) & ';' & Real'Image(quantiles(q)) & ';' & Real'Image(meas.VaR(q)));
+      Put_Line(
+        Integer'Image(q) & ';' &
+        Real'Image(quantiles(q)) & ';' &
+        Real'Image(meas_X.VaR(q))
+        Real'Image(meas_Y.VaR(q))
+        );
     end loop;
   end if;
 end Test_Pareto;

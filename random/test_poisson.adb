@@ -7,7 +7,7 @@ procedure Test_Poisson is
 
   subtype Real is Long_Float;
 
-  package GRF is new Generic_Random_Functions(Real);
+  package RRF is new Generic_Random_Functions(Real);
   package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
 
 
@@ -16,11 +16,11 @@ procedure Test_Poisson is
   gen: Real_U_Rand.Generator;
 
   function U return Real is begin return Real_U_Rand.Random(gen); end;
-  function Poisson is new GRF.Poisson(U);
+  function Poisson is new RRF.Poisson(U);
 
   package RIO is new Float_IO(Real);
 
-  use GRF, RIO, REF;
+  use RRF, RIO, REF;
 
   samples: constant := 1_000_000;
 

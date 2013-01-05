@@ -63,9 +63,9 @@ package body Generic_Random_Functions is
     n2:= r * Sin(phi);
   end Box_Muller;
 
-  function Pareto_inverse_CDF(u: Real; threshold, alpha: Real) return Real is
+  function Pareto_inverse_CDF(q, threshold, minus_inv_alpha: Real) return Real is
   begin
-    return threshold * (1.0-u) ** (-1.0/alpha);
+    return threshold * q ** (minus_inv_alpha);
   end Pareto_inverse_CDF;
 
 end Generic_Random_Functions;

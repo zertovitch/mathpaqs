@@ -14,8 +14,9 @@ project Mathpaqs is
 
       when "Debug" =>
          for Main use (
-           -- *** Proba / stat
+           -- *** Probabilities / statistics
            "test_copulas.adb", "test_samples.adb", "test_u_rand.adb",
+           "test_pareto.adb",
            "test_poisson.adb",
            -- *** Linear algebra
            "test_sparse.adb", "test_cholesky.adb",
