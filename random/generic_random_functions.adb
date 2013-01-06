@@ -68,4 +68,9 @@ package body Generic_Random_Functions is
     return threshold * q ** (minus_inv_alpha);
   end Pareto_inverse_CDF;
 
+  function Pareto_CDF(x, threshold, alpha: Real) return Real is
+  begin
+    return 1.0 - (threshold / x) ** alpha;
+  end Pareto_CDF;
+
 end Generic_Random_Functions;

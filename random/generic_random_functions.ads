@@ -114,4 +114,10 @@ package Generic_Random_Functions is
 
   function Normal_CDF(x: Real) return Real;
 
+  --------------------------
+  -- Pareto distributions --
+  --------------------------
+
+  function Pareto_CDF(x, threshold, alpha: Real) return Real;
+
 end Generic_Random_Functions;

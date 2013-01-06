@@ -12,7 +12,7 @@ procedure Test_Pareto is
 
   -- Several choices there:
   type Real is digits 15;
-  only_mean: constant Boolean:= True;
+  only_mean: constant Boolean:= False;
   -- use_pow  : constant Boolean:= True;
 
   package Real_U_Rand is new U_Rand(Real);
@@ -68,15 +68,16 @@ procedure Test_Pareto is
     0.9996666666666666,
     0.9998,
     0.9999,   -- 10 k years
-    0.999999, -- 1 mio years (added to PM's list)
-    1.0       -- infinity... (added to PM's list)
+    0.999999, -- 1 mio years
+    1.0       -- infinity...
   );
 
-  iter: constant:= 40_000_000;
+  iter: constant:= 40_000;
   bins: constant:= 10_000;
 
   minimum: constant:= 5_000_000.0;
   maximum: constant:= 10_000_000.0;
+  big_maximum: constant:= maximum * 100.0;
 
   threshold: constant:=  1_000_000.0;
   alpha    : constant:=  0.8;
@@ -89,7 +90,7 @@ procedure Test_Pareto is
 
   U, -- uniform
   X, -- Pareto
-  Y  -- Truncated
+  Y  -- Truncated Pareto
   : Real;
 
   gen: Generator;
@@ -103,7 +104,7 @@ begin
   T0:= Clock;
   Reset(gen, 1);
   if not only_mean then
-    Initialize(samp_X, minimum, maximum);
+    Initialize(samp_X, 0.0, big_maximum);
     Initialize(samp_Y, minimum, maximum);
   end if;
   for i in 1..iter loop
@@ -113,6 +114,7 @@ begin
       threshold       => threshold,
       minus_inv_alpha => -1.0 / alpha
     );
+    X:= Real'Min(big_maximum, X); -- well, we truncate too...
     Y:= Real'Min(maximum, Real'Max(minimum, X));
     if only_mean then
       sum_X:= sum_X + X;
@@ -138,13 +140,14 @@ begin
   if only_mean then
     Put_Line("Mean;" & Real'Image(sum_X) & Real'Image(sum_Y));
   else
-    Put_Line("Mean;" & Real'Image(meas.mean_X) & Real'Image(meas.mean_Y));
+    Put_Line("Mean;" & Real'Image(meas_X.mean) & Real'Image(meas_Y.mean));
     for q in quantiles'Range loop
       Put_Line(
         Integer'Image(q) & ';' &
         Real'Image(quantiles(q)) & ';' &
-        Real'Image(meas_X.VaR(q))
-        Real'Image(meas_Y.VaR(q))
+        Real'Image(meas_X.VaR(q)) & ';' & -- stat. CDF
+        Real'Image(Pareto_CDF(meas_X.VaR(q), threshold, alpha)) & ';' & -- exact CDF
+        Real'Image(meas_Y.VaR(q)) & ';'
         );
     end loop;
   end if;
