@@ -72,15 +72,17 @@ procedure Test_Pareto is
     1.0       -- infinity...
   );
 
-  iter: constant:= 40_000;
-  bins: constant:= 10_000;
+  iter: constant:= 4_000_000;
+  bins: constant:= 200_000;
 
-  minimum: constant:= 5_000_000.0;
-  maximum: constant:= 10_000_000.0;
+  scale: constant:= 100.0; -- 1_000_000.0;
+
+  minimum: constant:= scale * 5.0;
+  maximum: constant:= scale * 10.0;
   big_maximum: constant:= maximum * 100.0;
 
-  threshold: constant:=  1_000_000.0;
-  alpha    : constant:=  0.8;
+  threshold: constant:=  scale;
+  alpha    : constant:=  1.5;
 
   package My_Samples is new Samples(Real, Quantile_table, True);
   use My_Samples;
@@ -138,15 +140,17 @@ begin
   Put_Line("Duration in seconds;" & Duration'Image((T1-T0)));
   --
   if only_mean then
-    Put_Line("Mean;" & Real'Image(sum_X) & Real'Image(sum_Y));
+    Put_Line("Mean X;" & Real'Image(sum_X) & ";Mean Y;" & Real'Image(sum_Y));
   else
-    Put_Line("Mean;" & Real'Image(meas_X.mean) & Real'Image(meas_Y.mean));
+    Put_Line("Mean X;" & Real'Image(meas_X.mean) & ";Mean Y;" & Real'Image(meas_Y.mean));
+    Put_Line("index; quantile; exact X value; statisitical X value; exact CDF of statistical x value; statisitical Y value");
     for q in quantiles'Range loop
       Put_Line(
         Integer'Image(q) & ';' &
         Real'Image(quantiles(q)) & ';' &
-        Real'Image(meas_X.VaR(q)) & ';' & -- stat. CDF
-        Real'Image(Pareto_CDF(meas_X.VaR(q), threshold, alpha)) & ';' & -- exact CDF
+        Real'Image(Pareto_inverse_CDF(1.0-quantiles(q),threshold,-1.0/alpha)) & ';' & -- exact x value
+        Real'Image(meas_X.VaR(q)) & ';' & -- stat. x value
+        Real'Image(Pareto_CDF(meas_X.VaR(q), threshold, alpha)) & ';' & -- exact CDF of statistical x value
         Real'Image(meas_Y.VaR(q)) & ';'
         );
     end loop;
