@@ -12,7 +12,7 @@
 --
 -- Legal licensing note:
 --
---  Copyright (c) 2009..2010 Gautier de Montmollin
+--  Copyright (c) 2009..2013 Gautier de Montmollin
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -88,33 +88,39 @@ package Copulas is
   type Independent_Copula is new Copula with private;
   function Simulate(C: Independent_Copula; gen: Generator) return Real_Vector;
 
-  ------------------------
-  --Gauss copula --
-  ------------------------
+  ---------------------
+  -- Gaussian copula --
+  ---------------------
 
   type Gauss_Copula is new Copula with private;
   function Simulate(C: Gauss_Copula; gen: Generator) return Real_Vector;
-
-  --
-
-  -- Enumerated type describing the different basic kind of copulas
-
-  type Copula_family is
-    (independent,
-     -- elliptic - with a correlation matrix
-     gaussian,
-     student
-    );
 
   procedure Construct_as_Gauss(
     C   : out Copula_access;
     dim : Positive;
     corr: Real_Matrix
   );
-  -- The correlation matrix 'corr' may have less dimensions than c.dim .
-  -- In that case, the other dimensions up to c.dim are considered independent.
+  -- The correlation matrix 'corr' may have less dimensions than C.dim .
+  -- In that case, the other dimensions, from corr'Length(1)+1 up to C.dim,
+  -- are considered independent.
 
   wrong_use, undefined: exception;
+
+  -- Copula_family: enumerated type describing different
+  -- basic kind of copulas.
+  --
+  -- NB: This type was unrelated to the type hierarchy descending from
+  -- type Copula, brought confusion, and was of no practical use here:
+  -- in practice you could have e.g. several gaussien copulas, several
+  -- empirical ones, etc. to be alluded to by an enumerated type.
+  -- So we comment out Copula_family.
+
+  --    type Copula_family is
+  --      (independent,
+  --       -- elliptic - with a correlation matrix
+  --       gaussian,
+  --       student
+  --      );
 
 private
 
