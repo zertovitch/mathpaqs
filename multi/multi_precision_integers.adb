@@ -157,7 +157,7 @@ package body Multi_precision_integers is
   --  - correct code for block sizes smaller than Basic_int
   --  - fixed usage of negative flag
   function Basic(large: Multi_int) return Basic_int is
-    type Same_as_Basic_natural is mod 2 ** (Basic_int'Size-1);
+    type Same_as_Basic_natural is mod 2 ** Basic_int'Size;
     function Shift_Left
       (Value  : Same_as_Basic_natural;
        Amount : Natural) return Same_as_Basic_natural;
