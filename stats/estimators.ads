@@ -3,7 +3,7 @@
 ----------------
 -- This package provides various statistical estimators
 -------------
--- Author: G. de Montmollin, August 2013 and later
+-- Author: G. de Montmollin, September 2013 and later
 --
 -- Legal licensing note:
 
@@ -37,9 +37,9 @@ generic
 
 package Estimators is
 
-  -- Compute a and b for the function u(v):= a + b*u such as
-  -- sum((u(x(i))-y(i)) ** 2) is minimal.
-  -- It is the linear regression using the least squares criterion
+  -- Linear regression using the least squares criterion
+  -- Compute a and b for the function v(u):= a + b * u such as
+  -- sum(( v(x(i)) - y(i) ) ** 2) is minimal.
   procedure Linear_least_squares(x, y: Data_vector; a, b: out Real);
 
   -- Same as above, but assuming x = (1,2,3,...)
