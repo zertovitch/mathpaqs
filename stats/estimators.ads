@@ -42,7 +42,8 @@ package Estimators is
   -- sum(( v(x(i)) - y(i) ) ** 2) is minimal.
   procedure Linear_least_squares(x, y: Data_vector; a, b: out Real);
 
-  -- Same as above, but assuming x = (1,2,3,...)
+  -- Same as above, but assuming x = (1,2,3,...), like the
+  -- Excel LINEST function with only a vector given as parameter.
   procedure Linear_least_squares(y: Data_vector; a, b: out Real);
 
 end Estimators;
