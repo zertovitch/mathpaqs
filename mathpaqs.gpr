@@ -15,17 +15,20 @@ project Mathpaqs is
       when "Debug" =>
          for Main use (
            -- *** Probabilities / statistics
-           "test_copulas.adb", "test_samples.adb", "test_u_rand.adb",
-           "test_pareto.adb",
-           "test_poisson.adb",
+             "test_copulas.adb", "test_u_rand.adb",
+             "test_pareto.adb",
+             "test_poisson.adb",
+           -- *** Statistics
+             "test_samples.adb", 
+             "test_estimators.adb", 
            -- *** Linear algebra
-           "test_sparse.adb", "test_cholesky.adb",
+             "test_sparse.adb", "test_cholesky.adb",
            -- *** Algebra
-           "test_ert.adb",
+             "test_ert.adb",
            -- *** Multiple precision integers
-           "gnat_int.adb", "test_rsa.adb",
-           "fractal.adb", "biomorph.adb",
-           "champ_vt.adb", "arenstorf.adb"
+             "gnat_int.adb", "test_rsa.adb",
+             "fractal.adb", "biomorph.adb",
+             "champ_vt.adb", "arenstorf.adb"
            );
          for Object_Dir use "obj_debg";
          for Source_Dirs use (".", "algebra", "edp", "eds", "lin_alg", "multi", "numerics", "probas", "random", "lin_alg/sparse", "stats", "graph");
