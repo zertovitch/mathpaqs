@@ -59,7 +59,11 @@ procedure Test_random_performance is
       return Real(Random(ANF_gen));
     end ANF_Random;
 
-    procedure ANF_Test is new Generator_Test("Ada.Numerics.Float_Random", ANF_Reset, ANF_Random);
+    procedure ANF_Test is new Generator_Test(
+      "Ada.Numerics.Float_Random",
+      -- Note 14-Sep-2013: GNAT since at least 2008 uses Mersenne Twister
+      ANF_Reset, ANF_Random
+    );
 
     ------------
     -- U_Rand --
@@ -76,7 +80,9 @@ procedure Test_random_performance is
       return R_U_Rand.Random(U_gen);
     end U_Random;
 
-    procedure U_Test is new Generator_Test("U_Rand (G. Marsaglia)", U_Reset, U_Random);
+    procedure U_Test is new Generator_Test(
+      "U_Rand (G. Marsaglia)", U_Reset, U_Random
+    );
 
   begin
     Put_Line("Precision: " & Integer'Image(Real'Digits));
@@ -84,10 +90,10 @@ procedure Test_random_performance is
     U_Test;
   end Test;    
   
-  procedure Test_Float is new Test(Float);
+  -- procedure Test_Float is new Test(Float);
   procedure Test_Long_Float is new Test(Long_Float);
   
 begin
-  Test_Float;
+  -- Test_Float;
   Test_Long_Float;
 end Test_random_performance;

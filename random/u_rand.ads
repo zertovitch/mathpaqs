@@ -63,15 +63,17 @@ package U_Rand is
     --
     procedure Randomize (Gen : out Generator);
     procedure Reset (Gen : out Generator) renames Randomize;
-    -- Ada95
+    -- Ada 95 style
 
     ---------------------------------------------
     -- Obtaining the next pseudo-random number --
     ---------------------------------------------
     --
     function Next(Gen: Generator) return Uniformly_Distributed;
+    pragma Inline(Next);
     function Random(Gen: Generator) return Uniformly_Distributed renames Next;
-    -- Ada95
+    -- Ada 95 style
+    pragma Inline(Random);
 
 private
 
