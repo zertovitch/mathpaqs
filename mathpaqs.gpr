@@ -4,65 +4,62 @@
 --
 project Mathpaqs is
 
-   for Source_Dirs use (".");
+   for Source_Dirs use (".", "algebra", "edp", "eds", "lin_alg", "multi", "numerics", "probas", "random", "lin_alg/sparse", "stats", "graph");
    for Exec_Dir use ".";
-   type Build_Mode_Type is
-      ("Debug");
+   type Build_Mode_Type is ("Debug", "Fast");
    Build_Mode : Build_Mode_Type := external ("Build_Mode", "Debug");
 
+   for Main use (
+       -- *** Probabilities
+         "test_copulas.adb",
+         "test_pareto.adb",
+         "test_poisson.adb",
+       -- *** Random generation
+         "test_u_rand.adb",
+         "test_random_performance.adb",
+       -- *** Statistics
+         "test_samples.adb", 
+         "test_estimators.adb", 
+       -- *** Linear algebra
+         "test_sparse.adb", "test_cholesky.adb",
+       -- *** Algebra
+         "test_ert.adb",
+       -- *** Multiple precision integers
+         "gnat_int.adb", "test_rsa.adb",
+         "fractal.adb", "biomorph.adb",
+         "champ_vt.adb", "arenstorf.adb"
+       );
    case Build_Mode is
-
-      when "Debug" =>
-         for Main use (
-           -- *** Probabilities / statistics
-             "test_copulas.adb", "test_u_rand.adb",
-             "test_pareto.adb",
-             "test_poisson.adb",
-           -- *** Statistics
-             "test_samples.adb", 
-             "test_estimators.adb", 
-           -- *** Linear algebra
-             "test_sparse.adb", "test_cholesky.adb",
-           -- *** Algebra
-             "test_ert.adb",
-           -- *** Multiple precision integers
-             "gnat_int.adb", "test_rsa.adb",
-             "fractal.adb", "biomorph.adb",
-             "champ_vt.adb", "arenstorf.adb"
-           );
-         for Object_Dir use "obj_debg";
-         for Source_Dirs use (".", "algebra", "edp", "eds", "lin_alg", "multi", "numerics", "probas", "random", "lin_alg/sparse", "stats", "graph");
+     when "Debug" =>
+       for Object_Dir use "obj_debg";
+     when "Fast" =>
+       for Object_Dir use "obj_fast";
    end case;
-
+   
    package Compiler is
-
       case Build_Mode is
-
          when "Debug" =>
             for Default_Switches ("ada") use ("-gnat05", "-gnatwal", "-gnatVa", "-gnato", "-g", "-fno-inline", "-fstack-check", "-gnatec../debug.pra");
+         when "Fast" =>
+            for Default_Switches ("ada") use ("-gnat05", "-O2", "-gnatpn", "-gnatwu", "-fipa-cp-clone", "-fgcse-after-reload", "-funroll-loops", "-fpeel-loops", "-funswitch-loops", "-ftracer", "-ftree-vectorize", "-g");
       end case;
    end Compiler;
 
    package Linker is
-
       case Build_Mode is
-
          when "Debug" =>
             for Default_Switches ("ada") use ("-g");
+         when "Fast" =>
+            for Default_Switches ("ada") use ("-g", "-Wl,--gc-sections");
       end case;
    end Linker;
 
    package Binder is
-
-      case Build_Mode is
-
-         when "Debug" =>
-            for Default_Switches ("ada") use ("-E");
-      end case;
+      for Default_Switches ("ada") use ("-E");
    end Binder;
 
    package Builder is
-      for Default_Switches ("ada") use ("-j2", "-C");
+      for Default_Switches ("ada") use ("-j7", "-C");
    end Builder;
 
    package Ide is
