@@ -13,6 +13,7 @@ project Mathpaqs is
        -- *** Probabilities
          "test_copulas.adb",
          "test_pareto.adb",
+         "test_normal.adb",
          "test_poisson.adb",
        -- *** Random generation
          "test_u_rand.adb",
@@ -39,9 +40,9 @@ project Mathpaqs is
    package Compiler is
       case Build_Mode is
          when "Debug" =>
-            for Default_Switches ("ada") use ("-gnat05", "-gnatwal", "-gnatVa", "-gnato", "-g", "-fno-inline", "-fstack-check", "-gnatec../debug.pra");
+            for Default_Switches ("ada") use ("-gnat05", "-gnatwa", "-gnatVa", "-gnato", "-g", "-fno-inline", "-fstack-check", "-gnatec../debug.pra");
          when "Fast" =>
-            for Default_Switches ("ada") use ("-gnat05", "-O2", "-gnatpn", "-gnatwu", "-fipa-cp-clone", "-fgcse-after-reload", "-funroll-loops", "-fpeel-loops", "-funswitch-loops", "-ftracer", "-ftree-vectorize", "-g");
+            for Default_Switches ("ada") use ("-gnat05", "-gnatwa", "-O2", "-gnatpn", "-fipa-cp-clone", "-fgcse-after-reload", "-funroll-loops", "-fpeel-loops", "-funswitch-loops", "-ftracer", "-ftree-vectorize", "-g");
       end case;
    end Compiler;
 

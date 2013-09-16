@@ -113,6 +113,7 @@ package Generic_Random_Functions is
   --------------------------
 
   function Normal_CDF(x: Real) return Real;
+  pragma Inline(Normal_CDF);
 
   --------------------------
   -- Pareto distributions --

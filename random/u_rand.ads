@@ -62,8 +62,7 @@ package U_Rand is
     -- Randomize with real-time clock
     --
     procedure Randomize (Gen : out Generator);
-    procedure Reset (Gen : out Generator) renames Randomize;
-    -- Ada 95 style
+    procedure Reset (Gen : out Generator) renames Randomize; -- Ada 95 style
 
     ---------------------------------------------
     -- Obtaining the next pseudo-random number --
@@ -71,9 +70,7 @@ package U_Rand is
     --
     function Next(Gen: Generator) return Uniformly_Distributed;
     pragma Inline(Next);
-    function Random(Gen: Generator) return Uniformly_Distributed renames Next;
-    -- Ada 95 style
-    pragma Inline(Random);
+    function Random(Gen: Generator) return Uniformly_Distributed renames Next; -- Ada 95 style
 
 private
 

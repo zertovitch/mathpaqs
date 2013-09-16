@@ -30,23 +30,23 @@ package body Generic_Random_Functions is
   -- It has a maximum absolute error of 7.5e-8.
 
   function Normal_CDF(x: Real) return Real is
-    t: Real;
+    t, poly, y: Real;
     b1 : constant:=  0.31938_1530;
     b2 : constant:= -0.35656_3782;
     b3 : constant:=  1.78147_7937;
     b4 : constant:= -1.82125_5978;
     b5 : constant:=  1.33027_4429;
     p  : constant:=  0.23164_19;
-    c  : constant:=  0.39894228; -- = 1/Sqrt(2*pi)
+    c  : constant:=  0.398942280401433; -- ~= 1/Sqrt(2*pi)
+    mh : constant:=  -1.0 / 2.0;
   begin
+    t := 1.0 / (1.0 + p * abs x);
+    poly:= t * (t * (t * (t * (t * b5 + b4) + b3) + b2) + b1);
+    y:= c * Exp(x * x * mh) * poly;
     if x >= 0.0 then
-      t := 1.0 / (1.0 + p * x);
-      return (1.0 - c * Exp(-x * x / 2.0) * t *
-      (t * (t * (t * (t * b5 + b4) + b3) + b2) + b1));
+      return 1.0 - y;
     else
-      t := 1.0 / (1.0 - p * x);
-      return (c * Exp(-x * x / 2.0) * t *
-      (t * (t * (t * (t * b5 + b4) + b3) + b2) + b1));
+      return y;
     end if;
   end Normal_CDF;
 
@@ -72,11 +72,12 @@ package body Generic_Random_Functions is
   end Poisson;
 
   procedure Box_Muller(u1,u2: in Real; n1,n2: out Real) is
-    phi, z, r: Real;
+    phi, r: Real;
+    Two_Pi  : constant:= 2.0 * Pi;
+    m2 : constant:= -2.0;
   begin
-    phi:= 2.0 * pi* u1;
-    z:= -Log(u2);
-    r:= Sqrt(2.0 * z);
+    r:= Sqrt(m2 * Log(u2));
+    phi:= Two_Pi * u1;
     n1:= r * Cos(phi);
     n2:= r * Sin(phi);
   end Box_Muller;

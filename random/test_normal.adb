@@ -7,15 +7,12 @@ procedure Test_Normal is
   subtype Real is Long_Float;
 
   package GRF is new Generic_Random_Functions(Real);
-
   package RIO is new Float_IO(Real);
-
   use GRF, RIO;
 
   max: constant := 10000;
 
-  x: Real;
-  y: Real;
+  x, y: Real;
 
 begin
   for i in -max..max loop
