@@ -31,27 +31,29 @@ procedure Test_Copulas is
 
   use GRA, GRLE, RIO;
 
---  procedure Put(A: Real_Matrix) is
---  begin
---    for i in A'Range(1) loop
---      for j in A'Range(2) loop
---        Put(A(i,j), 4,2,0);
---      end loop;
---      New_Line;
---    end loop;
---  end Put;
+  procedure Put(A: Real_Matrix) is
+  begin
+    for i in A'Range(1) loop
+      for j in A'Range(2) loop
+        Put(A(i,j), 4, Real'Digits,0);
+      end loop;
+      New_Line;
+    end loop;
+  end Put;
 
-  procedure Test(A: Real_Matrix; name: String) is
+  procedure Test(A: Real_Matrix; res_name: String) is
     dim_dep: constant Integer:= A'Length(1);
     dim_indep: constant:= 3;
     U01: Real_Vector(1..dim_dep + dim_indep);
     gen: RRand.Generator;
-    copula: RCopulas.Copula_access;
+    use RCopulas;
+    copula: Copula_access;
     f: File_Type;
+    L, B: Real_Matrix(A'Range(1), A'Range(2));
   begin
     RRand.Reset(gen, 1);
-    RCopulas.Construct_as_Gauss(copula, U01'Length, A);
-    Create(f, Out_File, name & ".csv");
+    Construct_as_Gauss(copula, U01'Length, A);
+    Create(f, Out_File, res_name & ".csv");
     for i in 1..dim_dep loop
       Put(f, "dep;");
     end loop;
@@ -60,13 +62,20 @@ procedure Test_Copulas is
     end loop;
     New_Line(f);
     for n in 1..60_000 loop
-      U01:= RCopulas.Simulate(copula.all, gen);
+      U01:= Simulate(copula.all, gen);
       for i in U01'Range loop
         Put(f, U01(i));
         Put(f, ';');
       end loop;
       New_Line(f);
     end loop;
+    Put_Line("Results in file: " & Name(f));
+    L:= Get_Cholesky_Matrix(Gauss_Copula(copula.all));
+    B:= L * Transpose(L);
+    Put_Line("Matrix test (bitwise) " & Boolean'Image(A = B));
+    Put(A);
+    New_Line;
+    Put(B);
   end Test;
 
   A33: constant Real_Matrix(1..3, 1..3):=

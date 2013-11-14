@@ -90,6 +90,11 @@ package body Copulas is
     c:= new Gauss_Copula'(g);
   end Construct_as_Gauss;
 
+  function Get_Cholesky_Matrix(C: Gauss_Copula) return Real_Matrix is
+  begin
+    return C.Sqrt_Correl_Matrix.all;
+  end Get_Cholesky_Matrix;
+
   procedure Dispose_internal is
     new Ada.Unchecked_Deallocation(Copula'Class, Copula_access);
 

@@ -104,6 +104,8 @@ package Copulas is
   -- In that case, the other dimensions, from corr'Length(1)+1 up to C.dim,
   -- are considered independent.
 
+  function Get_Cholesky_Matrix(C: Gauss_Copula) return Real_Matrix;
+
   wrong_use, undefined: exception;
 
   -- Copula_family: enumerated type describing different
