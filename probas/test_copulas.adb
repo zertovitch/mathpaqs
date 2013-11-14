@@ -73,9 +73,14 @@ procedure Test_Copulas is
     L:= Get_Cholesky_Matrix(Gauss_Copula(copula.all));
     B:= L * Transpose(L);
     Put_Line("Matrix test (bitwise) " & Boolean'Image(A = B));
+    Put_Line("A =");
     Put(A);
     New_Line;
+    Put_Line("B:= L*Lt =");
     Put(B);
+    New_Line;
+    Put_Line("L =");
+    Put(L);
   end Test;
 
   A33: constant Real_Matrix(1..3, 1..3):=
