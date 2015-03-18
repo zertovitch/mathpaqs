@@ -1,17 +1,23 @@
--- Code by Jon Squire, adapted to Ada 2005
--- (easy: Generic_Real_Arrays = Ada.Numerics.Generic_Real_Arrays)
--- http://www.cs.umbc.edu/~squire/adaclass/gnatmath95/
+-- Author: Jon Squire
+-- Original code here:
+--   http://www.cs.umbc.edu/~squire/adaclass/gnatmath95/
+-- Changes:
+--   - Generic_Real_Arrays = Ada.Numerics.Generic_Real_Arrays (Ada 2005)
+--   - removed dependency on others non-standard packages
+--   - a few fixes
+--   - (18-Mar-2015): Integer_Vector as generic parameter added a few "_JS"
+--       suffixes to address ambiguities with Ada.Numerics.Generic_Real_Arrays
 
 with Ada.Numerics.Generic_Real_Arrays;
 
 generic
-  type REAL is digits <> ;
-  with package Real_Arrays is new Ada.Numerics.Generic_Real_Arrays(REAL);
+  type Real is digits <> ;
+  with package Real_Arrays is new Ada.Numerics.Generic_Real_Arrays(Real);
+  type Integer_Vector is array (Integer range <>) of Integer;
 
 package Generic_Real_Linear_Equations is
 
   use Real_Arrays;
-  type INTEGER_VECTOR is array (INTEGER range <>) of INTEGER;
 
   function LINEAR_EQUATIONS ( A : REAL_MATRIX ;
                               Y : REAL_VECTOR ) return REAL_VECTOR ;
@@ -19,9 +25,13 @@ package Generic_Real_Linear_Equations is
   function LINEAR_EQUATIONS ( A : REAL_MATRIX ;
                               Y : REAL_MATRIX ) return REAL_MATRIX ;
 
-  function DETERMINANT ( A : REAL_MATRIX ) return REAL ;
+  function DETERMINANT_JS ( A : REAL_MATRIX ) return REAL ;
+  -- Added "_JS" to address ambiguity with
+  -- Ada.Numerics.Generic_Real_Arrays.Determinant
 
-  function INVERSE ( A : REAL_MATRIX ) return REAL_MATRIX ;
+  function INVERSE_JS ( A : REAL_MATRIX ) return REAL_MATRIX ;
+  -- Added "_JS" to address ambiguity with
+  -- Ada.Numerics.Generic_Real_Arrays.Inverse
 
   procedure INVERSE ( A : in out REAL_MATRIX ) ;
 

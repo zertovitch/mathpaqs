@@ -1,4 +1,3 @@
-
 with Ada.Text_IO; use Ada.Text_IO; -- for debug
 --with INTEGER_ARRAYS_IO;  -- for debug
 --with REAL_ARRAYS_IO; -- for debug
@@ -222,7 +221,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     return X ;
   end LINEAR_EQUATIONS ;
 
-  function DETERMINANT ( A : REAL_MATRIX ) return REAL is
+  function DETERMINANT_JS ( A : REAL_MATRIX ) return REAL is
 
     --      PURPOSE : COMPUTE THE DETERMINANT OF A MATRIX
     --
@@ -303,10 +302,10 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
   exception
     when CONSTRAINT_ERROR => -- catches overflow
       return 0.0 ;
-  end DETERMINANT ;
+  end DETERMINANT_JS ;
 
 
-  function INVERSE ( A : REAL_MATRIX ) return REAL_MATRIX is
+  function INVERSE_JS ( A : REAL_MATRIX ) return REAL_MATRIX is
 
     --      PURPOSE : INVERT AN N BY N MATRIX
     --
@@ -430,7 +429,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       end loop ;
     end loop ;
     return AA ;
-  end INVERSE ;
+  end INVERSE_JS ;
 
   procedure INVERSE ( A : in out REAL_MATRIX ) is
 

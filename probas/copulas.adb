@@ -7,7 +7,7 @@ with Ada.Unchecked_Deallocation;
 package body Copulas is
 
   package GRF is new Generic_Random_Functions(Real);
-  package GRLE is new Generic_Real_Linear_Equations(Real, GRA);
+  package GRLE is new Generic_Real_Linear_Equations(Real, GRA, Integer_Vector);
 
   use GRF, GRLE;
 

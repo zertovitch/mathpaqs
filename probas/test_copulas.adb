@@ -8,11 +8,12 @@ with Copulas;
 procedure Test_Copulas is
 
   subtype Real is Long_Float;
+  type Integer_Vector is array (Integer range <>) of Integer;
 
   package RIO is new Float_IO(Real);
 
   package GRA is new Ada.Numerics.Generic_Real_Arrays(Real);
-  package GRLE is new Generic_Real_Linear_Equations(Real, GRA);
+  package GRLE is new Generic_Real_Linear_Equations(Real, GRA, Integer_Vector);
 
   package Real_U_Rand is new U_Rand(Real);
 
@@ -26,7 +27,8 @@ procedure Test_Copulas is
     RRand.Uniformly_Distributed,
     RRand.Generator,
     RRand.Random,
-    GRA
+    GRA,
+    Integer_Vector
   );
 
   use GRA, GRLE, RIO;

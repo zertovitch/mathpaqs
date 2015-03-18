@@ -61,6 +61,7 @@ generic
   with function Random (Gen : Generator) return RGN_Float;
 
   with package GRA is new Ada.Numerics.Generic_Real_Arrays(Real);
+  type Integer_Vector is array (Integer range <>) of Integer;
 
 package Copulas is
 
