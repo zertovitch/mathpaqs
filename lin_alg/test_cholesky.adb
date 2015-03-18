@@ -6,11 +6,12 @@ with Generic_Real_Linear_Equations;
 procedure Test_Cholesky is
 
   subtype Real is Long_Float;
+  type Integer_Vector is array (Integer range <>) of Integer;
 
   package RIO is new Float_IO(Real);
 
   package GRA is new Ada.Numerics.Generic_Real_Arrays(Real);
-  package GRLE is new Generic_Real_Linear_Equations(Real, GRA);
+  package GRLE is new Generic_Real_Linear_Equations(Real, GRA, Integer_Vector);
 
   use GRA, GRLE, RIO;
 
@@ -38,7 +39,7 @@ procedure Test_Cholesky is
         res:= res + abs Z(i,j);
       end loop;
     end loop;
-    Put("This sum should be close to 0:");
+    Put("This sum should be close to 0 :");
     Put(res);
     New_Line;
     New_Line;
@@ -111,5 +112,6 @@ begin
   Test( APM2 );
   Test( APM3 );
   Test( APM4 );
+  Put("Finished - press return");
   Skip_Line;
 end Test_Cholesky;

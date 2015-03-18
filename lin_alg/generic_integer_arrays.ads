@@ -1,4 +1,4 @@
--- Code by Jon Squire
+-- Author: Jon Squire
 -- Original code here:
 --   http://www.cs.umbc.edu/~squire/adaclass/gnatmath95/
 -- Changes:
@@ -85,9 +85,5 @@ package Generic_Integer_Arrays is
 
   function IDENTITY_MATRIX (ORDER : NATURAL;
                         FIRST_1, FIRST_2 : INTEGER := 1) return INTEGER_MATRIX;
-
--- EXCEPTIONS --
-
-  Array_Index_Error: exception;
 
 end Generic_Integer_Arrays;

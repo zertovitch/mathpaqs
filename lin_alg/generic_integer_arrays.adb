@@ -33,7 +33,7 @@ package body Generic_Integer_Arrays is
     C : INTEGER_VECTOR ( LEFT'RANGE ) ;
   begin
     if LEFT'LENGTH /= RIGHT'LENGTH then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error" ;
     end if ;
     for I in LEFT'RANGE loop
       C(I) := LEFT(I) + RIGHT(I-LEFT'FIRST+RIGHT'FIRST) ;
@@ -45,7 +45,7 @@ package body Generic_Integer_Arrays is
     C : INTEGER_VECTOR ( LEFT'RANGE ) ;
   begin
     if LEFT'LENGTH /= RIGHT'LENGTH then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error" ;
     end if ;
     for I in LEFT'RANGE loop
       C(I) := LEFT(I) - RIGHT(I-LEFT'FIRST+RIGHT'FIRST) ;
@@ -58,7 +58,7 @@ package body Generic_Integer_Arrays is
     TEMP : INTEGER_TYPE ;
   begin
     if LEFT'LENGTH /= RIGHT'LENGTH then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error" ;
     end if ;
     for I in LEFT'RANGE loop
       TEMP := LEFT(I) * RIGHT(I-LEFT'FIRST+RIGHT'FIRST) ;
@@ -71,7 +71,7 @@ package body Generic_Integer_Arrays is
     C : INTEGER_VECTOR ( LEFT'RANGE ) ;
   begin
     if LEFT'LENGTH /= RIGHT'LENGTH then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error" ;
     end if ;
     for I in LEFT'RANGE loop
       C(I) := LEFT(I) * RIGHT(I-LEFT'FIRST+RIGHT'FIRST) ;
@@ -83,7 +83,7 @@ package body Generic_Integer_Arrays is
     C : INTEGER_VECTOR ( LEFT'RANGE ) ;
   begin
     if LEFT'LENGTH /= RIGHT'LENGTH then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error" ;
     end if ;
     for I in LEFT'RANGE loop
       C(I) := LEFT(I) / RIGHT(I-LEFT'FIRST+RIGHT'FIRST) ;
@@ -141,7 +141,7 @@ package body Generic_Integer_Arrays is
     C : INTEGER_VECTOR ( FIRST..FIRST+ORDER-1) ;
   begin
     if INDEX < FIRST or INDEX > FIRST+ORDER-1 then
-      raise ARRAY_INDEX_ERROR;
+      raise Constraint_Error with "Dimension error";
     end if;
     for I in C'RANGE loop
       C(I) := 0;
@@ -199,7 +199,7 @@ package body Generic_Integer_Arrays is
   begin
     if LEFT'LENGTH(1) /= RIGHT'LENGTH(1) or
        LEFT'LENGTH(2) /= RIGHT'LENGTH(2) then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error" ;
     end if ;
     for I in LEFT'RANGE(1) loop
       for J in LEFT'RANGE(2) loop
@@ -215,7 +215,7 @@ package body Generic_Integer_Arrays is
   begin
     if LEFT'LENGTH(1) /= RIGHT'LENGTH(1) or
        LEFT'LENGTH(2) /= RIGHT'LENGTH(2) then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error" ;
     end if ;
     for I in LEFT'RANGE(1) loop
       for J in LEFT'RANGE(2) loop
@@ -230,7 +230,7 @@ package body Generic_Integer_Arrays is
     C : INTEGER_MATRIX ( LEFT'RANGE(1) , RIGHT'RANGE(2)) ;
   begin
     if LEFT'LENGTH(2) /= RIGHT'LENGTH(1) then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error" ;
     end if ;
     for I in LEFT'RANGE(1) loop
       for J in RIGHT'RANGE(2) loop
@@ -250,7 +250,7 @@ package body Generic_Integer_Arrays is
     SUM : INTEGER_TYPE ;
   begin
     if LEFT'LENGTH /= RIGHT'LENGTH(1) then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error" ;
     end if ;
     for J in RIGHT'RANGE(2) loop
       SUM := 0 ;
@@ -268,7 +268,7 @@ package body Generic_Integer_Arrays is
     SUM : INTEGER_TYPE ;
   begin
     if LEFT'LENGTH(2) /= RIGHT'LENGTH then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error" ;
     end if ;
     for I in LEFT'RANGE(1) loop
       SUM := 0 ;

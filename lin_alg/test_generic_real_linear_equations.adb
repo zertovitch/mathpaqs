@@ -21,7 +21,7 @@ with Ada.Numerics.Generic_Real_Arrays;
 
 procedure Test_Generic_Real_Linear_Equations is
 
-  type Real is digits 12 ;
+  subtype Real is Long_Float; -- digits 12 ;
 
   package Real_Arrays is new Ada.Numerics.Generic_Real_Arrays(Real);
   use Real_Arrays;
@@ -35,6 +35,15 @@ procedure Test_Generic_Real_Linear_Equations is
             ( Real, Real_Arrays, Integer_Vector ) ;
   use Real_Linear_Equations;
 
+  procedure Put_rect(A: Real_Matrix) is
+  begin
+    for i in A'Range(1) loop
+      for j in A'Range(2) loop
+        Put(A(i,j), 4,2,0);
+      end loop;
+      New_Line;
+    end loop;
+  end Put_rect;
 
 --                        SPECIFICATIONS
   A : REAL_MATRIX ( 1 .. 4 , 1 .. 4 ) ;
@@ -81,7 +90,11 @@ procedure Test_Generic_Real_Linear_Equations is
       end loop ;
     end loop ;
   end MAT_INIT_1 ;
+
 begin
+  Put_Line("Floating point digits: " & Integer'Image(Real'Digits));
+  New_Line;
+
   for I in L'RANGE(1) loop
     for J in L'RANGE(2) loop
       if I >= J-L'FIRST(2)+L'FIRST(1) then
@@ -90,10 +103,11 @@ begin
     end loop;
   end loop;
 
-  PUT_LINE ( "USING LINEAR_EQUATIONS, VECTOR" ) ;
+  PUT_LINE ( "*** USING LINEAR_EQUATIONS, VECTOR" ) ;
   PUT_LINE ( "INITIAL MATRIX A" ) ;
   MAT_INIT_1 ( A ) ;
-  PUT ( A ) ;
+  -- PUT ( A ) ;
+  Put_rect(A);
   PUT_LINE ( "INITIAL VECTOR Y" ) ;
   PUT ( Y ) ;
   PUT_LINE ( "SOLVING EQUATIONS" ) ;
@@ -108,25 +122,25 @@ begin
   PUT ( VECTOR_RESULT ) ;
   NEW_LINE ;
 
-  PUT_LINE ( "USING LINEAR_EQUATIONS, MATRIX" ) ;
+  PUT_LINE ( "*** USING LINEAR_EQUATIONS, MATRIX" ) ;
   PUT_LINE ( "INITIAL MATRIX A" ) ;
   MAT_INIT_1 ( A ) ;
-  PUT ( A ) ;
+  Put_rect ( A ) ;
   PUT_LINE ( "INITIAL MATRIX YY" ) ;
-  PUT ( YY ) ;
+  PUT_rect ( YY ) ;
   PUT_LINE ( "SOLVING EQUATIONS" ) ;
   XX := LINEAR_EQUATIONS ( A , YY ) ;
   PUT_LINE ( "XX = SOLUTION" ) ;
-  PUT ( XX ) ;
-  PUT_LINE ( "CHECK IF SOLUTION A*XX GIVES BACK YY" ) ;
+  Put_rect ( XX ) ;
+  PUT_LINE ( "CHECK IF SOLUTION A*XX GIVES BACK YY. A*XX=" ) ;
   MATRIX_RESULT := A * XX ;
-  PUT ( MATRIX_RESULT ) ;
+  Put_rect ( MATRIX_RESULT ) ;
   PUT_LINE ( "CHECK FOR ZERO MATRIX" ) ;
   MATRIX_RESULT := MATRIX_RESULT - YY ;
-  PUT ( MATRIX_RESULT ) ;
+  Put_rect( MATRIX_RESULT );
   NEW_LINE ;
 
-  PUT_LINE ( "CHECK USING CROUT_SOLVE" ) ;
+  PUT_LINE ( "*** CHECK USING CROUT_SOLVE" ) ;
   begin
     PUT_LINE ( "INITIAL MATRIX A" ) ;
     MAT_INIT_1 ( A ) ;
@@ -149,7 +163,9 @@ begin
       PUT_LINE ( "CROUT RAISED EXCEPTION" ) ;
   end ;
 
-  PUT_LINE ( "CHECK INVERSE" ) ;
+  PUT_LINE ( "*** CHECK INVERSE" ) ;
+  Put_Line("A=");
+  Put_rect(A);
   AI := INVERSE_JS ( A ) ;
   PUT_LINE ( "COMPUTED INVERSE" ) ;
   PUT ( AI ) ;
@@ -162,9 +178,14 @@ begin
   AII := INVERSE_JS ( AI ) ;
   PUT_LINE ( "PRINT INVERSE OF INVERSE" ) ;
   PUT ( AII ) ;
+  Put_rect(AII);
+  Put_Line("Compare... Ada.Numerics.Generic_Real_Arrays.Inverse");
+  Put_Line("   against Generic_Real_Linear_Equations.Inverse_JS.");
+  Put_Line("Expected: near zero matrix");
+  Put_rect( AI - Inverse(A) );
   NEW_LINE ;
 
-  PUT_LINE ( "CHECK FOR EXCEPTIONS IN LINEAR EQUATIONS" ) ;
+  PUT_LINE ( "*** CHECK FOR EXCEPTIONS IN LINEAR EQUATIONS" ) ;
   begin
     PUT_LINE ( "INITIAL MATRIX A2, singular" ) ;
     PUT ( A2 ) ;
@@ -181,7 +202,7 @@ begin
       PUT_LINE( "LINEAR EQUATIONS RAISED WRONG EXCEPTION" ) ;
   end ;
 
-  PUT_LINE ( "CHECK FOR EXCEPTIONS IN INVERSE" ) ;
+  PUT_LINE ( "*** CHECK FOR EXCEPTIONS IN INVERSE" ) ;
   begin
     PUT_LINE ( "A2" );
     PUT ( A2 ) ;
@@ -189,32 +210,32 @@ begin
     PUT_LINE ( "ERROR IF GET HERE" ) ;
     NEW_LINE ;
   exception
-    when MATRIX_DATA_ERROR =>
-      PUT_LINE( "MATRIX_DATA_ERROR CORRECTLY RAISED" ) ;
+    when Matrix_Data_Error =>
+      PUT_LINE( "Matrix_Data_Error CORRECTLY RAISED" ) ;
     when others =>
       PUT_LINE ( "INVERSE RAISED WRONG EXCEPTION" ) ;
   end ;
 
   begin
-    PUT_LINE ( "CALLING LINEAR_EQUATIONS WITH NON SQUARE MATRIX" ) ;
+    PUT_LINE ( "*** CALLING LINEAR_EQUATIONS WITH NON SQUARE MATRIX" ) ;
     X2 := LINEAR_EQUATIONS ( A3 , Y2 ) ;
-    PUT_LINE ( "WRONG, LINEAR_EQUATIONS DID NOT RAISE MATRIX_DATA_ERROR" ) ;
+    PUT_LINE ( " WRONG, LINEAR_EQUATIONS DID NOT RAISE Constraint_Error" ) ;
   exception
-    when MATRIX_DATA_ERROR =>
-      PUT_LINE ( "CORRECTLY RAISED MATRIX_DATA_ERROR" ) ;
+    when Constraint_Error =>
+      PUT_LINE ( " CORRECTLY RAISED Constraint_Error" ) ;
     when others =>
-      PUT_LINE ( "WRONG, RAISED SOME EXCEPTION, NOT MATRIX_DATA_ERROR" ) ;
+      PUT_LINE ( " WRONG, RAISED SOME EXCEPTION, NOT Constraint_Error" ) ;
   end;
 
   begin
-    PUT_LINE ( " CALLING INVERSE WITH NON SQUARE MATRIX " ) ;
+    PUT_LINE ( "*** CALLING INVERSE WITH NON SQUARE MATRIX " ) ;
     A2I := INVERSE_JS ( A3 ) ;
-    PUT_LINE ( " WRONG, INVERSE DID NOT RAISE MATRIX_DATA_ERROR " ) ;
+    PUT_LINE ( " WRONG, INVERSE DID NOT RAISE Constraint_Error " ) ;
   exception
-    when MATRIX_DATA_ERROR =>
-      PUT_LINE ( " CORRECTLY RAISED MATRIX_DATA_ERROR " ) ;
+    when Constraint_Error =>
+      PUT_LINE ( " CORRECTLY RAISED Constraint_Error " ) ;
     when others =>
-      PUT_LINE ( " WRONG, RAISED SOME EXCEPTION, NOT MATRIX_DATA_ERROR " ) ;
+      PUT_LINE ( " WRONG, RAISED SOME EXCEPTION, NOT Constraint_Error " ) ;
   end;
   NEW_LINE ;
 
@@ -231,33 +252,36 @@ begin
   PUT_LINE ( "DONE DETERMINANT" ) ;
   NEW_LINE ;
 
-  PUT_LINE ( "CHECK CHOLESKY DECOMPOSITION AND SOLVE" ) ;
-  PUT_LINE ( "CHOLESKY L to start with" ) ;
-  PUT ( L ) ;
+  PUT_LINE ( "*** CHECK CHOLESKY DECOMPOSITION AND SOLVE" ) ;
+  PUT_LINE ( "L to start with" ) ;
+  Put_rect ( L ) ;
   AC := L * TRANSPOSE(L); -- A must be symmetric
-  PUT_LINE ( "CHOLESKY new A=" ) ;
-  PUT ( AC ) ;
+  PUT_LINE ( "A := L L^T" ) ;
+  Put_rect ( AC ) ;
   L := CHOLESKY_DECOMPOSITION ( AC ) ;
   PUT_LINE ( "CHOLESKY L =" ) ;
-  PUT ( L ) ;
-  PUT_LINE ( "CHOLESKY Y =" ) ;
+  Put_rect ( L ) ;
+  PUT_LINE ( "Y =" ) ;
   PUT ( Y ) ;
   X := CHOLESKY_SOLVE ( L , Y ) ;
   PUT_LINE ( "CHOLESKY X solution =" ) ;
   PUT ( X ) ;
-  PUT_LINE ( "CHOLESKY zero check =" ) ;
+  PUT_LINE ( "CHOLESKY zero check (A X - Y) =" ) ;
   PUT ( AC * X - Y ) ;
   NEW_LINE ;
 
-  PUT_LINE ( "CHECK LU DECOMPOSITION AND SOLVE" ) ;
+  PUT_LINE ( "*** CHECK LU DECOMPOSITION AND SOLVE" ) ;
   begin
     PUT_LINE ( "INITIAL MATRIX  A" ) ;
     PUT ( A ) ;
+    Put_rect(A);
     LU_DECOMPOSITION ( A , L , U , P ) ;
     PUT_LINE ( "LU DECOMPOSITION L =" ) ;
     PUT ( L ) ;
+    Put_rect(L);
     PUT_LINE ( "LU DECOMPOSITION U =" ) ;
     PUT ( U ) ;
+    Put_rect(U);
     PUT_LINE ( "LU DECOMPOSITION P =" ) ;
     PUT ( P ) ;
     PUT_LINE ( "INITIAL VECTOR Y" ) ;
@@ -265,7 +289,7 @@ begin
     X := LU_SOLVE ( L , U , P , Y ) ;
     PUT_LINE ( "LU DECOMPOSITION SOLVED FOR X =" ) ;
     PUT ( X ) ;
-    PUT_LINE ( "LU SOLVE CHECK ZERO" ) ;
+    PUT_LINE ( "LU SOLVE CHECK ZERO (A X - Y) =" ) ;
     PUT ( A * X - Y ) ;
     NEW_LINE ;
   exception
@@ -273,26 +297,30 @@ begin
       PUT_LINE ( "LU DECOMPOSITION RAISED EXCEPTION" ) ;
   end ;
 
-  PUT_LINE ( "CHECK QR DECOMPOSITION AND SOLVE" ) ;
-    PUT_LINE ( "INITIAL MATRIX  A" ) ;
+  PUT_LINE ( "*** CHECK QR DECOMPOSITION AND SOLVE" ) ;
+    PUT_LINE ( "INITIAL MATRIX  A =" ) ;
     PUT ( A ) ;
+    Put_rect(A);
     QR_DECOMPOSITION ( A , Q , R ) ;
     PUT_LINE ( "QR DECOMPOSITION Q =" ) ;
     PUT ( Q ) ;
+    Put_rect(Q);
     PUT_LINE ( "QR DECOMPOSITION R =" ) ;
     PUT ( R ) ;
-    RI := INVERSE ( R ) ;
+    Put_rect(R);
+    RI := INVERSE_JS ( R ) ;
     PUT_LINE ( "R INVERSE" ) ;
     PUT ( RI ) ;
     QQ := A * RI ;
-    PUT_LINE ( "QQ THIS SHOUD BE THE Q, COMPUTED BY A * INVERSE(R)" ) ;
+    PUT_LINE ( "QQ THIS SHOULD BE THE Q, COMPUTED BY A * INVERSE(R)" ) ;
     PUT ( QQ ) ;
+    Put_rect(QQ);
     PUT_LINE ( "INITIAL VECTOR Y" ) ;
     PUT ( Y ) ;
     X := QR_SOLVE ( QQ , R , Y ) ;
     PUT_LINE ( "QR DECOMPOSITION SOLVED FOR X =" ) ;
     PUT ( X ) ;
-    PUT_LINE ( "QR SOLVE CHECK ZERO" ) ;
+    PUT_LINE ( "QR SOLVE CHECK ZERO (A X - Y) " ) ;
     PUT ( A * X - Y ) ;
     NEW_LINE ;
 

@@ -24,6 +24,7 @@ project Mathpaqs is
        -- *** Linear algebra
          "test_sparse.adb", 
          "test_cholesky.adb",
+         "test_qr.adb",
          "test_generic_real_linear_equations.adb",
        -- *** Algebra
          "test_ert.adb",

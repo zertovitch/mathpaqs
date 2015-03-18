@@ -1,4 +1,4 @@
--- Code by Jon Squire
+-- Author: Jon Squire
 -- Original code here:
 --   http://www.cs.umbc.edu/~squire/adaclass/gnatmath95/
 

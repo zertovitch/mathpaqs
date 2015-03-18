@@ -1,3 +1,5 @@
+-- !! replace all = 0.0 and x = y by almost_zero tests
+
 with Ada.Text_IO; use Ada.Text_IO; -- for debug
 --with INTEGER_ARRAYS_IO;  -- for debug
 --with REAL_ARRAYS_IO; -- for debug
@@ -47,8 +49,11 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     ABS_PIVOT : REAL ;                    -- ABS OF PIVOT ELEMENT
     NORM1 : REAL := 0.0 ;                 -- 1 NORM OF MATRIX
   begin
-    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) or A'LENGTH ( 1 ) /= Y'LENGTH then
-      raise ARRAY_INDEX_ERROR ;
+    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+      raise Constraint_Error with "Matrix A is not square";
+    end if ;
+    if A'LENGTH ( 1 ) /= Y'LENGTH then
+      raise Constraint_Error with "Matrix A row count is different than vector Y's";
     end if ;
 
     --                               BUILD WORKING DATA STRUCTURE
@@ -84,7 +89,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
 
       --                             CHECK FOR NEAR SINGULAR
       if ABS_PIVOT < REAL'EPSILON * NORM1 then
-        raise MATRIX_DATA_ERROR;
+        raise MATRIX_DATA_ERROR with "Matrix is near singular";
       end if;
 
       --                             HAVE PIVOT, INTERCHANGE ROW POINTERS
@@ -134,7 +139,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --      USAGE  :     X := LINEAR_EQUATIONS ( A , Y ) ;
     --
     --      EXCEPTION : MATRIX_DATA_ERROR WILL BE RAISED IF 'A' IS SINGULAR
-    --                  ARRAY_INDEX_ERROR IF 'A' IS NOT SQUARE OR
+    --                  Constraint_Error IF 'A' IS NOT SQUARE OR
     --                                       ROWS OF 'Y' /= ROWS OF 'A'
 
     N : constant INTEGER := A'LENGTH(1) ;      -- NUMBER OF EQUATIONS
@@ -147,8 +152,11 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     ABS_PIVOT : REAL ;                         -- ABS OF PIVOT ELEMENT
     NORM1 : REAL := 0.0 ;                      -- 1 NORM OF MATRIX
   begin
-    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) or A'LENGTH ( 1 ) /= Y'LENGTH ( 1 ) then
-      raise ARRAY_INDEX_ERROR ;
+    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+      raise Constraint_Error with "Matrix A is not square";
+    end if ;
+    if A'LENGTH ( 1 ) /= Y'LENGTH ( 1 ) then
+      raise Constraint_Error with "Matrix A row count is different than matrix Y's";
     end if ;
 
     --                               BUILD WORKING DATA STRUCTURE
@@ -186,7 +194,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
 
       --                             CHECK FOR NEAR SINGULAR
       if ABS_PIVOT < REAL'EPSILON * NORM1 then
-        raise MATRIX_DATA_ERROR;
+        raise MATRIX_DATA_ERROR with "Matrix is near singular";
       end if;
 
       --                             HAVE PIVOT, INTERCHANGE ROW POINTERS
@@ -234,7 +242,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      USAGE  :     D := DETERMINANT ( A ) ;
     --
-    --      EXCEPTIONS : ARRAY_INDEX_ERROR IF THE MATRIX IS NOT SQUARE
+    --      EXCEPTIONS : Constraint_Error IF THE MATRIX IS NOT SQUARE
     --
     --      WRITTEN BY : JON SQUIRE , 28 MAY 1983
 
@@ -247,7 +255,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     ABS_PIVOT : REAL ;                     -- ABS OF PIVOT ELEMENT
   begin
     if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Matrix A is not square";
     end if ;
     B := A ;
 
@@ -317,7 +325,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --               FOR PIVOT.
     --
     --      EXCEPTION : MATRIX_DATA_ERROR RAISED IF INVERSE CAN NOT BE COMPUTED
-    --                  ARRAY_INDEX_ERROR IF 'A' IS NOT SQUARE
+    --                  Constraint_Error IF 'A' IS NOT SQUARE
     --
     --      SAMPLE USE :  NEW_MATRIX := INVERSE ( OLD_MATRIX ) ;
     --                    MATRIX := INVERSE ( MATRIX ) * ANOTHER_MATRIX ;
@@ -334,7 +342,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     NORM1 : REAL := 0.0 ;                     -- 1 NORM OF MATRIX
   begin
     if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Matrix A is not square";
     end if ;
 
     --                              BUILD WORKING DATA STRUCTURE
@@ -373,7 +381,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
 
       --                            TEST FOR SINGULAR
       if ABS_PIVOT < REAL'EPSILON * NORM1 then
-        raise MATRIX_DATA_ERROR;
+        raise MATRIX_DATA_ERROR with "Matrix is singular";
       end if ;
 
       HOLD := ROW ( K ) ;
@@ -431,7 +439,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     return AA ;
   end INVERSE_JS ;
 
-  procedure INVERSE ( A : in out REAL_MATRIX ) is
+  procedure INVERSE_JS ( A : in out REAL_MATRIX ) is
 
     --      PURPOSE : INVERT AN N BY N MATRIX IN PLACE
     --
@@ -443,7 +451,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --               FOR PIVOT.
     --
     --      EXCEPTION : MATRIX_DATA_ERROR RAISED IF INVERSE CAN NOT BE COMPUTED
-    --                  ARRAY_INDEX_ERROR RAISED IF MATRIX IS NOT SQUARE
+    --                  Constraint_Error RAISED IF MATRIX IS NOT SQUARE
     --
     --      SAMPLE USE :  INVERSE ( SOME_MATRIX ) ;
 
@@ -457,7 +465,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     NORM1 : REAL := 0.0 ;                     -- 1 NORM OF MATRIX
   begin
     if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Matrix A is not square";
     end if ;
 
     --                              BUILD WORKING DATA STRUCTURE
@@ -552,7 +560,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       end loop ;
     end loop ;
     A := AA ;
-  end INVERSE ;
+  end INVERSE_JS ;
 
   function CROUT_SOLVE ( A : REAL_MATRIX ;
                          Y : REAL_VECTOR ) return REAL_VECTOR is
@@ -570,7 +578,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      USAGE  :     X := CROUT_SOLVE ( A , Y ) ;
     --
-    --      EXCEPTION : ARRAY_INDEX_ERROR  RASIED IF 'A' NOT SQUARE OR
+    --      EXCEPTION : Constraint_Error  RASIED IF 'A' NOT SQUARE OR
     --                                     Y LENGTH /= ROWS OF 'A'
     --                  MATRIX_DATA_ERROR  RAISED IF 'A' SINGULAR
     --
@@ -588,8 +596,11 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     NORM1 : REAL := 0.0 ;                      -- 1 NORM OF MATRIX
     SUM : REAL ;                               -- TEMP VARIBLE
   begin
-    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) or A'LENGTH ( 1 ) /= Y'LENGTH then
-      raise ARRAY_INDEX_ERROR ;
+    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+      raise Constraint_Error with "Matrix A is not square";
+    end if ;
+    if A'LENGTH ( 1 ) /= Y'LENGTH then
+      raise Constraint_Error with "Matrix A row count is different than vector Y's";
     end if ;
     Z(1):= 0.0; -- calm down "may be referenced before it has a value" warning
     X(1):= 0.0; -- calm down "may be referenced before it has a value" warning
@@ -691,7 +702,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      USAGE  :     L := CHOLESKY_DECOMPOSITION ( A ) ;
     --
-    --      EXCEPTION : ARRAY_INDEX_ERROR  RASIED IF 'A' NOT SQUARE
+    --      EXCEPTION : Constraint_Error  RASIED IF 'A' NOT SQUARE
     --                  MATRIX_DATA_ERROR  RAISED IF 'A' NOT SYMMETRIC OR
     --                                               'A' NOT POSITIVE DEFINATE
     --
@@ -708,7 +719,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
         if A(I,J) /= A(A'FIRST(1)-A'FIRST(2)+J, A'FIRST(2)-A'FIRST(1)+I) then
           if abs(A(I,J)-A(A'FIRST(1)-A'FIRST(2)+J, A'FIRST(2)-A'FIRST(1)+I)) >
              2.0 * REAL'EPSILON * abs(A(I,J)) then
-               raise MATRIX_DATA_ERROR with "not symmetric";
+               raise MATRIX_DATA_ERROR with "Matrix is not symmetric";
           end if;
         end if;
       end loop;
@@ -722,7 +733,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
         end loop;
         if I = A'FIRST(1)-A'FIRST(2)+J then
           if SUM <= 0.0 then
-            raise MATRIX_DATA_ERROR with "not positive definite";
+            raise MATRIX_DATA_ERROR with "Matrix is not positive definite";
           end if;
           L(I,J) := ELEMENTARY_FUNCTIONS.SQRT(SUM);
         else
@@ -749,7 +760,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      USAGE  :  X := CHOLESKY_SOLVE ( CHOLESKY_DECOMPOSITION ( A ) , Y ) ;
     --
-    --      EXCEPTION : ARRAY_INDEX_ERROR  RASIED IF 'A' NOT SQUARE OR
+    --      EXCEPTION : Constraint_Error  RASIED IF 'A' NOT SQUARE OR
     --                                     Y LENGTH /= ROWS OF 'A'
     --                  MATRIX_DATA_ERROR  RAISED IF 'A' SINGULAR
     --
@@ -797,9 +808,9 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --      METHOD : LU DECOMPOSITION  P APPLIED TO  A = L * U
     --               DIAGONAL OF L = 1.0
     --
-    --      USAGE  : LU_DECOMPOSITION ( A , L, U, P ) ;
+    --      USAGE  : LU_DECOMPOSITION ( A, L, U, P ) ;
     --
-    --      EXCEPTION : ARRAY_INDEX_ERROR  RASIED IF 'A' NOT SQUARE
+    --      EXCEPTION : Constraint_Error  RAISED IF 'A' NOT SQUARE
     --                  MATRIX_DATA_ERROR  RAISED IF 'A' IS SINGULAR
     --
 
@@ -815,13 +826,16 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     OFAA2 : constant INTEGER := A'FIRST(2) - A'FIRST(1) ;
     OFAP  : constant INTEGER := P'FIRST - A'FIRST(1) ;
   begin
-    if A'Length(1) /= A'Length(2) or
-       A'Length(1) /= L'Length(1) or
+    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+      raise Constraint_Error with "Matrix A is not square";
+    end if ;
+    if A'Length(1) /= L'Length(1) or
        A'Length(1) /= L'Length(2) or
        A'Length(1) /= U'Length(1) or
        A'Length(1) /= U'Length(2) or
-       A'Length(1) /= P'Length then
-      raise Array_Index_Error;
+       A'Length(1) /= P'Length
+    then
+      raise Constraint_Error with "Dimension error with L, U or P";
     end if;
 
     L := (others=>(others=>0.0));
@@ -887,7 +901,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      USAGE  :  X := LU_SOLVE ( L, U, P, Y ) ;
     --
-    --      EXCEPTION : ARRAY_INDEX_ERROR  RASIED IF 'L' AND 'U' DIFFERENT SIZE
+    --      EXCEPTION : Constraint_Error  RAISED IF 'L' AND 'U' DIFFERENT SIZE
     --                                     Y LENGTH /= ROWS OF 'L'
     --
 
@@ -904,7 +918,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
        L'Length(1) /= U'Length(2) or
        L'Length(1) /= P'Length or
        L'Length(1) /= Y'Length then
-      raise Array_Index_Error;
+      raise Constraint_Error with "Dimension error with L, U, P or Y";
     end if;
     B(B'First):= 0.0; -- calm down "may be referenced before..." warning
     X(X'First):= 0.0; -- calm down "may be referenced before..." warning
@@ -914,7 +928,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       for J in Y'First .. I-1 loop
         SUM := SUM + L(I+OFYL1,J+OFYL2) * B(J) ;
       end loop ;
-      B(I) := Y(P(I)) - SUM ;
+      B(I) := Y(P(I - Y'First + P'First)) - SUM ;
     end loop ;
 
     for I in reverse Y'Range loop
@@ -945,7 +959,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      USAGE  : QR_DECOMPOSITION ( A , Q, R ) ;
     --
-    --      EXCEPTION : ARRAY_INDEX_ERROR  RASIED IF 'A' NOT SQUARE OR
+    --      EXCEPTION : Constraint_Error  RAISED IF 'A' NOT SQUARE OR
     --                                     'A', 'Q', AND 'R' NOT SAME SIZE
     --                  MATRIX_DATA_ERROR  RAISED IF 'A' IS SINGULAR
     --
@@ -960,23 +974,27 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     OFAR1 : constant INTEGER := R'FIRST(1) - 1 ;
     OFAR2 : constant INTEGER := R'FIRST(2) - 1 ;
   begin
-    if N /= A'LENGTH(2) or N /= R'LENGTH(1) or N /= R'LENGTH(2) or
+    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+      raise Constraint_Error with "Matrix A is not square";
+    end if ;
+    if N /= R'LENGTH(1) or N /= R'LENGTH(2) or
        N /= Q'LENGTH(1) or N /= Q'LENGTH(2) then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error";
     end if ;
 
     AA := A;
-    SCALE := 0.0 ;
     for K in 1 .. N-1 loop
+      SCALE := 0.0 ;  -- Was before the main loop
       for I in K .. N loop
-        if SCALE > abs AA(I,K) then
+        if SCALE < abs AA(I,K) then  --  Was ">", then scale stayed always 0
           SCALE := abs AA(I,K) ;
         end if ;
       end loop ;
       if SCALE = 0.0 then
-        raise MATRIX_DATA_ERROR ; -- matrix is singular
+        raise MATRIX_DATA_ERROR with
+          "Matrix is singular (scale = 0 on column" & Integer'Image(K) & ")";
       else
-        for I in k .. N loop
+        for I in K .. N loop
           AA(I,K) := AA(I,K) / SCALE ;
         end loop ;
         SUM := 0.0 ;
@@ -1005,21 +1023,49 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     end loop ;
     D(N) := AA(N,N) ;
     if D(N) = 0.0 then
-      raise MATRIX_DATA_ERROR ;
+      raise MATRIX_DATA_ERROR with
+        "Matrix is singular (diag = 0 on position" & Integer'Image(N) & ")";
     end if ;
 
-    -- making R and Q
-    for I in 1 .. N loop
-      for J in 1 .. N loop
-        Q(I+OFAQ1,J+OFAQ2) := 0.0 ;
-        R(I+OFAR1,J+OFAR2) := 0.0 ;
-        if I = J then
-          R(I+OFAR1,I+OFAR2) := D(I) ;
-        else
-          R(I+OFAR1,J+OFAR2) := AA(I,J) ;
-        end if ;
-      end loop ;
-    end loop ;
+    Q:= Unit_Matrix(N);
+    for K in 1..N-1 loop
+      if C(K) /= 0.0 then
+        for J in 1..N loop
+          sum:= 0.0;
+          for I in K..N loop
+            sum:= sum + AA(I,K) * Q(J+OFAQ1, I+OFAQ2);
+          end loop;
+          sum:= sum / C(K);
+          for I in K..N loop
+            Q(J+OFAQ1, I+OFAQ2):= Q(J+OFAQ1, I+OFAQ2) - sum * AA(I,K);
+          end loop;
+        end loop;
+      end if;
+    end loop;
+    -- R
+    for I in 1..N loop
+      for J in 1..I-1 loop
+        R(I+OFAR1, J+OFAR2):= 0.0;
+      end loop;
+      R(I+OFAR1, I+OFAR2):= D(I);
+      for J in I+1..N loop
+        R(I+OFAR1, J+OFAR2):= AA(I,J);
+      end loop;
+    end loop;
+
+    -- Orig. code, incomplete (e.g. Q was just zeroed !)
+    --      making R and Q
+    --      for I in 1 .. N loop
+    --        for J in 1 .. N loop
+    --          Q(I+OFAQ1,J+OFAQ2) := 0.0 ;
+    --          R(I+OFAR1,J+OFAR2) := 0.0 ;
+    --          if I = J then
+    --            R(I+OFAR1,I+OFAR2) := D(I) ;
+    --          else
+    --            R(I+OFAR1,J+OFAR2) := AA(I,J) ;
+    --          end if ;
+    --        end loop ;
+    --      end loop ;
   end QR_DECOMPOSITION;
 
   function QR_SOLVE ( Q : REAL_MATRIX ;
@@ -1037,9 +1083,9 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      METHOD : BACK SUBSTITUTION USING LU DECOMPOSITION
     --
-    --      USAGE  :  X := LU_SOLVE ( Q, R, Y ) ;
+    --      USAGE  :  X := QR_SOLVE ( Q, R, Y ) ;
     --
-    --      EXCEPTION : ARRAY_INDEX_ERROR  RASIED IF 'Q' AND 'R' DIFFERENT SIZE
+    --      EXCEPTION : Constraint_Error  RAISED IF 'Q' AND 'R' DIFFERENT SIZE
     --                                     Y LENGTH /= ROWS OF 'Q'
     --
 
@@ -1052,15 +1098,17 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
   begin
     if Y'LENGTH /= R'LENGTH(1) or Y'LENGTH /= R'LENGTH(2) or
        Y'LENGTH /= Q'LENGTH(1) or Y'LENGTH /= Q'LENGTH(2) then
-      raise ARRAY_INDEX_ERROR ;
+      raise Constraint_Error with "Dimension error";
     end if ;
     X(X'First):= 0.0; -- calm down "may be referenced before..." warning
 
     for I in reverse Y'RANGE loop
       SUM := 0.0 ;
       for K in Y'RANGE loop
-        SUM := SUM + Q(K+OFYQ1,I+OFYQ2) * Y(I) ; -- TRANSPOSE(Q) * Y
+        SUM := SUM + Q(K+OFYQ1,I+OFYQ2) * Y(K) ; -- TRANSPOSE(Q) * Y
+        -- (orig: was Y(I) !)
       end loop ;
+      -- sum is (Qt y)_i
       for J in I+1 .. Y'LAST loop
         SUM := SUM - X(J) * R(I+OFYR1,J+OFYR2) ;
       end loop ;
@@ -1108,7 +1156,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     if Uu'length(1)/=M or Uu'length(2)/=N or
        Vv'length(1)/=N or Vv'length(2)/=N or
        Ww'length/=N then
-      raise Array_Index_Error;
+      raise Constraint_Error with "Dimension error";
     end if ;
     Machep := 2.0**(-23);
     --     HOUSEHOLDER REDUCTION TO BIDIAGONAL FORM
@@ -1395,7 +1443,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     Tmp:Real_Vector(1..N);
   begin
     if V'length(1)/=N or V'length(2)/=N or W'length/=N or Y'length/=N then
-      raise Array_Index_Error;
+      raise Constraint_Error with "Dimension error";
     end if ;
     for J in 1..N loop
       S := 0.0;
