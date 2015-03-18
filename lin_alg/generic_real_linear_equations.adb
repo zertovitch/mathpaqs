@@ -6,6 +6,11 @@ with Ada.Text_IO; use Ada.Text_IO; -- for debug
 with Ada.Numerics.GENERIC_ELEMENTARY_FUNCTIONS;
 package body GENERIC_REAL_LINEAR_EQUATIONS is
 
+  function Almost_zero(x: Real) return Boolean is
+  begin
+    return abs x <= Real'Base'Model_Small;
+  end Almost_zero;
+
   package ELEMENTARY_FUNCTIONS is new
                        Ada.Numerics.GENERIC_ELEMENTARY_FUNCTIONS ( REAL ) ;
 
@@ -852,8 +857,8 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
           KK := I;
         end if;
       end loop;
-      if BIG = 0.0 then
-        raise MATRIX_DATA_ERROR; -- singular
+      if Almost_zero(BIG) then
+        raise MATRIX_DATA_ERROR with "Matrix is singular";
       end if;
       ITEMP := P(K+OFAP);
       P(K+OFAP) := P(KK+OFAP);
@@ -990,7 +995,7 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
           SCALE := abs AA(I,K) ;
         end if ;
       end loop ;
-      if SCALE = 0.0 then
+      if Almost_zero(SCALE) then
         raise MATRIX_DATA_ERROR with
           "Matrix is singular (scale = 0 on column" & Integer'Image(K) & ")";
       else
@@ -1022,14 +1027,14 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       end if ;
     end loop ;
     D(N) := AA(N,N) ;
-    if D(N) = 0.0 then
+    if Almost_zero(D(N)) then
       raise MATRIX_DATA_ERROR with
         "Matrix is singular (diag = 0 on position" & Integer'Image(N) & ")";
     end if ;
 
     Q:= Unit_Matrix(N);
     for K in 1..N-1 loop
-      if C(K) /= 0.0 then
+      if not Almost_zero(C(K)) then
         for J in 1..N loop
           sum:= 0.0;
           for I in K..N loop
