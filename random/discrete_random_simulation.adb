@@ -37,7 +37,7 @@ package body Discrete_Random_Simulation is
         l:= Fx'First;
         r:= Fx'Last;
         loop
-          i:= (l+r)/2;
+          i:= l + ((r - l) / 2); -- (l+r) / 2 without overflow problem
           if Fx(i) <= U01 then
             l:= i;
           else

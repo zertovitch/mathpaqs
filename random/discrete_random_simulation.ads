@@ -9,7 +9,7 @@
 --
 -- Legal licensing note:
 
---  Copyright (c) 2011 Gautier de Montmollin
+--  Copyright (c) 2011..2015 Gautier de Montmollin
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,7 @@ package Discrete_Random_Simulation is
 	-- ^ this parameter is generic only for performance purposes
 	--   (and you don't want to use more than one method, do you ?)
   function Index(
-    U01 : Real; -- Probability value, assumed to be unform in [0,1]
+    U01 : Real; -- Probability value, assumed to be uniform in [0,1]
     Fx  : Cumulative_distribution_function -- CDF
   )
   return Natural;
