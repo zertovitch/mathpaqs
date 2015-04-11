@@ -30,6 +30,9 @@ project Mathpaqs is
          "test_ert.adb",
        -- *** Multiple precision integers
          "gnat_int.adb", "test_rsa.adb",
+       -- *** Formulas
+         "test_formulas.adb",
+       -- *** Misc
          "fractal.adb", "biomorph.adb",
          "champ_vt.adb", "arenstorf.adb"
        );
