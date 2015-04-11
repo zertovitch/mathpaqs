@@ -1,10 +1,11 @@
 --  ===========================================================================
---  ======|   Formulas                         |===============================
+--  ======|   Formulas: Symbolic computation                 |=================
+--  ======|   Parsing - output - evaluation - simplification |=================
 --  ===========================================================================
 
 --  Based on a Pascal university exercise (~1990's)
 --  Translated on 9-Apr-2015 by (New) P2Ada v. 28-Oct-2009
---  Reworked
+--  Reworked further (generic, private types, etc.)
 
 -- Copyright (c) Gautier de Montmollin 2015
 --
@@ -29,7 +30,14 @@
 -- NB: this is the MIT License, as found 2-May-2010 on the site
 -- http://www.opensource.org/licenses/mit-license.php
 
--- TO DO: get rid of the OK out parameter; do all with exceptions
+-- TO DO:
+--   - get rid of the OK out parameter; do all with exceptions
+--   - implement user functions
+--   - for unary operators: "arg" instead of "left" descendant
+--   - complete Simplify_functions
+--   - improve Simplify (see misses at Test_Formulas)
+--   - Deep_copy
+--   - Deep_delete internal; Finalization
 
 with Ada.Text_IO;
 
@@ -39,54 +47,61 @@ with Ada.Strings.Unbounded;             use Ada.Strings.Unbounded;
 
 generic
 
-  type T_Nb is digits <>;
+  type Real is digits <>;
 
-  with function Evaluate_variable(name: String) return T_Nb;
+  with function Evaluate_variable(name: String) return Real;
 
 package Formulas is
 
-       type S_Form  is
+  type Formula is private;
+  null_formula: constant Formula;
+
+  procedure Put (t: in  Ada.Text_IO.File_Type; f: Formula);
+  procedure Parse (str_base:  String; f: out Formula; OK: out Boolean);
+  function Evaluate (f: Formula) return Real;
+  function Equivalent (fa, fb : Formula) return Boolean;
+  procedure Simplify (f: in out Formula);
+  procedure Deep_delete (f: in out Formula);
+
+  No_Error,
+  Div_By_0,
+  Not_Pos_Power: exception;
+
+private
+
+  type S_Form is
                 (nb, vr,                                        --  0 arg
-                 plus1, moins1,                                 --  1 arg
+                 plus_una, moins_una,                           --  1 arg
                  expn, logn,
                  sinus, cosinus, tg, arctg,
                  sh, ch, th,
                  par, croch, accol,
                  fois, plus, moins, sur, puiss);                --  2 args
 
-  type Formula;
+  subtype Leaf is S_Form range nb .. vr;
+  subtype Unary is S_Form range plus_una .. accol;
+  subtype Binary is S_Form range fois .. puiss;
 
-  type Form_p is access Formula;
+  type Formula_Rec(S:  S_Form);
 
-  type Formula(S:  S_Form)  is
-  record
+  type Formula is access Formula_Rec;
+  null_formula: constant Formula:= null;
+
+  type Formula_Rec(S:  S_Form) is record
     case S is
-      when
-          Nb =>
-        N: T_Nb;
-      when Vr =>
-        V: Unbounded_String;
-      when Plus1 |  Moins1 |
+      when Nb =>   N: Real;
+      when Vr =>   V: Unbounded_String;
+      when plus_una |  moins_una |
           Expn |  Logn |
           Sinus |  Cosinus |  Tg |  Arctg |
           Sh |  Ch |  Th |
           Par |  Croch |  Accol |
-          Fois |  Plus |  Moins |  Sur |  Puiss=>
-        F1,F2: Form_P;
+          Fois |  Plus |  Moins |  Sur |  Puiss
+        =>
+          left, right: Formula;
     end case;
   end record;
 
-  procedure Dispose is new Ada.Unchecked_Deallocation(Formula, Form_P);
-
-  procedure Write_form (t: in  Ada.Text_IO.File_Type; f: Form_p);
-  procedure String_to_form (str_base:  String; f: out form_p; OK: out Boolean);
-  function Eval_form (f: Form_p) return T_nb;
-  function EqForms(fa, fb : Form_p) return Boolean;
-  procedure Simplify (f: in out Form_p);
-  procedure Del_Form (f: in out Form_p);
-
-  No_Error,
-  Div_By_0,
-  Not_Pos_Power: exception;
+  procedure Dispose is new Ada.Unchecked_Deallocation(Formula_Rec, Formula);
 
 end Formulas;

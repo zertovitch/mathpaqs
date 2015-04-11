@@ -7,6 +7,7 @@ procedure Test_Formulas is
   subtype Real is Long_Float;
 
   package RIO is new Ada.Text_IO.Float_IO(Real);
+  use RIO;
 
   function Evaluate_variable(name: String) return Real is
   begin
@@ -18,36 +19,40 @@ procedure Test_Formulas is
 
   package My_Formulas is new Formulas(Real, Evaluate_variable);
 
-  procedure Test_1(expr: String) is
+  procedure Test_1(expr: String; target: String:= "") is
     use My_Formulas;
-    f: Form_P:= null;
+    f: Formula:= null_formula;
     ok: Boolean;
-    use RIO;
     e0, e: Real;
   begin
     Put_Line("*************** Testing formula: " & expr);
-    String_to_Form(expr, f, ok);
+    Parse(expr, f, ok);
     Put("Output...   : ");
-    Write_Form(Standard_Output, f);
+    Put(Standard_Output, f);
     New_Line;
-    e0:= Eval_form(f);
+    e0:= Evaluate(f);
     for count in 1..4 loop
       Put("Simplify #" & Integer'Image(count) & ": ");
       Simplify(f);
-      Write_Form(Standard_Output, f);
+      Put(Standard_Output, f);
+      if target /= "" then
+        Put(";  target value is: " & target);
+      end if;
       New_Line;
-      e:= Eval_form(f);
-      if abs(e - e0) > 1.0e-7 then
+      e:= Evaluate(f);
+      if abs(e - e0) > 1.0e-10 then
         Put_Line("!!! Evaluation error !!!");
       end if;
     end loop;
-    Put("Eval: "); Put(e, 0,5,0);
+    Put("Eval: "); Put(e, 0,14,0);
     New_Line;
   end;
 begin
-  Test_1("sin(8.0)");
-  Test_1("x");
-  Test_1("x*(x*x)");
+  Put("x=");
+  Put(Evaluate_variable("x"), 0,3,0);
+  New_Line;
+  Test_1("x * (x*x)");
   Test_1("x*x*x");
   Test_1("x*x*x  +  x*x^2 + x+x");
+  Test_1("sin(2*2^(1/2+3/2) + 1*1/2 + 0*7.65) + sin(8.5)", "1.59697422524698 = 2*sin(8.5)");
 end Test_Formulas;

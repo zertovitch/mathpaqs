@@ -8,21 +8,18 @@ with Ada.Numerics.Generic_Elementary_Functions;
 
 package body Formulas is
 
-  package REF is new Ada.Numerics.Generic_Elementary_Functions(T_Nb);
-  package RIO is new Ada.Text_IO.Float_IO(T_Nb);
+  package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
+  package RIO is new Ada.Text_IO.Float_IO(Real);
 
   type S_Form_Set is array(S_Form) of Boolean;
-
-  Neutres : constant S_Form_Set:= (Plus1 | Par | Croch | Accol => True, others => False);
-  -- subtype Oper_2 is S_Form range Fois .. Puiss;
-
+  neutres : constant S_Form_Set:= (plus_una | Par | Croch | Accol => True, others => False);
   par_or_terminal: constant S_Form_Set:= (par|croch|accol|nb|vr => True, others => False);
 
   function conv_strg(s: S_Form) return String is
   begin
     case s is
-      when plus1   => return "+";
-      when moins1  => return "-";
+      when plus_una   => return "+";
+      when moins_una  => return "-";
       when expn    => return "Exp";
       when logn    => return "Log";
       when sinus   => return "Sin";
@@ -62,82 +59,80 @@ package body Formulas is
     return To_Upper(conv_strg(s));
   end;
 
-  procedure Write_form (t: in  Ada.Text_IO.File_Type; f: Form_p) is
-    x : t_nb;
+  procedure Put (t: in  Ada.Text_IO.File_Type; f: Formula) is
+    x : Real;
     use Ada.Text_IO, RIO;
   begin
     if  f/= null then
       case  f.s  is
         when nb =>
           x:= f.n;
-          if  x = T_nb'Floor(x) then
+          if  x = Real'Floor(x) then
             Put(t, Integer(x), 0);
           else
             Put(t,x,0,5,0);
           end if;
         when vr =>
           Put(t, To_String(f.v));
-        when moins1=>
+        when moins_una=>
           Put(t,'-');
-          Write_form(t,f.f1);
-        when plus1=>
+          Put(t,f.left);
+        when plus_una=>
           Put(t,'+');
-          Write_form(t,f.f1);
+          Put(t,f.left);
         when fois..puiss =>
-          Write_form(t,f.f1);
+          Put(t,f.left);
           Put(t,conv_strg(f.s));
-          Write_form(t,f.f2);
+          Put(t,f.right);
         when logn..th=>
           Put(t,conv_strg(f.s));
           Put(t,'(');
-          Write_form(t,f.f1);
+          Put(t,f.left);
           Put(t,')');
         when par=>
           Put(t,'(');
-          Write_form(t,f.f1);
+          Put(t,f.left);
           Put(t,')');
         when croch=>
           Put(t,'[');
-          Write_form(t,f.f1);
+          Put(t,f.left);
           Put(t,']');
         when accol=>
           Put(t,'{');
-          Write_form(t,f.f1);
+          Put(t,f.left);
           Put(t,'}');
         when others=>
           null;  -- [P2Ada]: no otherwise / else in Pascal
       end case;
 
     end if;
-  end Write_form;
+  end Put;
 
-  procedure Del_form (f: in out form_p) is
+  procedure Deep_delete (f: in out Formula) is
   begin
-    if f/=null then
+    if f /= null then
       case  f.s  is
-        when
-            moins1 |  plus1 |
-            expn |  logn |
-            sinus |  cosinus |
-            tg |  arctg |
-            par |  croch |  accol=>
-          Del_form(f.f1);
-        when plus |  moins |
-            fois |  sur |
-            puiss=>
-          Del_form(f.f1);
-          Del_form(f.f2);
+        when Unary =>
+          Deep_delete(f.left);
+        when Binary =>
+          Deep_delete(f.left);
+          Deep_delete(f.right);
         when others=>
-          null;  -- [P2Ada]: no otherwise / else in Pascal
+          null;
       end case;
       Dispose(f);
       f:= null;
     end if;
-  end Del_form;
+  end Deep_delete;
 
   type Character_Set is array(Character) of Boolean;
 
-  procedure String_to_form (str_base: String; f: out form_p; OK: out Boolean) is
+  function Almost_zero(x: Real) return Boolean is
+  begin
+    return abs x <= Real'Base'Model_Small;
+  end Almost_zero;
+
+  procedure Parse (str_base: String; f: out Formula; OK: out Boolean) is
 
     function No_Spaces(s: String) return String is
       t: String(s'Range);
@@ -163,32 +158,32 @@ package body Formulas is
 
     i : Integer;
 
-    function expression return form_p is
-      function terme return form_p is
-        function facteur return form_p is
+    function Expression return Formula is
+      function Term return Formula is
+        function Factor return Formula is
           --
-          function nombre return form_p is
-            n : form_p;
+          function Number return Formula is
+            n : Formula;
             j : Integer;
           begin
-            n:= new Formula(nb);
+            n:= new Formula_Rec(nb);
             j:=i;
             loop
               i:= i+1;
               exit when not chiffres(str(i));
             end loop;
-            n.n:= T_Nb'Value(str(j..i-1));
+            n.n:= Real'Value(str(j..i-1));
             return n;
           exception
             when Constraint_Error =>
               n.n:= 0.0;
               OK:= False;
               return n;
-          end nombre;
+          end Number;
 
-          function variable_fonction return form_p is
+          function Variable_or_function return Formula is
             --  variables, fonctions user, fonctions standard
-            n                        : form_p;
+            n                        : Formula;
             j                        : Integer;
           begin
             j:=i;
@@ -202,66 +197,63 @@ package body Formulas is
             begin
               if str(i)='(' then           --  --- (: fonctions std, usr
                 for s in  expn .. fois loop
-                  if mch = conv_mstr(s) then
-                    n:= new Formula(s);
+                  if mch = conv_mstr(s) then  -- Found a built-in function
+                    n:= new Formula_Rec(s);
                     exit;
                   end if;
                 end loop;
                 i:= i + 1;
-                -- !! fonctions usr !!
-                n.f1:= expression;
+                -- !! fonctions usr TBD !!
+                n.left:= Expression;
                 if str(i)/=')' then
                   OK:= False ;
                 else
                   i:= i + 1;
                 end if;
               else
-                n:= new Formula(vr);
+                n:= new Formula_Rec(vr);
                 n.v:= To_Unbounded_String(ch);
               end if;
             end;
             return n;
-          end variable_fonction;
+          end Variable_or_function;
 
-          --  -- Facteur
-          n,
-          n1 : form_p;
-          c  : Character;
+          --  Factor
+          n, n1 : Formula;
+          c     : Character;
         begin
           n:= null;
-          if  chiffres(str(i)) then
-            n:= nombre;
+          if chiffres(str(i)) then
+            n:= Number;
+          elsif lettres(str(i)) then
+            n:= Variable_or_function;
           else
-            if lettres(str(i)) then
-              n:= variable_fonction;
-            else
-              case str(i) is
-                when '-' =>
-                  n:= new Formula(moins1);
-                  i:= i + 1;
-                  n.f1:= facteur;
-                when '+' =>
-                  n:= new Formula(plus1);
-                  i:= i + 1;
-                  n.f1:= facteur ;
-                when others=>
-                  null;  -- [P2Ada]: no otherwise / else in Pascal
-              end case;
-            end if;
+            case str(i) is
+              when '-' =>
+                n:= new Formula_Rec(moins_una);
+                i:= i + 1;
+                n.left:= Factor;
+              when '+' =>
+                n:= new Formula_Rec(plus_una);
+                i:= i + 1;
+                n.left:= Factor;
+              when others=>
+                null;
+            end case;
           end if;
           c:= str(i);
-          case  c  is
+          case c is
             when '^'=>
-              n1:=n;
-              n:= new Formula(puiss);
+              n1:= n;
+              n:= new Formula_Rec(puiss);
               i:= i + 1;
-              n.f1:= n1;
-              n.f2:= facteur;
+              n.left:= n1;
+              n.right:= Factor;
             when '(' | '[' | '{'=>
-              if  n=null then
-                n:= new Formula(conv_symb(c));
+              if n = null then
+                n:= new Formula_Rec(conv_symb(c));
                 i:= i + 1;
-                n.f1:= expression;
+                n.left:= Expression;
                 case c is
                   when '('=>
                     OK:= OK  and str(i)=')';
@@ -278,47 +270,41 @@ package body Formulas is
               null;  -- [P2Ada]: no otherwise / else in Pascal
           end case;
           return n;
-        end facteur;
+        end Factor;
 
-        --  -- Terme
-        n,
-        g,
-        d : form_p;
+        --  Term
+        n, left : Formula;
         c : Character;
       begin
-        g:= Facteur;
+        left:= Factor;
         c:= str(i);
         if c = '*' or c = '/' then
           i:= i + 1;
-          d:= Terme;
-          n:= new Formula(conv_symb(c));
-          n.f1:= g;
-          n.f2:= d;
+          n:= new Formula_Rec(conv_symb(c));
+          n.left:= left;
+          n.right:= Term;
+          return n;
         else
-          n:= g;
+          return left;
         end if;
-        return n;
-      end terme;
+      end Term;
 
-      --  -- Expression
-      n,
-      g,
-      d : form_p;
+      --  Expression
+      n, left : Formula;
       c : Character;
     begin
-      g:= Terme;
+      left:= Term;
       c:= str(i);
-      if  c = '+' or c = '-' then
-        i:= i+1;
-        d:= Expression;
-        n:= new Formula(conv_symb(c));
-        n.f1:= g;
-        n.f2:=  d;
+      if c = '+' or c = '-' then
+        i:= i + 1;
+        n:= new Formula_Rec(conv_symb(c));
+        n.left:= left;
+        n.right:= Expression;
+        return n;
       else
-        n:=g;
+        return left;
       end if;
-      return n;
-    end expression;
+    end Expression;
 
   begin
     OK:= True;
@@ -326,14 +312,14 @@ package body Formulas is
     f:= Expression;
     OK:= OK and str(i) = c_fin;
     if not ok then
-      Del_form(f);
+      Deep_delete(f);
     end if;
-  end String_to_form;
+  end Parse;
 
   --  -------------------------------- Evaluate ---------------------------------
 
-  function Eval_form (f: Form_p) return T_nb is
-    aux: t_nb;
+  function Evaluate (f: Formula) return Real is
+    aux: Real;
     use REF;
   begin
     if f = null then
@@ -344,147 +330,134 @@ package body Formulas is
           return f.n;
         when vr=>
           return Evaluate_variable(To_String(f.v));
-        when moins1 =>
-          return -Eval_form(f.f1);
-        when plus1 |
+        when moins_una =>
+          return -Evaluate(f.left);
+        when plus_una |
              par |
              croch |
              accol =>
-          return Eval_form(f.f1);
+          return Evaluate(f.left);
         when plus =>
-          return Eval_form(f.f1) + Eval_form(f.f2);
+          return Evaluate(f.left) + Evaluate(f.right);
         when moins =>
-          return Eval_form(f.f1) - Eval_form(f.f2);
+          return Evaluate(f.left) - Evaluate(f.right);
         when fois =>
-          aux:= Eval_form(f.f1);
-          if aux = 0.0 then
+          aux:= Evaluate(f.left);
+          if Almost_zero(aux) then
             return 0.0;
+          elsif Almost_zero(aux - 1.0) then
+            return Evaluate(f.right);
           else
-            if aux = 1.0 then
-              return Eval_form(f.f2);
-            else
-              return aux * Eval_form(f.f2);
-            end if;
+            return aux * Evaluate(f.right);
           end if;
         when sur =>
-          aux:= Eval_form(f.f2);
-          if aux = 0.0 then
+          aux:= Evaluate(f.right);
+          if Almost_zero(aux) then
             raise div_by_0;
+          elsif Almost_zero(aux - 1.0) then    --  X/1 -> X
+            return Evaluate(f.left);
           else
-            if aux = 1.0 then
-              return Eval_form(f.f1);
-            else
-              return Eval_form(f.f1) / aux;
-            end if;
+            return Evaluate(f.left) / aux;
           end if;
         when puiss =>
-          aux:= Eval_form(f.f1);
+          aux:= Evaluate(f.left);
           if aux <= 0.0 then
             raise not_pos_power;
-          else
-            return Exp(Eval_form(f.f2)*Log(aux));
           end if;
+          return Exp(Evaluate(f.right)*Log(aux));
         when logn=>
-          aux:= Eval_form(f.f1);
+          aux:= Evaluate(f.left);
           if aux <= 0.0 then
             raise not_pos_power;
-          else
-            return Log(aux);
           end if;
+          return Log(aux);
         when expn=>
-          return Exp(Eval_form(f.f1));
+          return Exp(Evaluate(f.left));
         when sinus=>
-          return Sin(Eval_form(f.f1));
+          return Sin(Evaluate(f.left));
         when cosinus=>
-          return Cos(Eval_form(f.f1));
+          return Cos(Evaluate(f.left));
         when sh=>
-          return Sinh(Eval_form(f.f1));
+          return Sinh(Evaluate(f.left));
         when ch=>
-          return Cosh(Eval_form(f.f1));
+          return Cosh(Evaluate(f.left));
         when th=>
-          return Tanh(Eval_form(f.f1));
+          return Tanh(Evaluate(f.left));
         when arctg=>
-          return ArcTan(Eval_form(f.f1));
+          return ArcTan(Evaluate(f.left));
         when tg=>
-          return Tan(Eval_form(f.f1));
+          return Tan(Evaluate(f.left));
       end case;
     end if;
-  end Eval_form;
+  end Evaluate;
 
-  --  -------------------------------- Compare -----------------------------------
+  ------------------------------- Compare -----------------------------------
 
-
-  function EqForms(fa, fb : Form_p) return Boolean is
-    ok     : Boolean;
+  function Equivalent(fa, fb : Formula) return Boolean is
     ga, gb : s_form;
   begin
     if fa = null and fb = null then
       return True;
     end if;
-    if fa = null then -- fb is not null, at this point
+    -- fb is not null, at this point
+    if fa = null then
       return False;
     end if;
+    -- fa and fb are not null, at this point
     ga:= fa.s;
     gb:= fb.s;
     if neutres(ga) then
-      ok:= EqForms(fa.f1,fb);
+      return Equivalent(fa.left, fb); -- +A, (A), [A], {A}  -> A
+    elsif neutres(gb) then
+      return Equivalent(fa, fb.left); -- +B, (B), [B], {B}  -> B
+    elsif ga /= gb then
+      return False;
     else
-      if neutres(gb) then
-        ok:= EqForms(fa,fb.f1);
-      else
-        ok:= ga=gb;
-        if ok then
-          case  ga  is
-            when nb =>
-              ok:= fa.n = fb.n;
-            when vr =>
-              ok:= fa.v = fb.v;
-            when moins1 =>
-              ok:= EqForms(fa.f1, fb.f1);
-            when plus | moins | fois | sur | puiss =>
-              ok:= EqForms(fa.f1, fb.f1) and EqForms(fa.f2, fb.f2);
-            when others =>
-              null;  -- [P2Ada]: no otherwise / else in Pascal
-          end case;
-        end if;
-      end if;
+      case ga is
+        when nb =>
+          return Almost_zero(fa.n - fb.n);
+        when vr =>
+          return fa.v = fb.v;  --  same names
+        when Unary =>
+          return Equivalent(fa.left, fb.left);
+        when Binary =>
+          return Equivalent(fa.left, fb.left) and Equivalent(fa.right, fb.right);
+      end case;
     end if;
-    return ok;
-  end EqForms;
+  end Equivalent;
 
-  --  -------------------------------- Simplify -----------------------------------
+  ------------------------------- Simplify ----------------------------------
 
-
-  procedure Simplify (f : in out Form_p) is
+  procedure Simplify (f : in out Formula) is
     aux,
-    nexp : form_p;
-    x    : t_nb;
+    nexp : Formula;
+    x    : Real;
 
-    function IsConst (a: form_p; cst : t_nb) return Boolean is
+    function IsConst (a: Formula; cst : Real) return Boolean is
     begin
       return a /= null and then a.s = nb and then a.n = cst;
     end IsConst;
 
-    procedure f1_replaces_f is
+    procedure left_replaces_f is
     begin
-      aux:=f.f1;
-      f.f1:= null; --  empˆeche destruction
-      Del_form(f);
+      aux:= f.left;
+      f.left:= null; --  empˆeche destruction
+      Deep_delete(f);
       f:= aux ;
-    end f1_replaces_f;
+    end left_replaces_f;
 
-    procedure f2_replaces_f is
+    procedure right_replaces_f is
     begin
-      aux:=f.f2;
-      f.f2:= null; --  empˆeche destruction
-      Del_form(f);
+      aux:= f.right;
+      f.right:= null; --  empˆeche destruction
+      Deep_delete(f);
       f:= aux ;
-    end f2_replaces_f;
+    end right_replaces_f;
 
-    procedure cst_replaces_f (c: t_nb) is
+    procedure cst_replaces_f (c: Real) is
     begin
-      Del_form(f);
-      f:= new Formula(nb);
+      Deep_delete(f);
+      f:= new Formula_Rec(nb);
       f.n:= c ;
     end cst_replaces_f;
 
@@ -494,9 +467,9 @@ package body Formulas is
       if f = null then
         return;
       end if;
-      if f.f1 /= null then
-        if f.f1.s = nb then        --  Evaluate "f(cst)" into f(cst)
-          x:= f.f1.n;
+      if f.left /= null then
+        if f.left.s = nb then        --  Evaluate "f(cst)" into f(cst)
+          x:= f.left.n;
           case f.s is
             when sinus=>
               cst_replaces_f(Sin(x));
@@ -511,13 +484,12 @@ package body Formulas is
             when others=>
               null;  -- [P2Ada]: no otherwise / else in Pascal
           end case;
-
         end if;
       end if;
-      if f.s = cosinus and then f.f1 /= null and then f.f1.s = moins1 then
-        aux:=f.f1.f1;    --  Cos(-X) -> Cos(x)
-        Dispose(f.f1);
-        f.f1:= aux;
+      if f.s = cosinus and then f.left /= null and then f.left.s = moins_una then
+        aux:=f.left.left;    --  Cos(-X) -> Cos(x)
+        Dispose(f.left);
+        f.left:= aux;
       end if;
     end Simplify_functions;
 
@@ -527,137 +499,133 @@ package body Formulas is
     if f = null then
       return;
     end if;
-    --  Compacter les arguments
-    case  f.s  is
-      when moins1 |  plus1 |
-          expn |  logn |
-          sinus |  cosinus |
-          tg |  arctg |
-          par |  croch |  accol=>
-        Simplify(f.f1);
-      when plus | moins | fois | sur | puiss =>
-        Simplify(f.f1);
-        Simplify(f.f2);
+    --  Simplify arguments
+    case f.s is
+      when Unary =>
+        Simplify(f.left);
+      when Binary =>
+        Simplify(f.left);
+        Simplify(f.right);
       when others=>
-        null;  -- [P2Ada]: no otherwise / else in Pascal
+        null;
     end case;
     if f = null then
       return;
     end if;
     case f.s is
-      when moins1=>
-        if f.f1 /= null and then f.f1.s= moins1 then     --    - -X  ->  X
-          aux:=f.f1.f1;
-          Dispose(f.f1);
+      when moins_una=>
+        if f.left /= null and then f.left.s= moins_una then     --    - -X  ->  X
+          aux:=f.left.left;
+          Dispose(f.left);
           Dispose(f);
           f:= aux;
         end if;
-      when plus1 =>
-        f1_replaces_f;                                   --  +X -> X
+      when plus_una =>
+        left_replaces_f;                                   --  +X -> X
       when par | croch | accol=>
-        if  f.f1 /= null and then par_or_terminal(f.f1.s) then
-          f1_replaces_f;     --  ((...)) ->(...), (c) -> c, (v) -> v
+        if f.left /= null and then par_or_terminal(f.left.s) then
+          left_replaces_f;     --  ((...)) ->(...), (c) -> c, (v) -> v
         end if;
       when plus =>
-        if EqForms(f.f1, f.f2) then             --  X+X -> 2*X
-          aux:= new Formula(fois);
-          aux.f1:= new Formula(nb);
-          aux.f1.n:= 2.0;
-          aux.f2:= f.f2;
-          Del_form(f.f1);
+        if Equivalent(f.left, f.right) then             --  X+X -> 2*X
+          aux:= new Formula_Rec(fois);
+          aux.left:= new Formula_Rec(nb);
+          aux.left.n:= 2.0;
+          aux.right:= f.right;
+          Deep_delete(f.left);
           Dispose(f);
           f:= aux;
-        elsif f.f1.s = nb and f.f2.s= nb then   --  cst+cst -> cst
-          cst_replaces_f( f.f1.n + f.f2.n );
-        elsif IsConst(f.f1, 0.0) then
-          f2_replaces_f;                --  0+X -> X
-        elsif IsConst(f.f2, 0.0) then
-          f1_replaces_f;                --  X+0 -> X
+        elsif f.left.s = nb and f.right.s= nb then   --  cst+cst -> cst
+          cst_replaces_f( f.left.n + f.right.n );
+        elsif IsConst(f.left, 0.0) then
+          right_replaces_f;                --  0+X -> X
+        elsif IsConst(f.right, 0.0) then
+          left_replaces_f;                 --  X+0 -> X
         end if;
       when moins =>
-        if EqForms(f.f1, f.f2) then                --  X - X   ->    0
+        if Equivalent(f.left, f.right) then          --  X - X   ->    0
           cst_replaces_f(0.0);
-        elsif IsConst(f.f1, 0.0) then              --  0 - X   ->   -X
-          aux:= new Formula(moins1);
-          aux.f1:= f.f2;
-          Del_form(f.f1);
+        elsif IsConst(f.left, 0.0) then              --  0 - X   ->   -X
+          aux:= new Formula_Rec(moins_una);
+          aux.left:= f.right;
+          Deep_delete(f.left);
           Dispose(f);
           f:= aux;
-        elsif IsConst(f.f2, 0.0) then
-          f1_replaces_f;        --  X - 0   ->   X
+        elsif IsConst(f.right, 0.0) then
+          left_replaces_f;        --  X - 0   ->   X
         end if;
       when fois =>
-        if EqForms(f.f1, f.f2) then             --  X*X -> X^2
-          aux:= new Formula(puiss);
-          aux.f1:= f.f1;
-          aux.f2:= new Formula(nb);
-          aux.f2.n:= 2.0;
-          Del_form(f.f2);
+        if Equivalent(f.left, f.right) then             --  X*X -> X^2
+          aux:= new Formula_Rec(puiss);
+          aux.left:= f.left;
+          aux.right:= new Formula_Rec(nb);
+          aux.right.n:= 2.0;
+          Deep_delete(f.right);
           Dispose(f);
           f:= aux;
-        elsif f.f1.s = nb and f.f2.s = nb then   --  cst*cst -> cst
-          cst_replaces_f( f.f1.n * f.f2.n );
-        elsif f.f1.s = puiss and then f.f2.s = puiss and then EqForms(f.f1.f1, f.f2.f1) then
-          aux:= new Formula(par);        --  X^m * X^n   ->   X^(m+n)
-          aux.f1:= new Formula(plus);
-          aux.f1.f1:= f.f1.f2;
-          aux.f1.f2:= f.f2.f2;        --  aux= "(m+n)"
-          nexp:= new Formula(puiss);
-          nexp.f1:= f.f1.f1;
-          nexp.f2:= aux;                 --  nexp= "X^(m+n)"
-          Del_Form(f.f2.f1);
-          Dispose(f.f1);
-          Dispose(f.f2);
+        elsif f.left.s = nb and f.right.s = nb then   --  cst*cst -> cst
+          cst_replaces_f( f.left.n * f.right.n );
+        elsif f.left.s = puiss and then f.right.s = puiss and then Equivalent(f.left.left, f.right.left) then
+          aux:= new Formula_Rec(par);        --  X^m * X^n   ->   X^(m+n)
+          aux.left:= new Formula_Rec(plus);
+          aux.left.left:= f.left.right;
+          aux.left.right:= f.right.right;        --  aux= "(m+n)"
+          nexp:= new Formula_Rec(puiss);
+          nexp.left:= f.left.left;
+          nexp.right:= aux;                 --  nexp= "X^(m+n)"
+          Deep_delete(f.right.left);
+          Dispose(f.left);
+          Dispose(f.right);
           Dispose(f);                --  dissoudre ancienne expr
           f:= nexp;
-        elsif f.f2.s = puiss and then EqForms(f.f1, f.f2.f1) then  --  X * X^n   ->   X^(n+1)
-          aux:= f.f2;
-          Del_Form(f.f1);
+        elsif f.right.s = puiss and then Equivalent(f.left, f.right.left) then  --  X * X^n   ->   X^(n+1)
+          aux:= f.right;
+          Deep_delete(f.left);
           dispose(f);
           f:= aux;            --  got rid of *
-          aux:= new Formula(par);
-          aux.f1:= new Formula(plus);
-          aux.f1.f1:= f.f2;
-          aux.f1.f2:= new Formula(nb);
-          aux.f1.f2.n:= 1.0;     --  (n+1) prepared
-          f.f2:= aux;
-        elsif f.f1.s = puiss and then EqForms(f.f1.f1, f.f2) then  --  X^n * X   ->   X^(n+1)
-          aux:= f.f1;
-          Del_Form(f.f2);
+          aux:= new Formula_Rec(par);
+          aux.left:= new Formula_Rec(plus);
+          aux.left.left:= f.right;
+          aux.left.right:= new Formula_Rec(nb);
+          aux.left.right.n:= 1.0;     --  (n+1) prepared
+          f.right:= aux;
+        elsif f.left.s = puiss and then Equivalent(f.left.left, f.right) then  --  X^n * X   ->   X^(n+1)
+          aux:= f.left;
+          Deep_delete(f.right);
           dispose(f);
           f:= aux;            --  got rid of *
-          aux:= new Formula(par);
-          aux.f1:= new Formula(plus);
-          aux.f1.f1:= f.f2;
-          aux.f1.f2:= new Formula(nb);
-          aux.f1.f2.n:= 1.0;     --  (n+1) prepared
-          f.f2:= aux;
-        elsif IsConst(f.f1, 0.0) then
+          aux:= new Formula_Rec(par);
+          aux.left:= new Formula_Rec(plus);
+          aux.left.left:= f.right;
+          aux.left.right:= new Formula_Rec(nb);
+          aux.left.right.n:= 1.0;     --  (n+1) prepared
+          f.right:= aux;
+        elsif IsConst(f.left, 0.0) then
           cst_replaces_f(0.0);      --  0*X  ->  0
-        elsif IsConst(f.f1, 1.0) then
-          f2_replaces_f;            --  1*X  ->  X
-        elsif IsConst(f.f2, 0.0) then
+        elsif IsConst(f.left, 1.0) then
+          right_replaces_f;            --  1*X  ->  X
+        elsif IsConst(f.right, 0.0) then
           cst_replaces_f(0.0);      --  X*0  ->  0
-        elsif IsConst(f.f2, 1.0) then
-          f1_replaces_f;            --  X*1  ->  X
+        elsif IsConst(f.right, 1.0) then
+          left_replaces_f;            --  X*1  ->  X
         end if;
 
       when sur =>
-        if IsConst(f.f2, 1.0) then
-          f1_replaces_f;        --  X/1 -> X
-        elsif EqForms(f.f1, f.f2) then
+        if IsConst(f.right, 1.0) then
+          left_replaces_f;        --  X/1 -> X
+        elsif Equivalent(f.left, f.right) then
           cst_replaces_f(1.0);  --  X/X -> 1
-        elsif f.f1.s= nb and f.f2.s= nb then
-          cst_replaces_f( f.f1.n / f.f2.n );  --  cst/cst -> cst
+        elsif f.left.s= nb and f.right.s= nb then
+          cst_replaces_f( f.left.n / f.right.n );  --  cst/cst -> cst
         end if;
 
       when puiss =>
-        if IsConst(f.f2, 0.0) then
+        if IsConst(f.right, 0.0) then
           cst_replaces_f(1.0);        --  X^0  ->  1
-        elsif IsConst(f.f2, 1.0) then
-          f1_replaces_f;              --  X^1  ->  X
-        elsif f.f1.s= nb and f.f2.s= nb then           --  cst^cst -> cst
-          cst_replaces_f( Exp(Log(f.f1.n) * f.f2.n) );
+        elsif IsConst(f.right, 1.0) then
+          left_replaces_f;              --  X^1  ->  X
+        elsif f.left.s= nb and f.right.s= nb then           --  cst^cst -> cst
+          cst_replaces_f( Exp(Log(f.left.n) * f.right.n) );
         end if;
       when sinus |  cosinus | expn |  logn=>
         Simplify_functions;
