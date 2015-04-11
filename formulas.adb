@@ -42,17 +42,21 @@ package body Formulas is
     end case;
   end;
 
-  conv_symb : constant array (Character'(' ') .. '~' ) of s_form :=
-    (
-    '+' => plus,
-    '-' => moins,
-    '*' => fois,
-    '/' => sur,
-    '^' => puiss,
-    '(' => par,
-    '[' => croch,
-    '{' => accol,
-    others => nb);
+  conv_symb_una : constant array (Character) of s_form :=
+    ( '+' => plus_una,
+      '-' => moins_una,
+      others => nb);
+
+  conv_symb : constant array (Character) of s_form :=
+    ( '+' => plus,
+      '-' => moins,
+      '*' => fois,
+      '/' => sur,
+      '^' => puiss,
+      '(' => par,
+      '[' => croch,
+      '{' => accol,
+      others => nb);
 
   function conv_mstr(s: S_Form) return String is
   begin
@@ -80,7 +84,7 @@ package body Formulas is
         when plus_una=>
           Put(t,'+');
           Put(t,f.left);
-        when fois..puiss =>
+        when Binary =>
           Put(t,f.left);
           Put(t,conv_strg(f.s));
           Put(t,f.right);
@@ -150,7 +154,7 @@ package body Formulas is
       return t(t'First .. j);
     end No_Spaces;
 
-    c_fin    : constant Character     := Character'Val (0);
+    c_fin    : constant Character := Character'Val (0);
     str: constant String:= No_Spaces(str_base) & c_fin;
 
     chiffres : constant Character_Set := ('0' .. '9' | '.' => True, others => False);
@@ -183,12 +187,12 @@ package body Formulas is
 
           function Variable_or_function return Formula is
             --  variables, fonctions user, fonctions standard
-            n                        : Formula;
-            j                        : Integer;
+            n: Formula;
+            j: Integer;
           begin
-            j:=i;
+            j:= i;
             loop
-              i:= i+1;
+              i:= i + 1;
               exit when not lettres(str(i));
             end loop;
             declare
@@ -223,23 +227,15 @@ package body Formulas is
           c     : Character;
         begin
           n:= null;
-          if chiffres(str(i)) then
+          c:= str(i);
+          if chiffres(c) then
             n:= Number;
-          elsif lettres(str(i)) then
+          elsif lettres(c) then
             n:= Variable_or_function;
-          else
-            case str(i) is
-              when '-' =>
-                n:= new Formula_Rec(moins_una);
-                i:= i + 1;
-                n.left:= Factor;
-              when '+' =>
-                n:= new Formula_Rec(plus_una);
-                i:= i + 1;
-                n.left:= Factor;
-              when others=>
-                null;
-            end case;
+          elsif c = '-' or c = '+' then
+            n:= new Formula_Rec(conv_symb_una(c));
+            i:= i + 1;
+            n.left:= Factor;
           end if;
           c:= str(i);
           case c is
@@ -600,14 +596,12 @@ package body Formulas is
           aux.left.right:= new Formula_Rec(nb);
           aux.left.right.n:= 1.0;     --  (n+1) prepared
           f.right:= aux;
-        elsif IsConst(f.left, 0.0) then
-          cst_replaces_f(0.0);      --  0*X  ->  0
+        elsif IsConst(f.left, 0.0) or else IsConst(f.right, 0.0) then
+          cst_replaces_f(0.0);         --  0*X or X*0  ->  0
         elsif IsConst(f.left, 1.0) then
           right_replaces_f;            --  1*X  ->  X
-        elsif IsConst(f.right, 0.0) then
-          cst_replaces_f(0.0);      --  X*0  ->  0
         elsif IsConst(f.right, 1.0) then
-          left_replaces_f;            --  X*1  ->  X
+          left_replaces_f;             --  X*1  ->  X
         end if;
 
       when sur =>
