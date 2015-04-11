@@ -1,6 +1,7 @@
 -- Translated on 9-Apr-2015 by (New) P2Ada v. 28-Oct-2009
 
 with Ada.Characters.Handling;           use Ada.Characters.Handling;
+with Ada.Exceptions;                    use Ada.Exceptions;
 with Ada.Integer_Text_IO;               use Ada.Integer_Text_IO;
 -- This is for Pi :
 -- with Ada.Numerics; use Ada.Numerics;
@@ -12,7 +13,6 @@ package body Formulas is
   package RIO is new Ada.Text_IO.Float_IO(Real);
 
   type S_Form_Set is array(S_Form) of Boolean;
-  neutres : constant S_Form_Set:= (plus_una | Par | Croch | Accol => True, others => False);
   par_or_terminal: constant S_Form_Set:= (par|croch|accol|nb|vr => True, others => False);
 
   function conv_strg(s: S_Form) return String is
@@ -67,8 +67,8 @@ package body Formulas is
     x : Real;
     use Ada.Text_IO, RIO;
   begin
-    if  f/= null then
-      case  f.s  is
+    if f/= null then
+      case f.s is
         when nb =>
           x:= f.n;
           if  x = Real'Floor(x) then
@@ -115,7 +115,7 @@ package body Formulas is
   procedure Deep_delete (f: in out Formula) is
   begin
     if f /= null then
-      case  f.s  is
+      case f.s is
         when Unary =>
           Deep_delete(f.left);
         when Binary =>
@@ -136,7 +136,31 @@ package body Formulas is
     return abs x <= Real'Base'Model_Small;
   end Almost_zero;
 
-  procedure Parse (str_base: String; f: out Formula; OK: out Boolean) is
+  Closing: constant array(Character) of Character:=
+    ('(' => ')',
+     '[' => ']',
+     '{' => '}',
+     others => 'X');
+
+  c_fin: constant Character := Character'Val (0);
+
+  procedure Check_brackets(open, close: Character) is
+  begin
+    if Closing(open) = close then
+      return;
+    end if;
+    if close = c_fin then
+      Raise_Exception(
+        Parse_Error'Identity,
+        "'" & Closing(open) & "' is missing");
+    else
+      Raise_Exception(
+        Parse_Error'Identity,
+        "'" & Closing(open) & "' expected, found '" & close & ''');
+    end if;
+  end Check_brackets;
+
+  procedure Parse (str_base: String; f: out Formula) is
 
     function No_Spaces(s: String) return String is
       t: String(s'Range);
@@ -154,7 +178,6 @@ package body Formulas is
       return t(t'First .. j);
     end No_Spaces;
 
-    c_fin    : constant Character := Character'Val (0);
     str: constant String:= No_Spaces(str_base) & c_fin;
 
     chiffres : constant Character_Set := ('0' .. '9' | '.' => True, others => False);
@@ -173,20 +196,14 @@ package body Formulas is
             n:= new Formula_Rec(nb);
             j:=i;
             loop
-              i:= i+1;
+              i:= i + 1;
               exit when not chiffres(str(i));
             end loop;
             n.n:= Real'Value(str(j..i-1));
             return n;
-          exception
-            when Constraint_Error =>
-              n.n:= 0.0;
-              OK:= False;
-              return n;
           end Number;
 
           function Variable_or_function return Formula is
-            --  variables, fonctions user, fonctions standard
             n: Formula;
             j: Integer;
           begin
@@ -209,11 +226,8 @@ package body Formulas is
                 i:= i + 1;
                 -- !! fonctions usr TBD !!
                 n.left:= Expression;
-                if str(i)/=')' then
-                  OK:= False ;
-                else
-                  i:= i + 1;
-                end if;
+                Check_brackets('(', str(i));
+                i:= i + 1;
               else
                 n:= new Formula_Rec(vr);
                 n.v:= To_Unbounded_String(ch);
@@ -250,21 +264,15 @@ package body Formulas is
                 n:= new Formula_Rec(conv_symb(c));
                 i:= i + 1;
                 n.left:= Expression;
-                case c is
-                  when '('=>
-                    OK:= OK  and str(i)=')';
-                  when '['=>
-                    OK:= OK  and str(i)=']';
-                  when '{'=>
-                    OK:= OK  and str(i)='}';
-                  when others=>
-                    null;
-                end case;
-                i:= i+1;
+                Check_brackets(c, str(i));
+                i:= i + 1;
               end if;
             when others=>
               null;  -- [P2Ada]: no otherwise / else in Pascal
           end case;
+          if n = null then
+            Raise_Exception(Parse_Error'Identity, "Unexpected end in factor");
+          end if;
           return n;
         end Factor;
 
@@ -303,13 +311,16 @@ package body Formulas is
     end Expression;
 
   begin
-    OK:= True;
     i:= 1;
     f:= Expression;
-    OK:= OK and str(i) = c_fin;
-    if not ok then
+    if str(i) /= c_fin then
       Deep_delete(f);
+      Raise_Exception(Parse_Error'Identity, "Unexpected end in expression");
     end if;
+  exception
+    when E: Parse_Error =>
+      Deep_delete(f);
+      Raise_Exception(Parse_Error'Identity, Exception_Message(E));
   end Parse;
 
   --  -------------------------------- Evaluate ---------------------------------
@@ -320,71 +331,70 @@ package body Formulas is
   begin
     if f = null then
       return 0.0;
-    else
-      case f.s is
-        when nb=>
-          return f.n;
-        when vr=>
-          return Evaluate_variable(To_String(f.v));
-        when moins_una =>
-          return -Evaluate(f.left);
-        when plus_una |
-             par |
-             croch |
-             accol =>
-          return Evaluate(f.left);
-        when plus =>
-          return Evaluate(f.left) + Evaluate(f.right);
-        when moins =>
-          return Evaluate(f.left) - Evaluate(f.right);
-        when fois =>
-          aux:= Evaluate(f.left);
-          if Almost_zero(aux) then
-            return 0.0;
-          elsif Almost_zero(aux - 1.0) then
-            return Evaluate(f.right);
-          else
-            return aux * Evaluate(f.right);
-          end if;
-        when sur =>
-          aux:= Evaluate(f.right);
-          if Almost_zero(aux) then
-            raise div_by_0;
-          elsif Almost_zero(aux - 1.0) then    --  X/1 -> X
-            return Evaluate(f.left);
-          else
-            return Evaluate(f.left) / aux;
-          end if;
-        when puiss =>
-          aux:= Evaluate(f.left);
-          if aux <= 0.0 then
-            raise not_pos_power;
-          end if;
-          return Exp(Evaluate(f.right)*Log(aux));
-        when logn=>
-          aux:= Evaluate(f.left);
-          if aux <= 0.0 then
-            raise not_pos_power;
-          end if;
-          return Log(aux);
-        when expn=>
-          return Exp(Evaluate(f.left));
-        when sinus=>
-          return Sin(Evaluate(f.left));
-        when cosinus=>
-          return Cos(Evaluate(f.left));
-        when sh=>
-          return Sinh(Evaluate(f.left));
-        when ch=>
-          return Cosh(Evaluate(f.left));
-        when th=>
-          return Tanh(Evaluate(f.left));
-        when arctg=>
-          return ArcTan(Evaluate(f.left));
-        when tg=>
-          return Tan(Evaluate(f.left));
-      end case;
     end if;
+    case f.s is
+      when nb=>
+        return f.n;
+      when vr=>
+        return Evaluate_variable(To_String(f.v));
+      when moins_una =>
+        return -Evaluate(f.left);
+      when plus_una |
+           par |
+           croch |
+           accol =>
+        return Evaluate(f.left);
+      when plus =>
+        return Evaluate(f.left) + Evaluate(f.right);
+      when moins =>
+        return Evaluate(f.left) - Evaluate(f.right);
+      when fois =>
+        aux:= Evaluate(f.left);
+        if Almost_zero(aux) then
+          return 0.0;
+        elsif Almost_zero(aux - 1.0) then
+          return Evaluate(f.right);
+        else
+          return aux * Evaluate(f.right);
+        end if;
+      when sur =>
+        aux:= Evaluate(f.right);
+        if Almost_zero(aux) then
+          raise div_by_0;
+        elsif Almost_zero(aux - 1.0) then    --  X/1 -> X
+          return Evaluate(f.left);
+        else
+          return Evaluate(f.left) / aux;
+        end if;
+      when puiss =>
+        aux:= Evaluate(f.left);
+        if aux <= 0.0 then
+          raise not_pos_power;
+        end if;
+        return Exp(Evaluate(f.right)*Log(aux));
+      when logn=>
+        aux:= Evaluate(f.left);
+        if aux <= 0.0 then
+          raise not_pos_power;
+        end if;
+        return Log(aux);
+      when expn=>
+        return Exp(Evaluate(f.left));
+      when sinus=>
+        return Sin(Evaluate(f.left));
+      when cosinus=>
+        return Cos(Evaluate(f.left));
+      when sh=>
+        return Sinh(Evaluate(f.left));
+      when ch=>
+        return Cosh(Evaluate(f.left));
+      when th=>
+        return Tanh(Evaluate(f.left));
+      when arctg=>
+        return ArcTan(Evaluate(f.left));
+      when tg=>
+        return Tan(Evaluate(f.left));
+    end case;
   end Evaluate;
 
   ------------------------------- Compare -----------------------------------
@@ -392,19 +402,18 @@ package body Formulas is
   function Equivalent(fa, fb : Formula) return Boolean is
     ga, gb : s_form;
   begin
-    if fa = null and fb = null then
-      return True;
-    end if;
-    -- fb is not null, at this point
     if fa = null then
+      return fb = null;
+    end if;
+    if fb = null then
       return False;
     end if;
     -- fa and fb are not null, at this point
     ga:= fa.s;
     gb:= fb.s;
-    if neutres(ga) then
+    if ga in Neutral then
       return Equivalent(fa.left, fb); -- +A, (A), [A], {A}  -> A
-    elsif neutres(gb) then
+    elsif gb in Neutral then
       return Equivalent(fa, fb.left); -- +B, (B), [B], {B}  -> B
     elsif ga /= gb then
       return False;
@@ -422,17 +431,27 @@ package body Formulas is
     end if;
   end Equivalent;
 
+  function Is_constant(a: Formula; cst : Real) return Boolean is
+  begin
+    return a /= null and then a.s = nb and then a.n = cst;
+  end;
+
+  function Is_constant_pair(a: Formula) return Boolean is
+  begin
+    return
+      a.s in Binary and then
+      a.left /= null and then
+      a.right /= null and then
+      a.left.s = nb and then
+      a.right.s = nb;
+  end;
+
   ------------------------------- Simplify ----------------------------------
 
   procedure Simplify (f : in out Formula) is
     aux,
     nexp : Formula;
     x    : Real;
-
-    function IsConst (a: Formula; cst : Real) return Boolean is
-    begin
-      return a /= null and then a.s = nb and then a.n = cst;
-    end IsConst;
 
     procedure left_replaces_f is
     begin
@@ -459,10 +478,8 @@ package body Formulas is
 
     procedure Simplify_functions is
       use REF;
+      --  Assumes: f.s in Built_in_function
     begin
-      if f = null then
-        return;
-      end if;
       if f.left /= null then
         if f.left.s = nb then        --  Evaluate "f(cst)" into f(cst)
           x:= f.left.n;
@@ -483,7 +500,7 @@ package body Formulas is
         end if;
       end if;
       if f.s = cosinus and then f.left /= null and then f.left.s = moins_una then
-        aux:=f.left.left;    --  Cos(-X) -> Cos(x)
+        aux:= f.left.left;    --  Cos(-X) -> Cos(X)
         Dispose(f.left);
         f.left:= aux;
       end if;
@@ -531,23 +548,23 @@ package body Formulas is
           Deep_delete(f.left);
           Dispose(f);
           f:= aux;
-        elsif f.left.s = nb and f.right.s= nb then   --  cst+cst -> cst
-          cst_replaces_f( f.left.n + f.right.n );
-        elsif IsConst(f.left, 0.0) then
+        elsif Is_constant_pair(f) then
+          cst_replaces_f( f.left.n + f.right.n );       --  cst+cst  ->  cst
+        elsif Is_constant(f.left, 0.0) then
           right_replaces_f;                --  0+X -> X
-        elsif IsConst(f.right, 0.0) then
+        elsif Is_constant(f.right, 0.0) then
           left_replaces_f;                 --  X+0 -> X
         end if;
       when moins =>
         if Equivalent(f.left, f.right) then          --  X - X   ->    0
           cst_replaces_f(0.0);
-        elsif IsConst(f.left, 0.0) then              --  0 - X   ->   -X
+        elsif Is_constant(f.left, 0.0) then              --  0 - X   ->   -X
           aux:= new Formula_Rec(moins_una);
           aux.left:= f.right;
           Deep_delete(f.left);
           Dispose(f);
           f:= aux;
-        elsif IsConst(f.right, 0.0) then
+        elsif Is_constant(f.right, 0.0) then
           left_replaces_f;        --  X - 0   ->   X
         end if;
       when fois =>
@@ -559,8 +576,8 @@ package body Formulas is
           Deep_delete(f.right);
           Dispose(f);
           f:= aux;
-        elsif f.left.s = nb and f.right.s = nb then   --  cst*cst -> cst
-          cst_replaces_f( f.left.n * f.right.n );
+        elsif Is_constant_pair(f) then
+          cst_replaces_f( f.left.n * f.right.n );       --  cst+cst  ->  cst
         elsif f.left.s = puiss and then f.right.s = puiss and then Equivalent(f.left.left, f.right.left) then
           aux:= new Formula_Rec(par);        --  X^m * X^n   ->   X^(m+n)
           aux.left:= new Formula_Rec(plus);
@@ -596,32 +613,32 @@ package body Formulas is
           aux.left.right:= new Formula_Rec(nb);
           aux.left.right.n:= 1.0;     --  (n+1) prepared
           f.right:= aux;
-        elsif IsConst(f.left, 0.0) or else IsConst(f.right, 0.0) then
+        elsif Is_constant(f.left, 0.0) or else Is_constant(f.right, 0.0) then
           cst_replaces_f(0.0);         --  0*X or X*0  ->  0
-        elsif IsConst(f.left, 1.0) then
+        elsif Is_constant(f.left, 1.0) then
           right_replaces_f;            --  1*X  ->  X
-        elsif IsConst(f.right, 1.0) then
+        elsif Is_constant(f.right, 1.0) then
           left_replaces_f;             --  X*1  ->  X
         end if;
 
       when sur =>
-        if IsConst(f.right, 1.0) then
+        if Is_constant(f.right, 1.0) then
           left_replaces_f;        --  X/1 -> X
         elsif Equivalent(f.left, f.right) then
           cst_replaces_f(1.0);  --  X/X -> 1
-        elsif f.left.s= nb and f.right.s= nb then
-          cst_replaces_f( f.left.n / f.right.n );  --  cst/cst -> cst
+        elsif Is_constant_pair(f) and then not Almost_zero(f.right.n) then
+          cst_replaces_f( f.left.n / f.right.n );       --  cst/cst -> cst
         end if;
 
       when puiss =>
-        if IsConst(f.right, 0.0) then
+        if Is_constant(f.right, 0.0) then
           cst_replaces_f(1.0);        --  X^0  ->  1
-        elsif IsConst(f.right, 1.0) then
+        elsif Is_constant(f.right, 1.0) then
           left_replaces_f;              --  X^1  ->  X
-        elsif f.left.s= nb and f.right.s= nb then           --  cst^cst -> cst
+        elsif f.left.s= nb and f.right.s= nb then       --  cst^cst  ->  cst
           cst_replaces_f( Exp(Log(f.left.n) * f.right.n) );
         end if;
-      when sinus |  cosinus | expn |  logn=>
+      when Built_in_function =>
         Simplify_functions;
       when others=>
         null;  -- [P2Ada]: no otherwise / else in Pascal

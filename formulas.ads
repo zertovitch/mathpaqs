@@ -1,11 +1,11 @@
 --  ===========================================================================
---  ======|   Formulas: Symbolic computation                 |=================
---  ======|   Parsing - output - evaluation - simplification |=================
+--  ======|   Formulas: Symbolic computation                  |================
+--  ======|   Parsing - writing - evaluation - simplification |================
 --  ===========================================================================
 
 --  Based on a Pascal university exercise (~1990's)
 --  Translated on 9-Apr-2015 by (New) P2Ada v. 28-Oct-2009
---  Reworked further (generic, private types, etc.)
+--  Reworked further (generic, private types, exceptions, etc.)
 
 -- Copyright (c) Gautier de Montmollin 2015
 --
@@ -31,7 +31,6 @@
 -- http://www.opensource.org/licenses/mit-license.php
 
 -- TO DO:
---   - get rid of the OK out parameter; do all with exceptions
 --   - implement user functions
 --   - for unary operators: "arg" instead of "left" descendant
 --   - complete Simplify_functions
@@ -57,13 +56,13 @@ package Formulas is
   null_formula: constant Formula;
 
   procedure Put (t: in  Ada.Text_IO.File_Type; f: Formula);
-  procedure Parse (str_base:  String; f: out Formula; OK: out Boolean);
+  procedure Parse (str_base:  String; f: out Formula);
   function Evaluate (f: Formula) return Real;
   function Equivalent (fa, fb : Formula) return Boolean;
   procedure Simplify (f: in out Formula);
   procedure Deep_delete (f: in out Formula);
 
-  No_Error,
+  Parse_Error,
   Div_By_0,
   Not_Pos_Power: exception;
 
@@ -71,15 +70,17 @@ private
 
   type S_Form is
                 (nb, vr,                                        --  0 arg
-                 plus_una, moins_una,                           --  1 arg
+                 moins_una, plus_una,                           --  1 arg
+                 par, croch, accol,
                  expn, logn,
                  sinus, cosinus, tg, arctg,
                  sh, ch, th,
-                 par, croch, accol,
                  fois, plus, moins, sur, puiss);                --  2 args
 
   subtype Leaf is S_Form range nb .. vr;
-  subtype Unary is S_Form range plus_una .. accol;
+  subtype Unary is S_Form range moins_una .. th;
+  subtype Neutral is Unary range plus_una .. accol;
+  subtype Built_in_function is Unary range expn .. th;
   subtype Binary is S_Form range fois .. puiss;
 
   type Formula_Rec(S:  S_Form);
@@ -91,14 +92,7 @@ private
     case S is
       when Nb =>   N: Real;
       when Vr =>   V: Unbounded_String;
-      when plus_una |  moins_una |
-          Expn |  Logn |
-          Sinus |  Cosinus |  Tg |  Arctg |
-          Sh |  Ch |  Th |
-          Par |  Croch |  Accol |
-          Fois |  Plus |  Moins |  Sur |  Puiss
-        =>
-          left, right: Formula;
+      when Unary | Binary => left, right: Formula;
     end case;
   end record;
 

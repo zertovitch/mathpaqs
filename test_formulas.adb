@@ -22,11 +22,10 @@ procedure Test_Formulas is
   procedure Test_1(expr: String; target: String:= "") is
     use My_Formulas;
     f: Formula:= null_formula;
-    ok: Boolean;
     e0, e: Real;
   begin
     Put_Line("*************** Testing formula: " & expr);
-    Parse(expr, f, ok);
+    Parse(expr, f);
     Put("Output...   : ");
     Put(Standard_Output, f);
     New_Line;
@@ -51,9 +50,9 @@ begin
   Put("x=");
   Put(Evaluate_variable("x"), 0,3,0);
   New_Line;
-  Test_1("x * (x*x)");
+  Test_1("x * (x*x + 0)");
   Test_1("x*x*x");
-  Test_1("cos(x/2)*cos(x/2)*cos(x/2)  +  cos(x/2)*cos(x/2)^2 + cos(x/2) + cos(x/2)");
+  Test_1("cos(+x/2)*cos(x/2)*cos(-(x/2))  +  cos(x/2)*cos(x/2)^2 + cos(x/2) + cos(x/2)");
   Test_1("cos(x/2)*cos(x/2)*cos(x/2) + cos(x/2) + cos(x/2) +  cos(x/2)*cos(x/2)^2 ");
   Test_1("sin(2*2^(1/2+3/2) + 1*1/2 + 0*7.65) + sin(8.5)", "1.59697422524698 = 2*sin(8.5)");
 end Test_Formulas;
