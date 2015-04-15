@@ -325,7 +325,7 @@ package body Formulas is
 
   --  -------------------------------- Evaluate ---------------------------------
 
-  function Evaluate (f: Formula) return Real is
+  function Evaluate (f: Formula; payload: Payload_type) return Real is
     aux: Real;
     use REF;
   begin
@@ -336,64 +336,64 @@ package body Formulas is
       when nb=>
         return f.n;
       when vr=>
-        return Evaluate_variable(To_String(f.v));
+        return Evaluate_variable(To_String(f.v), payload);
       when moins_una =>
-        return -Evaluate(f.left);
+        return -Evaluate(f.left, payload);
       when plus_una |
            par |
            croch |
            accol =>
-        return Evaluate(f.left);
+        return Evaluate(f.left, payload);
       when plus =>
-        return Evaluate(f.left) + Evaluate(f.right);
+        return Evaluate(f.left, payload) + Evaluate(f.right, payload);
       when moins =>
-        return Evaluate(f.left) - Evaluate(f.right);
+        return Evaluate(f.left, payload) - Evaluate(f.right, payload);
       when fois =>
-        aux:= Evaluate(f.left);
+        aux:= Evaluate(f.left, payload);
         if Almost_zero(aux) then
           return 0.0;
         elsif Almost_zero(aux - 1.0) then
-          return Evaluate(f.right);
+          return Evaluate(f.right, payload);
         else
-          return aux * Evaluate(f.right);
+          return aux * Evaluate(f.right, payload);
         end if;
       when sur =>
-        aux:= Evaluate(f.right);
+        aux:= Evaluate(f.right, payload);
         if Almost_zero(aux) then
           raise div_by_0;
         elsif Almost_zero(aux - 1.0) then    --  X/1 -> X
-          return Evaluate(f.left);
+          return Evaluate(f.left, payload);
         else
-          return Evaluate(f.left) / aux;
+          return Evaluate(f.left, payload) / aux;
         end if;
       when puiss =>
-        aux:= Evaluate(f.left);
+        aux:= Evaluate(f.left, payload);
         if aux <= 0.0 then
           raise not_pos_power;
         end if;
-        return Exp(Evaluate(f.right)*Log(aux));
+        return Exp(Evaluate(f.right, payload)*Log(aux));
       when logn=>
-        aux:= Evaluate(f.left);
+        aux:= Evaluate(f.left, payload);
         if aux <= 0.0 then
           raise not_pos_power;
         end if;
         return Log(aux);
       when expn=>
-        return Exp(Evaluate(f.left));
+        return Exp(Evaluate(f.left, payload));
       when sinus=>
-        return Sin(Evaluate(f.left));
+        return Sin(Evaluate(f.left, payload));
       when cosinus=>
-        return Cos(Evaluate(f.left));
+        return Cos(Evaluate(f.left, payload));
       when sh=>
-        return Sinh(Evaluate(f.left));
+        return Sinh(Evaluate(f.left, payload));
       when ch=>
-        return Cosh(Evaluate(f.left));
+        return Cosh(Evaluate(f.left, payload));
       when th=>
-        return Tanh(Evaluate(f.left));
+        return Tanh(Evaluate(f.left, payload));
       when arctg=>
-        return ArcTan(Evaluate(f.left));
+        return ArcTan(Evaluate(f.left, payload));
       when tg=>
-        return Tan(Evaluate(f.left));
+        return Tan(Evaluate(f.left, payload));
     end case;
   end Evaluate;
 

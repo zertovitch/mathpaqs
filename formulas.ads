@@ -48,7 +48,9 @@ generic
 
   type Real is digits <>;
 
-  with function Evaluate_variable(name: String) return Real;
+  type Payload_type is private; -- This can be a container type for user variables
+
+  with function Evaluate_variable(name: String; payload: Payload_type) return Real;
 
 package Formulas is
 
@@ -57,7 +59,7 @@ package Formulas is
 
   procedure Put (t: in  Ada.Text_IO.File_Type; f: Formula);
   procedure Parse (str_base:  String; f: out Formula);
-  function Evaluate (f: Formula) return Real;
+  function Evaluate (f: Formula; payload: Payload_type) return Real;
   function Equivalent (fa, fb : Formula) return Boolean;
   procedure Simplify (f: in out Formula);
   procedure Deep_delete (f: in out Formula);

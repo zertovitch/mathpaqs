@@ -9,7 +9,10 @@ procedure Test_Formulas is
   package RIO is new Ada.Text_IO.Float_IO(Real);
   use RIO;
 
-  function Evaluate_variable(name: String) return Real is
+  type Dummy_type is new Integer;
+  dummy: constant Dummy_type:= 0;
+
+  function Evaluate_variable(name: String; dummy: Dummy_type) return Real is
   begin
     if name = "x" then
       return 1.234;
@@ -17,7 +20,7 @@ procedure Test_Formulas is
     return 0.0;
   end Evaluate_variable;
 
-  package My_Formulas is new Formulas(Real, Evaluate_variable);
+  package My_Formulas is new Formulas(Real, Dummy_type, Evaluate_variable);
 
   procedure Test_1(expr: String; target: String:= "") is
     use My_Formulas;
@@ -29,7 +32,7 @@ procedure Test_Formulas is
     Put("Output...   : ");
     Put(Standard_Output, f);
     New_Line;
-    e0:= Evaluate(f);
+    e0:= Evaluate(f, dummy);
     for count in 1..4 loop
       Put("Simplify #" & Integer'Image(count) & ": ");
       Simplify(f);
@@ -38,7 +41,7 @@ procedure Test_Formulas is
         Put(";  target value is: " & target);
       end if;
       New_Line;
-      e:= Evaluate(f);
+      e:= Evaluate(f, dummy);
       if abs(e - e0) > 1.0e-10 then
         Put_Line("!!! Evaluation error !!!");
       end if;
@@ -48,7 +51,7 @@ procedure Test_Formulas is
   end;
 begin
   Put("x=");
-  Put(Evaluate_variable("x"), 0,3,0);
+  Put(Evaluate_variable("x", dummy), 0,3,0);
   New_Line;
   Test_1("x * (x*x + 0)");
   Test_1("x*x*x");
