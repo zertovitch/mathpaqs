@@ -180,8 +180,12 @@ package body Formulas is
 
     str: constant String:= No_Spaces(str_base) & c_fin;
 
-    chiffres : constant Character_Set := ('0' .. '9' | '.' => True, others => False);
-    lettres  : constant Character_Set := ('a' .. 'z' | 'A' .. 'Z' | '_' | '$' => True, others => False);
+    chiffres : constant Character_Set :=
+      ('0' .. '9' | '.' => True, others => False);
+    lettres  : constant Character_Set :=
+      ('a' .. 'z' | 'A' .. 'Z' => True, others => False);
+    lettres_ext  : constant Character_Set :=
+      ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '.' => True, others => False);
 
     i : Integer;
 
@@ -210,7 +214,7 @@ package body Formulas is
             j:= i;
             loop
               i:= i + 1;
-              exit when not lettres(str(i));
+              exit when not lettres_ext(str(i));
             end loop;
             declare
               ch: constant String:= str(j..i-1);
