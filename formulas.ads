@@ -34,6 +34,7 @@
 --   - implement user functions
 --   - complete Simplify_functions
 --   - improve Simplify (see misses at Test_Formulas)
+--   - improve Equivalent : e.g. X * Y eq Y * X
 --   - Deep_copy
 --   - Deep_delete internal; Finalization
 

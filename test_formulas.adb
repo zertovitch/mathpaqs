@@ -28,7 +28,7 @@ procedure Test_Formulas is
     use My_Formulas;
     f: Formula:= null_formula;
     e0, e: Real;
-    style: constant Output_style:= normal;
+    style: constant Output_style:= bracketed;
   begin
     Put_Line("*************** Testing formula: " & expr);
     Parse(expr, f);
@@ -59,14 +59,18 @@ begin
   Put(", y=");
   Put(Evaluate_variable("y", dummy), 0,3,0);
   New_Line;
-  Test_1("-12345");   --  - {12345}  ->  negative contant -12345
+  Test_1("-12345");   --  - {12345}  ->  negative constant -12345
+  Test_1("x+x+y");
+  Test_1("x+y+x");
+  Test_1("6-3+2", "5"); -- !!
+  Test_1("tan(x+1+1)+tan(x+2)+y");
   Test_1("x * (x*x + 0)");
   Test_1("x*x*x");
   Test_1("3 - +2 + -x");
   Test_1("Exp(1) + -1 - sin(-0.5)");
   Test_1("Exp(1) * 0 - 1");
-  Test_1("Min(x,y) + Min(x,y) + Exp(1) * 0 - 1");
-  Test_1("Max(x+x,y) + Max( x - - x , y )");
+  Test_1("Min(x,y) + Exp(1) * 0 - 1 + Min(x,y)");
+  Test_1("Max(x+x,y) + 5 + Max( x--x , y )");
   Test_1("cos(+x/2)*cos(x/2)*cos(-(x/2))  +  cos(x/2)*cos(x/2)^2 + cos(x/2) + cos(x/2)");
   Test_1("cos(x/2)*cos(x/2)*cos(x/2) + cos(x/2) + cos(x/2) +  cos(x/2)*cos(x/2)^2 ");
   Test_1("sin(2*2^(1/2+3/2) + 1*1/2 + 0*7.65) + sin(8.5)", "1.59697422524698 = 2*sin(8.5)");

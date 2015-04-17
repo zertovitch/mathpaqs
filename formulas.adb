@@ -362,7 +362,7 @@ package body Formulas is
       Raise_Exception(Parse_Error'Identity, Exception_Message(E));
   end Parse;
 
-  --  -------------------------------- Evaluate ---------------------------------
+  ---------------------------------- Evaluate ---------------------------------
 
   function Evaluate (f: Formula; payload: Payload_type) return Real is
     aux: Real;
@@ -604,14 +604,34 @@ package body Formulas is
           Dispose(f.right);
           Dispose(f);
           f:= aux;
-        elsif Equivalent(f.left, f.right) then          --  X + X  ->  2*X
-          aux:= new Formula_Rec(fois);
+        elsif Equivalent(f.left, f.right) then
+          aux:= new Formula_Rec(fois);                  --  X + X  ->  2*X
           aux.left:= new Formula_Rec(nb);
           aux.left.n:= 2.0;
           aux.right:= f.right;
           Deep_delete(f.left);
           Dispose(f);
           f:= aux;
+        elsif f.right.s = plus and then Equivalent(f.left, f.right.left) then
+          aux:= new Formula_Rec(fois);                  --  X + {X + Y}  ->  2*X + Y
+          aux.left:= new Formula_Rec(nb);
+          aux.left.n:= 2.0;
+          aux.right:= f.left;          -- 2*X is constructed
+          f.left:= aux;
+          Deep_delete(f.right.left);   -- destroy 2nd occurence of X
+          aux:= f.right.right;         -- keep Y
+          Dispose(f.right);
+          f.right:= aux;
+        elsif f.right.s = plus and then Equivalent(f.left, f.right.right) then
+          aux:= new Formula_Rec(fois);                  --  X + {Y + X}  ->  2*X + Y
+          aux.left:= new Formula_Rec(nb);
+          aux.left.n:= 2.0;
+          aux.right:= f.left;          -- 2*X is constructed
+          f.left:= aux;
+          Deep_delete(f.right.right);  -- destroy 2nd occurence of X
+          aux:= f.right.left;          -- keep Y
+          Dispose(f.right);
+          f.right:= aux;
         elsif f.right.s = nb and then f.right.n < 0.0 then
           aux:= new Formula_Rec(moins);                 --  X + neg_cst  ->  X - {abs neg_cst}
           aux.left := f.left;
