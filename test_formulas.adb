@@ -28,7 +28,7 @@ procedure Test_Formulas is
     use My_Formulas;
     f: Formula:= null_formula;
     e0, e: Real;
-    style: constant Output_style:= bracketed;
+    style: constant Output_style:= normal;
   begin
     Put_Line("*************** Testing formula: " & expr);
     Parse(expr, f);
@@ -49,7 +49,7 @@ procedure Test_Formulas is
         Put_Line("!!! Evaluation error !!!");
       end if;
     end loop;
-    Put("Eval: "); Put(e, 0,14,0);
+    Put("Final eval: "); Put(e, 0,14,0);
     New_Line;
   end Test_1;
 
@@ -62,7 +62,11 @@ begin
   Test_1("-12345");   --  - {12345}  ->  negative constant -12345
   Test_1("x+x+y");
   Test_1("x+y+x");
-  Test_1("6-3+2", "5"); -- !!
+  Test_1("6-3+2", "5");
+  Test_1("21/3*5/7/5-1", "0");
+  Test_1("2 -4 +6 -1 -1- 0 +8", "10");
+  Test_1("2*3*4/8 -   5/2*4 +  6 + 0/3", "-1");
+  Test_1("(2) + (17*2-30) * (5)+2 - (8/2)*4", "8");
   Test_1("tan(x+1+1)+tan(x+2)+y");
   Test_1("x * (x*x + 0)");
   Test_1("x*x*x");

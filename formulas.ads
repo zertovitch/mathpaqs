@@ -35,6 +35,7 @@
 --   - complete Simplify_functions
 --   - improve Simplify (see misses at Test_Formulas)
 --   - improve Equivalent : e.g. X * Y eq Y * X
+--   - Put to String (then, parser entropy test)
 --   - Deep_copy
 --   - Deep_delete internal; Finalization
 
@@ -87,7 +88,7 @@ private
                                                      --  2 arguments:
                  min, max,
                  -- ^^^ end of built-in functions
-                 fois, plus, moins, sur, puiss);
+                 moins, plus, sur, fois, puiss);
 
   subtype Unary is S_Form range moins_una .. th;
   subtype Binary is S_Form range min .. puiss;
