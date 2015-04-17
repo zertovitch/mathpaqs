@@ -73,7 +73,7 @@ begin
   Test_1("3 - +2 + -x");
   Test_1("Exp(1) + -1 - sin(-0.5)");
   Test_1("Exp(1) * 0 - 1");
-  Test_1("Min(x,y) + Exp(1) * 0 - 1 + Min(x,y)");
+  Test_1("Min(x,y*2) + Exp(1) * 0 - 1 + Min(y+y,x)");
   Test_1("Max(x+x,y) + 5 + Max( x--x , y )");
   Test_1("cos(+x/2)*cos(x/2)*cos(-(x/2))  +  cos(x/2)*cos(x/2)^2 + cos(x/2) + cos(x/2)");
   Test_1("cos(x/2)*cos(x/2)*cos(x/2) + cos(x/2) + cos(x/2) +  cos(x/2)*cos(x/2)^2 ");

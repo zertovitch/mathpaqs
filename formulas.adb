@@ -23,6 +23,8 @@ package body Formulas is
   type S_Form_Set is array (S_Form) of Boolean;
   par_or_terminal : constant S_Form_Set := (par|croch|accol|nb|var => True, others => False);
 
+  symmetric : constant S_Form_Set := (min | max | plus | fois => True, others => False);
+
   function Conv_strg (s : S_Form) return String is
   begin
     case s is
@@ -494,7 +496,13 @@ package body Formulas is
         when Unary =>
           return Equivalent(fa.left, fb.left);
         when Binary =>
-          return Equivalent(fa.left, fb.left) and then Equivalent(fa.right, fb.right);
+          return
+              (Equivalent(fa.left, fb.left) and then
+               Equivalent(fa.right, fb.right))
+            or else
+              (symmetric(ga) and then
+               Equivalent(fa.left, fb.right) and then
+               Equivalent(fa.right, fb.left));
       end case;
     end if;
   end Equivalent;
