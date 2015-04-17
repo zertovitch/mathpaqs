@@ -485,6 +485,17 @@ package body Formulas is
     elsif gb in Neutral then
       return Equivalent(fa, fb.left); -- +B, (B), [B], {B}  -> B
     elsif ga /= gb then
+      if
+        -- X * cst equivalent to X / (1/cst)
+        ((ga = fois and gb = sur) or (ga = sur and gb = fois)) and then
+        Equivalent(fa.left, fb.left) and then
+        fa.right /= null and then fa.right.s = nb and then
+        fb.right /= null and then fb.right.s = nb and then
+        Almost_zero(fa.right.n * fb.right.n - 1.0)
+      then
+        return True;
+      end if;
+      --  General case when formulas' nodes a and b are not of the same kind
       return False;
     else
       --  Formulas' nodes a and b are of the same kind
@@ -500,6 +511,7 @@ package body Formulas is
               (Equivalent(fa.left, fb.left) and then
                Equivalent(fa.right, fb.right))
             or else
+              --  Detect that X * Y is equivalent to Y * X
               (symmetric(ga) and then
                Equivalent(fa.left, fb.right) and then
                Equivalent(fa.right, fb.left));
