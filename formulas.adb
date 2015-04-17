@@ -572,7 +572,9 @@ package body Formulas is
     then
       return;
     end if;
+
     case f.s is
+
       when moins_una=>
         if f.left.s = moins_una then
           aux:=f.left.left;                             --  --X  ->  X
@@ -585,12 +587,15 @@ package body Formulas is
           Dispose(f);
           f:= aux;
         end if;
+
       when plus_una =>
         left_replaces_f;                                --  +X  ->  X
+
       when par | croch | accol=>
         if par_or_terminal(f.left.s) then
           left_replaces_f;     --  ((...)) -> (...), (c) -> c, (v) -> v
         end if;
+
       when plus =>
         if f.right.s = moins_una then
           aux:= new Formula_Rec(moins);                 --  X + -Y  ->  X - Y
@@ -599,7 +604,7 @@ package body Formulas is
           Dispose(f.right);
           Dispose(f);
           f:= aux;
-        elsif Equivalent(f.left, f.right) then          --  X+X  ->  2*X
+        elsif Equivalent(f.left, f.right) then          --  X + X  ->  2*X
           aux:= new Formula_Rec(fois);
           aux.left:= new Formula_Rec(nb);
           aux.left.n:= 2.0;
@@ -617,12 +622,20 @@ package body Formulas is
         elsif Is_constant_pair(f) then
           cst_replaces_f( f.left.n + f.right.n );       --  cst+cst  ->  cst
         elsif Is_constant(f.left, 0.0) then
-          right_replaces_f;                             --  0+X  ->  X
+          right_replaces_f;                             --  0 + X  ->  X
         elsif Is_constant(f.right, 0.0) then
-          left_replaces_f;                              --  X+0  ->  X
+          left_replaces_f;                              --  X + 0  ->  X
         end if;
+
       when moins =>
-        if Equivalent(f.left, f.right) then
+        if f.right.s = moins_una then
+          aux:= new Formula_Rec(plus);                  --  X - -Y  ->  X + Y
+          aux.left := f.left;
+          aux.right:= f.right.left;
+          Dispose(f.right);
+          Dispose(f);
+          f:= aux;
+        elsif Equivalent(f.left, f.right) then
           cst_replaces_f(0.0);                          --  X - X   ->    0
         elsif f.right.s = nb and then f.right.n < 0.0 then
           aux:= new Formula_Rec(plus);                  --  X - neg_cst  ->  X + {abs neg_cst}
@@ -642,6 +655,7 @@ package body Formulas is
         elsif Is_constant(f.right, 0.0) then
           left_replaces_f;                              --  X - 0   ->   X
         end if;
+
       when fois =>
         if Equivalent(f.left, f.right) then             --  X*X -> X^2
           aux:= new Formula_Rec(puiss);
@@ -716,6 +730,7 @@ package body Formulas is
         elsif f.left.s = nb and f.right.s = nb then     --  cst^cst  ->  cst
           cst_replaces_f( Exp(Log(f.left.n) * f.right.n) );
         end if;
+
       when Built_in_function =>
         Simplify_functions;
       when others=>
