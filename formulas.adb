@@ -29,6 +29,8 @@ package body Formulas is
       when sh      => return "Sinh";
       when ch      => return "Cosh";
       when th      => return "Tanh";
+      when min     => return "Min";
+      when max     => return "Max";
       when par     => return "(";
       when croch   => return "[";
       when accol   => return "{";
@@ -63,7 +65,7 @@ package body Formulas is
     return To_Upper(conv_strg(s));
   end;
 
-  procedure Put (t: in  Ada.Text_IO.File_Type; f: Formula) is
+  procedure Put (t: in Ada.Text_IO.File_Type; f: Formula) is
     x : Real;
     use Ada.Text_IO, RIO;
   begin
@@ -84,14 +86,18 @@ package body Formulas is
         when plus_una=>
           Put(t,'+');
           Put(t,f.left);
-        when Binary =>
+        when Binary_operator =>
           Put(t,f.left);
           Put(t,conv_strg(f.s));
           Put(t,f.right);
-        when logn..th=>
+        when Built_in_function =>
           Put(t,conv_strg(f.s));
           Put(t,'(');
           Put(t,f.left);
+          if f.s in Binary then
+            Put(t,',');
+            Put(t,f.right);
+          end if;
           Put(t,')');
         when par=>
           Put(t,'(');
@@ -105,10 +111,7 @@ package body Formulas is
           Put(t,'{');
           Put(t,f.left);
           Put(t,'}');
-        when others=>
-          null;  -- [P2Ada]: no otherwise / else in Pascal
       end case;
-
     end if;
   end Put;
 
@@ -144,21 +147,26 @@ package body Formulas is
 
   c_fin: constant Character := Character'Val (0);
 
-  procedure Check_brackets(open, close: Character) is
+  procedure Check(expected, found: Character) is
   begin
-    if Closing(open) = close then
+    if expected = found then
       return;
     end if;
-    if close = c_fin then
+    if found = c_fin then
       Raise_Exception(
         Parse_Error'Identity,
-        "'" & Closing(open) & "' is missing");
+        "End of formula reached, '" & expected & "' is missing");
     else
       Raise_Exception(
         Parse_Error'Identity,
-        "'" & Closing(open) & "' expected, found '" & close & ''');
+        "'" & expected & "' was expected, found '" & found & ''');
     end if;
-  end Check_brackets;
+  end Check;
+
+  procedure Check_brackets(open, close: Character) is
+  begin
+    Check(expected => Closing(open), found => close);
+  end;
 
   procedure Parse (str_base: String; f: out Formula) is
 
@@ -221,15 +229,22 @@ package body Formulas is
               mch: constant String:= To_Upper(ch);
             begin
               if str(i)='(' then           --  --- (: fonctions std, usr
-                for s in  expn .. fois loop
+                for s in Built_in_function loop
                   if mch = conv_mstr(s) then  -- Found a built-in function
                     n:= new Formula_Rec(s);
                     exit;
                   end if;
                 end loop;
                 i:= i + 1;
-                -- !! fonctions usr TBD !!
+                if n = null then
+                  Raise_Exception(Parse_Error'Identity, "User functions not yet supported");
+                end if;
                 n.left:= Expression;
+                if n.s in Binary then  --  Function with two arguments: read 2nd argument
+                  Check(',', str(i));
+                  i:= i + 1;
+                  n.right:= Expression;
+                end if;
                 Check_brackets('(', str(i));
                 i:= i + 1;
               else
@@ -398,6 +413,10 @@ package body Formulas is
         return ArcTan(Evaluate(f.left, payload));
       when tg=>
         return Tan(Evaluate(f.left, payload));
+      when min =>
+        return Real'Min(Evaluate(f.left, payload), Evaluate(f.right, payload));
+      when max =>
+        return Real'Max(Evaluate(f.left, payload), Evaluate(f.right, payload));
     end case;
   end Evaluate;
 
@@ -422,6 +441,7 @@ package body Formulas is
     elsif ga /= gb then
       return False;
     else
+      --  Formulas' nodes a and b are of the same kind
       case ga is
         when nb =>
           return Almost_zero(fa.n - fb.n);
@@ -430,7 +450,7 @@ package body Formulas is
         when Unary =>
           return Equivalent(fa.left, fb.left);
         when Binary =>
-          return Equivalent(fa.left, fb.left) and Equivalent(fa.right, fb.right);
+          return Equivalent(fa.left, fb.left) and then Equivalent(fa.right, fb.right);
       end case;
     end if;
   end Equivalent;
@@ -448,7 +468,7 @@ package body Formulas is
       a.right /= null and then
       a.left.s = nb and then
       a.right.s = nb;
-  end;
+  end Is_constant_pair;
 
   ------------------------------- Simplify ----------------------------------
 

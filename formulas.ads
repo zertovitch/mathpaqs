@@ -32,7 +32,6 @@
 
 -- TO DO:
 --   - implement user functions
---   - for unary operators: "arg" instead of "left" descendant
 --   - complete Simplify_functions
 --   - improve Simplify (see misses at Test_Formulas)
 --   - Deep_copy
@@ -57,8 +56,8 @@ package Formulas is
   type Formula is private;
   null_formula: constant Formula;
 
-  procedure Put (t: in  Ada.Text_IO.File_Type; f: Formula);
-  procedure Parse (str_base:  String; f: out Formula);
+  procedure Put (t: in Ada.Text_IO.File_Type; f: Formula);
+  procedure Parse (str_base: String; f: out Formula);
   function Evaluate (f: Formula; payload: Payload_type) return Real;
   function Equivalent (fa, fb : Formula) return Boolean;
   procedure Simplify (f: in out Formula);
@@ -71,19 +70,26 @@ package Formulas is
 private
 
   type S_Form is
-                (nb, vr,                                        --  0 arg
-                 moins_una, plus_una,                           --  1 arg
+                (                                        --  0 arguments (leaf, terminal nodes)
+                 nb, vr,
+                                                         --  1 arguments
+                 moins_una, plus_una,
                  par, croch, accol,
+                 -- vvv begin of built-in functions
                  expn, logn,
                  sinus, cosinus, tg, arctg,
                  sh, ch, th,
-                 fois, plus, moins, sur, puiss);                --  2 args
+                                                         --  2 arguments
+                 min, max,
+                 -- ^^^ end of built-in functions
+                 fois, plus, moins, sur, puiss);
 
   subtype Leaf is S_Form range nb .. vr;
   subtype Unary is S_Form range moins_una .. th;
   subtype Neutral is Unary range plus_una .. accol;
-  subtype Built_in_function is Unary range expn .. th;
-  subtype Binary is S_Form range fois .. puiss;
+  subtype Built_in_function is S_Form range expn .. max;
+  subtype Binary is S_Form range min .. puiss;
+  subtype Binary_operator is Binary range fois .. puiss;
 
   type Formula_Rec(S:  S_Form);
 

@@ -16,6 +16,8 @@ procedure Test_Formulas is
   begin
     if name = "x" then
       return 1.234;
+    elsif name = "y" then
+      return 4.321;
     end if;
     return 0.0;
   end Evaluate_variable;
@@ -55,6 +57,8 @@ begin
   New_Line;
   Test_1("x * (x*x + 0)");
   Test_1("x*x*x");
+  Test_1("Min(x,y) + Min(x,y) + Exp(1) * 0");
+  Test_1("Max(x,y)");
   Test_1("cos(+x/2)*cos(x/2)*cos(-(x/2))  +  cos(x/2)*cos(x/2)^2 + cos(x/2) + cos(x/2)");
   Test_1("cos(x/2)*cos(x/2)*cos(x/2) + cos(x/2) + cos(x/2) +  cos(x/2)*cos(x/2)^2 ");
   Test_1("sin(2*2^(1/2+3/2) + 1*1/2 + 0*7.65) + sin(8.5)", "1.59697422524698 = 2*sin(8.5)");
