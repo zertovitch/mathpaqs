@@ -28,17 +28,18 @@ procedure Test_Formulas is
     use My_Formulas;
     f: Formula:= null_formula;
     e0, e: Real;
+    style: constant Output_style:= normal;
   begin
     Put_Line("*************** Testing formula: " & expr);
     Parse(expr, f);
     Put("Output...   : ");
-    Put(f);
+    Put(f, style);
     New_Line;
     e0:= Evaluate(f, dummy);
     for count in 1..4 loop
       Put("Simplify #" & Integer'Image(count) & ": ");
       Simplify(f);
-      Put(f);
+      Put(f, style);
       if target /= "" then
         Put(";  target value is: " & target);
       end if;
@@ -58,6 +59,7 @@ begin
   Put(", y=");
   Put(Evaluate_variable("y", dummy), 0,3,0);
   New_Line;
+  Test_1("-12345");   --  - {12345}  ->  negative contant -12345
   Test_1("x * (x*x + 0)");
   Test_1("x*x*x");
   Test_1("3 - +2 + -x");

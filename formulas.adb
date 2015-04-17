@@ -70,58 +70,65 @@ package body Formulas is
     return To_Upper (Conv_strg (s));
   end;
 
-  procedure Put (f : Formula) is
+  procedure Put (f : Formula; style : Output_style:= normal) is
   begin
-    Put (Ada.Text_IO.Current_Output, f);
+    Put (Ada.Text_IO.Current_Output, f, style);
   end;
 
-  procedure Put (t : in Ada.Text_IO.File_Type; f : Formula) is
+  procedure Put (t : in Ada.Text_IO.File_Type; f : Formula; style : Output_style:= normal) is
     x : Real;
     use Ada.Text_IO, RIO;
   begin
-    if f /= null then
-      case f.s is
-        when nb =>
-          x:= f.n;
-          if x = Real'Floor (x) then
-            Put(t, Integer(x), 0);
-          else
-            Put(t,x,0,5,0);
-          end if;
-        when var =>
-          Put(t, To_String(f.v));
-        when moins_una=>
-          Put(t,'-');
-          Put(t,f.left);
-        when plus_una=>
-          Put(t,'+');
-          Put(t,f.left);
-        when Binary_operator =>
-          Put(t,f.left);
-          Put(t,conv_strg(f.s));
-          Put(t,f.right);
-        when Built_in_function =>
-          Put(t,conv_strg(f.s));
-          Put(t,'(');
-          Put(t,f.left);
-          if f.s in Binary then
-            Put(t,',');
-            Put(t,f.right);
-          end if;
-          Put(t,')');
-        when par=>
-          Put(t,'(');
-          Put(t,f.left);
-          Put(t,')');
-        when croch=>
-          Put(t,'[');
-          Put(t,f.left);
-          Put(t,']');
-        when accol=>
-          Put(t,'{');
-          Put(t,f.left);
-          Put(t,'}');
-      end case;
+    if f = null then
+      return;
+    end if;
+    if style = bracketed then
+      Put(t,'{');
+    end if;
+    case f.s is
+      when nb =>
+        x:= f.n;
+        if x = Real'Floor (x) then
+          Put(t, Integer(x), 0);
+        else
+          Put(t, x, 0,5,0);
+        end if;
+      when var =>
+        Put(t, To_String(f.v));
+      when moins_una=>
+        Put(t,'-');
+        Put(t,f.left, style);
+      when plus_una=>
+        Put(t,'+');
+        Put(t,f.left, style);
+      when Binary_operator =>
+        Put(t,f.left, style);
+        Put(t,conv_strg(f.s));
+        Put(t,f.right, style);
+      when Built_in_function =>
+        Put(t,conv_strg(f.s));
+        Put(t,'(');
+        Put(t,f.left, style);
+        if f.s in Binary then
+          Put(t,',');
+          Put(t,f.right, style);
+        end if;
+        Put(t,')');
+      when par=>
+        Put(t,'(');
+        Put(t,f.left, style);
+        Put(t,')');
+      when croch=>
+        Put(t,'[');
+        Put(t,f.left, style);
+        Put(t,']');
+      when accol=>
+        Put(t,'{');
+        Put(t,f.left, style);
+        Put(t,'}');
+    end case;
+    if style = bracketed then
+      Put(t,'}');
     end if;
   end Put;
 
@@ -572,9 +579,9 @@ package body Formulas is
           Dispose(f.left);
           Dispose(f);
           f:= aux;
-        elsif f.left.s = nb and then f.left.n < 0.0 then
-          aux:= f.left;                                 --  -neg_cst  ->  {abs neg_cst}
-          aux.left.n:= abs aux.left.n;
+        elsif f.left.s = nb then
+          aux:= f.left;                                 --  -cst  ->  cst
+          aux.n:= -aux.n;
           Dispose(f);
           f:= aux;
         end if;

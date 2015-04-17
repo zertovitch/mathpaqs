@@ -53,8 +53,14 @@ package Formulas is
   type Formula is private;
   null_formula : constant Formula;
 
-  procedure Put (f : Formula);
-  procedure Put (t : in Ada.Text_IO.File_Type; f : Formula);
+  type Output_style is (
+    normal,     --  Normal is infix, should be the closest to the parsed formula
+    bracketed   --  Like normal, but displays a {} around every parse tree node
+  );
+
+
+  procedure Put (f : Formula; style : Output_style:= normal);
+  procedure Put (t : in Ada.Text_IO.File_Type; f : Formula; style : Output_style:= normal);
   procedure Parse (str_base : String; f : out Formula);
   function Evaluate (f : Formula; payload : Payload_type) return Real;
   function Equivalent (fa, fb : Formula) return Boolean;
