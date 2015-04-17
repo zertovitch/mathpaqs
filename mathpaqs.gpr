@@ -6,7 +6,7 @@ project Mathpaqs is
 
    for Source_Dirs use (".", "algebra", "edp", "eds", "lin_alg", "multi", "numerics", "probas", "random", "lin_alg/sparse", "stats", "graph");
    for Exec_Dir use ".";
-   type Build_Mode_Type is ("Debug", "Fast");
+   type Build_Mode_Type is ("Debug", "Style_Checks", "Fast");
    Build_Mode : Build_Mode_Type := external ("Build_Mode", "Debug");
 
    for Main use (
@@ -37,24 +37,30 @@ project Mathpaqs is
          "champ_vt.adb", "arenstorf.adb"
        );
    case Build_Mode is
-     when "Debug" =>
+     when "Debug" | "Style_Checks" =>
        for Object_Dir use "obj_debg";
      when "Fast" =>
        for Object_Dir use "obj_fast";
    end case;
+
+   Common_Options := ("-gnat05", "-gnatwa");
+   Debug_Options  := ("-gnatVa", "-gnato", "-g", "-fno-inline", "-fstack-check", "-gnatec../debug.pra", "-gnatq", "-gnatQ");
+   Fast_Options   := ("-O2", "-gnatpn", "-fipa-cp-clone", "-fgcse-after-reload", "-funroll-loops", "-fpeel-loops", "-funswitch-loops", "-ftracer", "-ftree-vectorize", "-g");
    
    package Compiler is
       case Build_Mode is
          when "Debug" =>
-            for Default_Switches ("ada") use ("-gnat05", "-gnatwa", "-gnatVa", "-gnato", "-g", "-fno-inline", "-fstack-check", "-gnatec../debug.pra");
+            for Default_Switches ("ada") use Common_Options & Debug_Options ;
+         when "Style_Checks" =>
+            for Default_Switches ("ada") use Common_Options & Debug_Options & ("-gnaty2abCefhikM100nOprStux");
          when "Fast" =>
-            for Default_Switches ("ada") use ("-gnat05", "-gnatwa", "-O2", "-gnatpn", "-fipa-cp-clone", "-fgcse-after-reload", "-funroll-loops", "-fpeel-loops", "-funswitch-loops", "-ftracer", "-ftree-vectorize", "-g");
+            for Default_Switches ("ada") use Common_Options & Fast_Options;
       end case;
    end Compiler;
 
    package Linker is
       case Build_Mode is
-         when "Debug" =>
+         when "Debug" | "Style_Checks" =>
             for Default_Switches ("ada") use ("-g");
          when "Fast" =>
             for Default_Switches ("ada") use ("-g", "-Wl,--gc-sections");

@@ -6,16 +6,22 @@ with Ada.Integer_Text_IO;               use Ada.Integer_Text_IO;
 -- This is for Pi :
 -- with Ada.Numerics; use Ada.Numerics;
 with Ada.Numerics.Generic_Elementary_Functions;
+with Ada.Unchecked_Deallocation;
 
 package body Formulas is
 
-  package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
-  package RIO is new Ada.Text_IO.Float_IO(Real);
+  package REF is new Ada.Numerics.Generic_Elementary_Functions (Real);
+  package RIO is new Ada.Text_IO.Float_IO (Real);
 
-  type S_Form_Set is array(S_Form) of Boolean;
-  par_or_terminal: constant S_Form_Set:= (par|croch|accol|nb|var => True, others => False);
+  subtype Leaf is S_Form range nb .. var;
+  subtype Neutral is Unary range plus_una .. accol;
+  subtype Built_in_function is S_Form range expn .. max;
+  subtype Binary_operator is Binary range fois .. puiss;
 
-  function conv_strg(s: S_Form) return String is
+  type S_Form_Set is array (S_Form) of Boolean;
+  par_or_terminal : constant S_Form_Set := (par|croch|accol|nb|var => True, others => False);
+
+  function Conv_strg (s : S_Form) return String is
   begin
     case s is
       when plus_una   => return "+";
@@ -41,38 +47,43 @@ package body Formulas is
       when puiss   => return "^";
       when Leaf    => return "";
     end case;
-  end;
+  end Conv_strg;
 
-  conv_symb_una : constant array (Character) of s_form :=
-    ( '+' => plus_una,
-      '-' => moins_una,
-      others => nb);
+  conv_symb_una : constant array (Character) of S_Form :=
+    ('+' => plus_una,
+     '-' => moins_una,
+     others => nb);
 
-  conv_symb : constant array (Character) of s_form :=
-    ( '+' => plus,
-      '-' => moins,
-      '*' => fois,
-      '/' => sur,
-      '^' => puiss,
-      '(' => par,
-      '[' => croch,
-      '{' => accol,
-      others => nb);
+  conv_symb : constant array (Character) of S_Form :=
+    ('+' => plus,
+     '-' => moins,
+     '*' => fois,
+     '/' => sur,
+     '^' => puiss,
+     '(' => par,
+     '[' => croch,
+     '{' => accol,
+     others => nb);
 
-  function conv_mstr(s: S_Form) return String is
+  function Conv_mstr (s : S_Form) return String is
   begin
-    return To_Upper(conv_strg(s));
+    return To_Upper (Conv_strg (s));
   end;
 
-  procedure Put (t: in Ada.Text_IO.File_Type; f: Formula) is
+  procedure Put (f : Formula) is
+  begin
+    Put (Ada.Text_IO.Current_Output, f);
+  end;
+
+  procedure Put (t : in Ada.Text_IO.File_Type; f : Formula) is
     x : Real;
     use Ada.Text_IO, RIO;
   begin
-    if f/= null then
+    if f /= null then
       case f.s is
         when nb =>
           x:= f.n;
-          if  x = Real'Floor(x) then
+          if x = Real'Floor (x) then
             Put(t, Integer(x), 0);
           else
             Put(t,x,0,5,0);
@@ -114,6 +125,8 @@ package body Formulas is
     end if;
   end Put;
 
+  procedure Dispose is new Ada.Unchecked_Deallocation (Formula_Rec, Formula);
+
   procedure Deep_delete (f: in out Formula) is
   begin
     if f /= null then
@@ -131,14 +144,14 @@ package body Formulas is
     end if;
   end Deep_delete;
 
-  type Character_Set is array(Character) of Boolean;
+  type Character_Set is array (Character) of Boolean;
 
-  function Almost_zero(x: Real) return Boolean is
+  function Almost_zero (x: Real) return Boolean is
   begin
     return abs x <= Real'Base'Model_Small;
   end Almost_zero;
 
-  Closing: constant array(Character) of Character:=
+  Closing : constant array(Character) of Character:=
     ('(' => ')',
      '[' => ']',
      '{' => '}',
@@ -146,7 +159,7 @@ package body Formulas is
 
   c_fin: constant Character := Character'Val (0);
 
-  procedure Check(expected, found: Character) is
+  procedure Check (expected, found: Character) is
   begin
     if expected = found then
       return;
@@ -162,14 +175,14 @@ package body Formulas is
     end if;
   end Check;
 
-  procedure Check_brackets(open, close: Character) is
+  procedure Check_brackets (open, close: Character) is
   begin
     Check(expected => Closing(open), found => close);
   end;
 
   procedure Parse (str_base: String; f: out Formula) is
 
-    function No_Spaces(s: String) return String is
+    function No_Spaces (s: String) return String is
       t: String(s'Range);
       j: Integer:= s'First - 1;
     begin
@@ -227,9 +240,9 @@ package body Formulas is
               ch: constant String:= str(j..i-1);
               mch: constant String:= To_Upper(ch);
             begin
-              if str(i)='(' then           --  --- (: fonctions std, usr
+              if str(i)='(' then
                 for s in Built_in_function loop
-                  if mch = conv_mstr(s) then  -- Found a built-in function
+                  if mch = Conv_mstr(s) then  -- Found a built-in function
                     n:= new Formula_Rec(s);
                     exit;
                   end if;
@@ -237,15 +250,16 @@ package body Formulas is
                 i:= i + 1;
                 if n = null then
                   Raise_Exception(Parse_Error'Identity, "User functions not yet supported");
-                end if;
-                n.left:= Expression;
-                if n.s in Binary then  --  Function with two arguments: read 2nd argument
-                  Check(',', str(i));
+                else
+                  n.left:= Expression;
+                  if n.s in Binary then  --  Function with two arguments: read 2nd argument
+                    Check(',', str(i));
+                    i:= i + 1;
+                    n.right:= Expression;
+                  end if;
+                  Check_brackets('(', str(i));
                   i:= i + 1;
-                  n.right:= Expression;
                 end if;
-                Check_brackets('(', str(i));
-                i:= i + 1;
               else
                 n:= new Formula_Rec(var);
                 n.v:= To_Unbounded_String(ch);
@@ -459,7 +473,7 @@ package body Formulas is
     return a /= null and then a.s = nb and then a.n = cst;
   end;
 
-  function Is_constant_pair(a: Formula) return Boolean is
+  function Is_constant_pair (a: Formula) return Boolean is
   begin
     return
       a.s in Binary and then
@@ -545,25 +559,40 @@ package body Formulas is
       when others=>
         null;
     end case;
-    if f = null then
+    if f = null or else
+      (f.s in Unary and then f.left = null) or else
+      (f.s in Binary and then (f.left = null or else f.right = null))
+    then
       return;
     end if;
     case f.s is
       when moins_una=>
-        if f.left /= null and then f.left.s= moins_una then
+        if f.left.s = moins_una then
           aux:=f.left.left;                             --  --X  ->  X
           Dispose(f.left);
+          Dispose(f);
+          f:= aux;
+        elsif f.left.s = nb and then f.left.n < 0.0 then
+          aux:= f.left;                                 --  -neg_cst  ->  {abs neg_cst}
+          aux.left.n:= abs aux.left.n;
           Dispose(f);
           f:= aux;
         end if;
       when plus_una =>
         left_replaces_f;                                --  +X  ->  X
       when par | croch | accol=>
-        if f.left /= null and then par_or_terminal(f.left.s) then
+        if par_or_terminal(f.left.s) then
           left_replaces_f;     --  ((...)) -> (...), (c) -> c, (v) -> v
         end if;
       when plus =>
-        if Equivalent(f.left, f.right) then             --  X+X  ->  2*X
+        if f.right.s = moins_una then
+          aux:= new Formula_Rec(moins);                 --  X + -Y  ->  X - Y
+          aux.left := f.left;
+          aux.right:= f.right.left;
+          Dispose(f.right);
+          Dispose(f);
+          f:= aux;
+        elsif Equivalent(f.left, f.right) then          --  X+X  ->  2*X
           aux:= new Formula_Rec(fois);
           aux.left:= new Formula_Rec(nb);
           aux.left.n:= 2.0;
@@ -571,16 +600,32 @@ package body Formulas is
           Deep_delete(f.left);
           Dispose(f);
           f:= aux;
+        elsif f.right.s = nb and then f.right.n < 0.0 then
+          aux:= new Formula_Rec(moins);                 --  X + neg_cst  ->  X - {abs neg_cst}
+          aux.left := f.left;
+          aux.right:= f.right;
+          aux.right.n:= abs aux.right.n;
+          Dispose(f);
+          f:= aux;
         elsif Is_constant_pair(f) then
           cst_replaces_f( f.left.n + f.right.n );       --  cst+cst  ->  cst
         elsif Is_constant(f.left, 0.0) then
-          right_replaces_f;                --  0+X -> X
+          right_replaces_f;                             --  0+X  ->  X
         elsif Is_constant(f.right, 0.0) then
-          left_replaces_f;                 --  X+0 -> X
+          left_replaces_f;                              --  X+0  ->  X
         end if;
       when moins =>
         if Equivalent(f.left, f.right) then
           cst_replaces_f(0.0);                          --  X - X   ->    0
+        elsif f.right.s = nb and then f.right.n < 0.0 then
+          aux:= new Formula_Rec(plus);                  --  X - neg_cst  ->  X + {abs neg_cst}
+          aux.left := f.left;
+          aux.right:= f.right;
+          aux.right.n:= abs aux.right.n;
+          Dispose(f);
+          f:= aux;
+        elsif Is_constant_pair(f) then
+          cst_replaces_f( f.left.n - f.right.n );       --  cst-cst  ->  cst
         elsif Is_constant(f.left, 0.0) then
           aux:= new Formula_Rec(moins_una);             --  0 - X   ->   -X
           aux.left:= f.right;
@@ -600,8 +645,11 @@ package body Formulas is
           Dispose(f);
           f:= aux;
         elsif Is_constant_pair(f) then
-          cst_replaces_f( f.left.n * f.right.n );       --  cst+cst  ->  cst
-        elsif f.left.s = puiss and then f.right.s = puiss and then Equivalent(f.left.left, f.right.left) then
+          cst_replaces_f( f.left.n * f.right.n );       --  cst*cst  ->  cst
+        elsif f.left.s  = puiss and then
+              f.right.s = puiss and then
+          Equivalent(f.left.left, f.right.left)
+        then
           aux:= new Formula_Rec(par);                   --  X^m * X^n   ->   X^(m+n)
           aux.left:= new Formula_Rec(plus);
           aux.left.left:= f.left.right;
@@ -626,8 +674,7 @@ package body Formulas is
           aux.left.right.n:= 1.0;     --  (n+1) prepared
           f.right:= aux;
         elsif f.left.s = puiss and then Equivalent(f.left.left, f.right) then
-                                                        --  X^n * X   ->   X^(n+1)
-          aux:= f.left;
+          aux:= f.left;                                 --  X^n * X   ->   X^(n+1)
           Deep_delete(f.right);
           dispose(f);
           f:= aux;            --  got rid of *
@@ -659,7 +706,7 @@ package body Formulas is
           cst_replaces_f(1.0);                          --  X^0  ->  1
         elsif Is_constant(f.right, 1.0) then
           left_replaces_f;                              --  X^1  ->  X
-        elsif f.left.s= nb and f.right.s= nb then       --  cst^cst  ->  cst
+        elsif f.left.s = nb and f.right.s = nb then     --  cst^cst  ->  cst
           cst_replaces_f( Exp(Log(f.left.n) * f.right.n) );
         end if;
       when Built_in_function =>

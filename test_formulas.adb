@@ -32,13 +32,13 @@ procedure Test_Formulas is
     Put_Line("*************** Testing formula: " & expr);
     Parse(expr, f);
     Put("Output...   : ");
-    Put(Standard_Output, f);
+    Put(f);
     New_Line;
     e0:= Evaluate(f, dummy);
     for count in 1..4 loop
       Put("Simplify #" & Integer'Image(count) & ": ");
       Simplify(f);
-      Put(Standard_Output, f);
+      Put(f);
       if target /= "" then
         Put(";  target value is: " & target);
       end if;
@@ -50,7 +50,8 @@ procedure Test_Formulas is
     end loop;
     Put("Eval: "); Put(e, 0,14,0);
     New_Line;
-  end;
+  end Test_1;
+
 begin
   Put("x=");
   Put(Evaluate_variable("x", dummy), 0,3,0);
@@ -59,7 +60,10 @@ begin
   New_Line;
   Test_1("x * (x*x + 0)");
   Test_1("x*x*x");
-  Test_1("Min(x,y) + Min(x,y) + Exp(1) * 1 - 1");
+  Test_1("3 - +2 + -x");
+  Test_1("Exp(1) + -1 - sin(-0.5)");
+  Test_1("Exp(1) * 0 - 1");
+  Test_1("Min(x,y) + Min(x,y) + Exp(1) * 0 - 1");
   Test_1("Max(x,y)");
   Test_1("cos(+x/2)*cos(x/2)*cos(-(x/2))  +  cos(x/2)*cos(x/2)^2 + cos(x/2) + cos(x/2)");
   Test_1("cos(x/2)*cos(x/2)*cos(x/2) + cos(x/2) + cos(x/2) +  cos(x/2)*cos(x/2)^2 ");

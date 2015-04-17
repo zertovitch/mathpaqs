@@ -37,11 +37,8 @@
 --   - Deep_copy
 --   - Deep_delete internal; Finalization
 
-with Ada.Text_IO;
-
-with Ada.Unchecked_Deallocation;
-
 with Ada.Strings.Unbounded;             use Ada.Strings.Unbounded;
+with Ada.Text_IO;
 
 generic
 
@@ -49,23 +46,24 @@ generic
 
   type Payload_type is private; -- This can be a container type for user variables
 
-  with function Evaluate_variable(name: String; payload: Payload_type) return Real;
+  with function Evaluate_variable (name : String; payload: Payload_type) return Real;
 
 package Formulas is
 
   type Formula is private;
-  null_formula: constant Formula;
+  null_formula : constant Formula;
 
-  procedure Put (t: in Ada.Text_IO.File_Type; f: Formula);
-  procedure Parse (str_base: String; f: out Formula);
-  function Evaluate (f: Formula; payload: Payload_type) return Real;
+  procedure Put (f : Formula);
+  procedure Put (t : in Ada.Text_IO.File_Type; f : Formula);
+  procedure Parse (str_base : String; f : out Formula);
+  function Evaluate (f : Formula; payload : Payload_type) return Real;
   function Equivalent (fa, fb : Formula) return Boolean;
-  procedure Simplify (f: in out Formula);
-  procedure Deep_delete (f: in out Formula);
+  procedure Simplify (f : in out Formula);
+  procedure Deep_delete (f : in out Formula);
 
   Parse_Error,
   Div_By_0,
-  Not_Pos_Power: exception;
+  Not_Pos_Power : exception;
 
 private
 
@@ -84,26 +82,20 @@ private
                  -- ^^^ end of built-in functions
                  fois, plus, moins, sur, puiss);
 
-  subtype Leaf is S_Form range nb .. var;
   subtype Unary is S_Form range moins_una .. th;
-  subtype Neutral is Unary range plus_una .. accol;
-  subtype Built_in_function is S_Form range expn .. max;
   subtype Binary is S_Form range min .. puiss;
-  subtype Binary_operator is Binary range fois .. puiss;
 
-  type Formula_Rec(S:  S_Form);
+  type Formula_Rec (s :  S_Form);
 
   type Formula is access Formula_Rec;
-  null_formula: constant Formula:= null;
+  null_formula : constant Formula := null;
 
-  type Formula_Rec(S:  S_Form) is record
-    case S is
-      when nb =>   n: Real;
-      when var =>  v: Unbounded_String;
-      when Unary | Binary => left, right: Formula;
+  type Formula_Rec (s :  S_Form) is record
+    case s is
+      when nb =>   n : Real;
+      when var =>  v : Unbounded_String;
+      when Unary | Binary => left, right : Formula;
     end case;
   end record;
-
-  procedure Dispose is new Ada.Unchecked_Deallocation(Formula_Rec, Formula);
 
 end Formulas;
