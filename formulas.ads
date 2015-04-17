@@ -1,6 +1,6 @@
 --  ===========================================================================
---  ======|   Formulas: Symbolic computation                  |================
---  ======|   Parsing - writing - evaluation - simplification |================
+--  ======|   Formulas: Symbolic computation                    |==============
+--  ======|   Parsing - writing - evaluation - simplification   |==============
 --  ===========================================================================
 
 --  Based on a Pascal university exercise (~1990's)
@@ -70,21 +70,21 @@ package Formulas is
 private
 
   type S_Form is
-                (                                        --  0 arguments (leaf, terminal nodes)
-                 nb, vr,
-                                                         --  1 arguments
+                (                                    --  0 argument (leaf, terminal nodes):
+                 nb, var,
+                                                     --  1 argument:
                  moins_una, plus_una,
                  par, croch, accol,
                  -- vvv begin of built-in functions
                  expn, logn,
                  sinus, cosinus, tg, arctg,
                  sh, ch, th,
-                                                         --  2 arguments
+                                                     --  2 arguments:
                  min, max,
                  -- ^^^ end of built-in functions
                  fois, plus, moins, sur, puiss);
 
-  subtype Leaf is S_Form range nb .. vr;
+  subtype Leaf is S_Form range nb .. var;
   subtype Unary is S_Form range moins_una .. th;
   subtype Neutral is Unary range plus_una .. accol;
   subtype Built_in_function is S_Form range expn .. max;
@@ -98,8 +98,8 @@ private
 
   type Formula_Rec(S:  S_Form) is record
     case S is
-      when Nb =>   N: Real;
-      when Vr =>   V: Unbounded_String;
+      when nb =>   n: Real;
+      when var =>  v: Unbounded_String;
       when Unary | Binary => left, right: Formula;
     end case;
   end record;

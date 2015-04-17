@@ -54,10 +54,12 @@ procedure Test_Formulas is
 begin
   Put("x=");
   Put(Evaluate_variable("x", dummy), 0,3,0);
+  Put(", y=");
+  Put(Evaluate_variable("y", dummy), 0,3,0);
   New_Line;
   Test_1("x * (x*x + 0)");
   Test_1("x*x*x");
-  Test_1("Min(x,y) + Min(x,y) + Exp(1) * 0");
+  Test_1("Min(x,y) + Min(x,y) + Exp(1) * 1 - 1");
   Test_1("Max(x,y)");
   Test_1("cos(+x/2)*cos(x/2)*cos(-(x/2))  +  cos(x/2)*cos(x/2)^2 + cos(x/2) + cos(x/2)");
   Test_1("cos(x/2)*cos(x/2)*cos(x/2) + cos(x/2) + cos(x/2) +  cos(x/2)*cos(x/2)^2 ");
