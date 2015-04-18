@@ -107,10 +107,10 @@ package body Formulas is
         Put(t,f.left, style);
       when Binary_operator =>
         Put(t,f.left, style);
-        Put(t,conv_strg(f.s));
+        Put(t,Conv_strg(f.s));
         Put(t,f.right, style);
       when Built_in_function =>
-        Put(t,conv_strg(f.s));
+        Put(t,Conv_strg(f.s));
         Put(t,'(');
         Put(t,f.left, style);
         if f.s in Binary then
@@ -425,7 +425,7 @@ package body Formulas is
       when sur =>
         aux:= Evaluate(f.right, payload);
         if Almost_zero(aux) then
-          raise div_by_0;
+          raise Div_By_0;
         elsif Almost_zero(aux - 1.0) then    --  X/1 -> X
           return Evaluate(f.left, payload);
         else
@@ -434,13 +434,13 @@ package body Formulas is
       when puiss =>
         aux:= Evaluate(f.left, payload);
         if aux <= 0.0 then
-          raise not_pos_power;
+          raise Not_Pos_Power;
         end if;
         return Exp(Evaluate(f.right, payload)*Log(aux));
       when logn=>
         aux:= Evaluate(f.left, payload);
         if aux <= 0.0 then
-          raise not_pos_power;
+          raise Not_Pos_Power;
         end if;
         return Log(aux);
       when expn=>
@@ -456,7 +456,7 @@ package body Formulas is
       when th=>
         return Tanh(Evaluate(f.left, payload));
       when arctg=>
-        return ArcTan(Evaluate(f.left, payload));
+        return Arctan(Evaluate(f.left, payload));
       when tg=>
         return Tan(Evaluate(f.left, payload));
       when min =>
@@ -468,8 +468,32 @@ package body Formulas is
 
   ------------------------------- Compare -----------------------------------
 
+  --  Special case:
+  --  X * cst, or cst * X, equivalent to X / (1/cst)
+  function Equivalent_Times_Div(fa, fb : Formula) return Boolean is
+  begin
+    return
+      fa /= null and then fb /= null and then
+      (fa.s = fois and fb.s = sur) and then
+      fb.right /= null and then fb.right.s = nb and then
+      (
+        ( --  check X * cst
+          Equivalent(fa.left, fb.left) and then
+          fa.right /= null and then fa.right.s = nb and then
+          Almost_zero(fa.right.n * fb.right.n - 1.0)
+        )
+        or else
+        ( --  check cst * X
+          Equivalent(fa.right, fb.left) and then
+          fa.left /= null and then fa.left.s = nb and then
+          Almost_zero(fa.left.n * fb.right.n - 1.0)
+        )
+      );
+  end Equivalent_Times_Div;
+
+  --  General case:
   function Equivalent(fa, fb : Formula) return Boolean is
-    ga, gb : s_form;
+    ga, gb : S_Form;
   begin
     if fa = null then
       return fb = null;
@@ -484,20 +508,7 @@ package body Formulas is
       return Equivalent(fa.left, fb); -- +A, (A), [A], {A}  -> A
     elsif gb in Neutral then
       return Equivalent(fa, fb.left); -- +B, (B), [B], {B}  -> B
-    elsif ga /= gb then
-      if
-        -- X * cst equivalent to X / (1/cst)
-        ((ga = fois and gb = sur) or (ga = sur and gb = fois)) and then
-        Equivalent(fa.left, fb.left) and then
-        fa.right /= null and then fa.right.s = nb and then
-        fb.right /= null and then fb.right.s = nb and then
-        Almost_zero(fa.right.n * fb.right.n - 1.0)
-      then
-        return True;
-      end if;
-      --  General case when formulas' nodes a and b are not of the same kind
-      return False;
-    else
+    elsif ga = gb then
       --  Formulas' nodes a and b are of the same kind
       case ga is
         when nb =>
@@ -516,6 +527,11 @@ package body Formulas is
                Equivalent(fa.left, fb.right) and then
                Equivalent(fa.right, fb.left));
       end case;
+    else
+      --  Formulas' nodes a and b are not of the same kind
+      return
+        Equivalent_Times_Div(fa, fb) or else
+        Equivalent_Times_Div(fa => fb, fb => fa);
     end if;
   end Equivalent;
 
@@ -750,7 +766,7 @@ package body Formulas is
         elsif f.right.s = puiss and then Equivalent(f.left, f.right.left) then
           aux:= f.right;                                --  X * X^n   ->   X^(n+1)
           Deep_delete(f.left);
-          dispose(f);
+          Dispose(f);
           f:= aux;            --  got rid of *
           aux:= new Formula_Rec(par);
           aux.left:= new Formula_Rec(plus);
@@ -761,7 +777,7 @@ package body Formulas is
         elsif f.left.s = puiss and then Equivalent(f.left.left, f.right) then
           aux:= f.left;                                 --  X^n * X   ->   X^(n+1)
           Deep_delete(f.right);
-          dispose(f);
+          Dispose(f);
           f:= aux;            --  got rid of *
           aux:= new Formula_Rec(par);
           aux.left:= new Formula_Rec(plus);

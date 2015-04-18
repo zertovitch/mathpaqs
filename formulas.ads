@@ -59,7 +59,6 @@ package Formulas is
     bracketed   --  Like normal, but displays a {} around every parse tree node
   );
 
-
   procedure Put (f : Formula; style : Output_style:= normal);
   procedure Put (t : in Ada.Text_IO.File_Type; f : Formula; style : Output_style:= normal);
   procedure Parse (str_base : String; f : out Formula);
