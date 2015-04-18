@@ -34,7 +34,6 @@
 --   - implement user functions
 --   - complete Simplify_functions
 --   - improve Simplify (see misses at Test_Formulas)
---   - Put to String (then, parser entropy test)
 --   - Deep_copy
 --   - Deep_delete internal; Finalization
 
@@ -61,10 +60,14 @@ package Formulas is
 
   procedure Put (f : Formula; style : Output_style:= normal);
   procedure Put (t : in Ada.Text_IO.File_Type; f : Formula; style : Output_style:= normal);
+  function Image (f : Formula; style : Output_style:= normal) return String;
+
   procedure Parse (str_base : String; f : out Formula);
   function Evaluate (f : Formula; payload : Payload_type) return Real;
+
   function Equivalent (fa, fb : Formula) return Boolean;
   procedure Simplify (f : in out Formula);
+
   procedure Deep_delete (f : in out Formula);
 
   Parse_Error,

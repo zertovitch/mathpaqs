@@ -2,10 +2,10 @@
 
 with Ada.Characters.Handling;           use Ada.Characters.Handling;
 with Ada.Exceptions;                    use Ada.Exceptions;
-with Ada.Integer_Text_IO;               use Ada.Integer_Text_IO;
 -- This is for Pi :
 -- with Ada.Numerics; use Ada.Numerics;
 with Ada.Numerics.Generic_Elementary_Functions;
+with Ada.Strings.Fixed;                 use Ada.Strings.Fixed, Ada.Strings;
 with Ada.Unchecked_Deallocation;
 
 package body Formulas is
@@ -80,61 +80,64 @@ package body Formulas is
   end;
 
   procedure Put (t : in Ada.Text_IO.File_Type; f : Formula; style : Output_style:= normal) is
+  begin
+    Ada.Text_IO.Put(t, Image(f, style));
+  end;
+
+  function Image_simple (f : Formula; style : Output_style:= normal) return String is
     x : Real;
     use Ada.Text_IO, RIO;
+    s: String(1..20);
   begin
     if f = null then
-      return;
-    end if;
-    if style = bracketed then
-      Put(t,'{');
+      return "";
     end if;
     case f.s is
       when nb =>
         x:= f.n;
         if x = Real'Floor (x) then
-          Put(t, Integer(x), 0);
+          return Trim(Integer'Image(Integer(x)),Left);
         else
-          Put(t, x, 0,5,0);
+          Put(s, x, 5,0);
+          return Trim(s,Left);
         end if;
       when var =>
-        Put(t, To_String(f.v));
-      when moins_una=>
-        Put(t,'-');
-        Put(t,f.left, style);
-      when plus_una=>
-        Put(t,'+');
-        Put(t,f.left, style);
+        return To_String(f.v);
+      when moins_una =>
+        return '-' & Image(f.left, style);
+      when plus_una =>
+        return '+' & Image(f.left, style);
       when Binary_operator =>
-        Put(t,f.left, style);
-        Put(t,Conv_strg(f.s));
-        Put(t,f.right, style);
+        return Image(f.left, style) & Conv_strg(f.s) & Image(f.right, style);
       when Built_in_function =>
-        Put(t,Conv_strg(f.s));
-        Put(t,'(');
-        Put(t,f.left, style);
         if f.s in Binary then
-          Put(t,',');
-          Put(t,f.right, style);
+          return Conv_strg(f.s) & '(' &
+            Image(f.left, style) & ',' &
+            Image(f.right, style) &
+          ')';
+        else
+          return Conv_strg(f.s) & '(' & Image(f.left, style) & ')';
         end if;
-        Put(t,')');
-      when par=>
-        Put(t,'(');
-        Put(t,f.left, style);
-        Put(t,')');
-      when croch=>
-        Put(t,'[');
-        Put(t,f.left, style);
-        Put(t,']');
-      when accol=>
-        Put(t,'{');
-        Put(t,f.left, style);
-        Put(t,'}');
+      when par =>
+        return '(' & Image(f.left, style) & ')';
+      when croch =>
+        return '[' & Image(f.left, style) & ']';
+      when accol =>
+        return '{' & Image(f.left, style) & '}';
     end case;
-    if style = bracketed then
-      Put(t,'}');
+  end Image_simple;
+
+  function Image (f : Formula; style : Output_style:= normal) return String is
+  begin
+    if f = null then
+      return "";
     end if;
-  end Put;
+    if style = bracketed then
+      return '{' & Image_simple(f, style) & '}';
+    else
+      return Image_simple(f, style);
+    end if;
+  end Image;
 
   procedure Dispose is new Ada.Unchecked_Deallocation (Formula_Rec, Formula);
 
