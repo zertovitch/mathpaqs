@@ -194,7 +194,7 @@ package body Formulas is
     Check(expected => Closing(open), found => close);
   end;
 
-  procedure Parse (str_base: String; f: out Formula) is
+  function Parse (s : String) return Formula is
 
     function No_Spaces (s: String) return String is
       t: String(s'Range);
@@ -212,7 +212,7 @@ package body Formulas is
       return t(t'First .. j);
     end No_Spaces;
 
-    str: constant String:= No_Spaces(str_base) & c_fin;
+    str: constant String:= No_Spaces(s) & c_fin;
 
     chiffres : constant Character_Set :=
       ('0' .. '9' | '.' => True, others => False);
@@ -378,6 +378,8 @@ package body Formulas is
       end if;
     end Expression;
 
+    f: Formula;
+
   begin
     i:= 1;
     f:= Expression;
@@ -385,6 +387,7 @@ package body Formulas is
       Deep_delete(f);
       Raise_Exception(Parse_Error'Identity, "Unexpected end in formula (extra symbols)");
     end if;
+    return f;
   exception
     when E: Parse_Error =>
       Deep_delete(f);

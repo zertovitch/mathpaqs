@@ -62,7 +62,7 @@ package Formulas is
   procedure Put (t : in Ada.Text_IO.File_Type; f : Formula; style : Output_style:= normal);
   function Image (f : Formula; style : Output_style:= normal) return String;
 
-  procedure Parse (str_base : String; f : out Formula);
+  function Parse (s : String) return Formula;
   function Evaluate (f : Formula; payload : Payload_type) return Real;
 
   function Equivalent (fa, fb : Formula) return Boolean;
