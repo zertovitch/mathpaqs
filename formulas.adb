@@ -748,9 +748,29 @@ package body Formulas is
           aux.left:= f.left;
           aux.right:= new Formula_Rec(nb);
           aux.right.n:= 2.0;
-          Deep_delete(f.right);
+          Deep_delete(f.right);        -- destroy 2nd occurence of X
           Dispose(f);
           f:= aux;
+        elsif f.right.s = fois and then Equivalent(f.left, f.right.left) then
+          aux:= new Formula_Rec(puiss);                 --  X * {X * Y}  ->  X^2 * Y
+          aux.left:= f.left;
+          aux.right:= new Formula_Rec(nb);
+          aux.right.n:= 2.0;           -- X^2 is constructed
+          f.left:= aux;
+          Deep_delete(f.right.left);   -- destroy 2nd occurence of X
+          aux:= f.right.right;         -- keep Y
+          Dispose(f.right);
+          f.right:= aux;
+        elsif f.right.s = fois and then Equivalent(f.left, f.right.right) then
+          aux:= new Formula_Rec(puiss);                 --  X * {Y * X}  ->  X^2 * Y
+          aux.left:= f.left;
+          aux.right:= new Formula_Rec(nb);
+          aux.right.n:= 2.0;           -- X^2 is constructed
+          f.left:= aux;
+          Deep_delete(f.right.right);  -- destroy 2nd occurence of X
+          aux:= f.right.left;          -- keep Y
+          Dispose(f.right);
+          f.right:= aux;
         elsif Is_constant_pair(f) then
           cst_replaces_f( f.left.n * f.right.n );       --  cst*cst  ->  cst
         elsif f.left.s  = puiss and then
