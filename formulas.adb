@@ -558,6 +558,16 @@ package body Formulas is
 
   ------------------------------- Simplify ----------------------------------
 
+  function Build_X_pow_2(X: Formula) return Formula is
+    aux: Formula;
+  begin
+    aux:= new Formula_Rec(puiss);
+    aux.left:= X;
+    aux.right:= new Formula_Rec(nb);
+    aux.right.n:= 2.0;           -- X^2 is constructed
+    return aux;
+  end Build_X_pow_2;
+
   procedure Simplify (f : in out Formula) is
     aux,
     nexp : Formula;
@@ -586,8 +596,9 @@ package body Formulas is
       f.n:= c ;
     end cst_replaces_f;
 
+    use REF;
+
     procedure Simplify_functions is
-      use REF;
       --  Assumes: f.s in Built_in_function
     begin
       if f.left /= null then
@@ -615,8 +626,6 @@ package body Formulas is
         f.left:= aux;
       end if;
     end Simplify_functions;
-
-    use REF;
 
   begin
     if f = null then
@@ -744,29 +753,18 @@ package body Formulas is
 
       when fois =>
         if Equivalent(f.left, f.right) then             --  X*X -> X^2
-          aux:= new Formula_Rec(puiss);
-          aux.left:= f.left;
-          aux.right:= new Formula_Rec(nb);
-          aux.right.n:= 2.0;
+          aux:= Build_X_pow_2(f.left);
           Deep_delete(f.right);        -- destroy 2nd occurence of X
           Dispose(f);
           f:= aux;
         elsif f.right.s = fois and then Equivalent(f.left, f.right.left) then
-          aux:= new Formula_Rec(puiss);                 --  X * {X * Y}  ->  X^2 * Y
-          aux.left:= f.left;
-          aux.right:= new Formula_Rec(nb);
-          aux.right.n:= 2.0;           -- X^2 is constructed
-          f.left:= aux;
+          f.left:= Build_X_pow_2(f.left);               --  X * {X * Y}  ->  X^2 * Y
           Deep_delete(f.right.left);   -- destroy 2nd occurence of X
           aux:= f.right.right;         -- keep Y
           Dispose(f.right);
           f.right:= aux;
         elsif f.right.s = fois and then Equivalent(f.left, f.right.right) then
-          aux:= new Formula_Rec(puiss);                 --  X * {Y * X}  ->  X^2 * Y
-          aux.left:= f.left;
-          aux.right:= new Formula_Rec(nb);
-          aux.right.n:= 2.0;           -- X^2 is constructed
-          f.left:= aux;
+          f.left:= Build_X_pow_2(f.left);               --  X * {Y * X}  ->  X^2 * Y
           Deep_delete(f.right.right);  -- destroy 2nd occurence of X
           aux:= f.right.left;          -- keep Y
           Dispose(f.right);
