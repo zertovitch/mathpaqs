@@ -100,10 +100,17 @@ package body Formulas is
     case f.s is
       when nb =>
         x:= f.n;
-        if Almost_zero(x - Real'Floor (x)) then
-          return Trim(Integer'Image(Integer(x)),Left);
+        if Almost_zero(x - Real'Floor (x)) and then
+          abs x < Real(Long_Integer'Last)
+        then
+          return Trim(Long_Integer'Image(Long_Integer(x)),Left);
         else
-          Put(s, x, 5,0);
+          begin
+            Put(s, x, 5,0);
+          exception
+            when Layout_Error =>
+              Put(s, x);
+          end;
           return Trim(s,Left);
         end if;
       when var =>
@@ -299,7 +306,11 @@ package body Formulas is
           end if;
           c:= str(i);
           case c is
-            when '^'=>
+            when '^' =>
+              -- NB: right-associative in this parser.
+              --     x^y^z means x^(y^z) like in R and unlike
+              --     in Excel where x^y^z means (x^y)^z.
+              --     Ada asks for parenthesization.
               n1:= n;
               n:= new Formula_Rec(puiss);
               i:= i + 1;
@@ -472,7 +483,12 @@ package body Formulas is
 
   ------------------------------- Compare -----------------------------------
 
-  --  Special case:
+  --  Special cases.
+  --    We check these equivalences because the concerned formula
+  --    parts are unlikely to be changed by the Simplify procedure.
+  --    E.g. we don't want to change x/2 into x*0.5; then, we check
+  --    the equivalence.
+
   --  X * cst, or cst * X, equivalent to X / (1/cst)
   function Equivalent_Times_Div(fa, fb : Formula) return Boolean is
   begin
@@ -532,7 +548,7 @@ package body Formulas is
                Equivalent(fa.right, fb.left));
       end case;
     else
-      --  Formulas' nodes a and b are not of the same kind
+      --  Formulas' nodes a and b are not of the same kind, but...
       return
         Equivalent_Times_Div(fa, fb) or else
         Equivalent_Times_Div(fa => fb, fb => fa);

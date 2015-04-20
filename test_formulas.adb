@@ -65,7 +65,7 @@ procedure Test_Formulas is
       end if;
       New_Line;
       e := Evaluate (f, dummy);
-      if abs (e - e0) > 1.0e-10 then
+      if abs (e - e0) > abs (e) * 1.0e-10 then
         Put_Line (Standard_Error, "!!! Evaluation error !!!");
       end if;
     end loop;
@@ -85,6 +85,7 @@ begin
   Test_1 ("2 -4 +6 -1 -1- 0 +8", "10");
   Test_1 ("2*3*4/8 -   5/2*4 +  6 + 0/3", "-1");
   Test_1 ("(2) + (17*2-30) * (5)+2 - (8/2)*4", "8");
+  Test_1 ("4^3^2");  --  262144 in R, 4096 in Excel. Ada asks for parenthesization.
   Test_1 ("x+x+y");
   Test_1 ("x+y+x");
   Test_1 ("x*y*x");
