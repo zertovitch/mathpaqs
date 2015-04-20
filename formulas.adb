@@ -92,7 +92,7 @@ package body Formulas is
   function Image_simple (f : Formula; style : Output_style:= normal) return String is
     x : Real;
     use Ada.Text_IO, RIO;
-    s: String(1..20);
+    s: String(1..40);
   begin
     if f = null then
       return "";
@@ -150,6 +150,27 @@ package body Formulas is
       return Image_simple(f, style);
     end if;
   end Image;
+
+  function Deep_copy(f : Formula) return Formula is
+    g: Formula;
+  begin
+    if f = null then
+      return null;
+    end if;
+    g:= new Formula_Rec(f.s);
+    case f.s is
+      when nb =>
+        g.n:= f.n;
+      when var =>
+        g.v:= f.v;
+      when Unary =>
+        g.left:= Deep_copy(f.left);
+      when Binary =>
+        g.left := Deep_copy(f.left);
+        g.right:= Deep_copy(f.right);
+    end case;
+    return g;
+  end Deep_copy;
 
   procedure Dispose is new Ada.Unchecked_Deallocation (Formula_Rec, Formula);
 

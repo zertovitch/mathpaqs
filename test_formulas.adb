@@ -41,9 +41,19 @@ procedure Test_Formulas is
       end if;
     end Entropy_test;
     --
+    procedure Copy_test(f: Formula) is
+      g: Formula:= Deep_copy(f);
+    begin
+      if not Equivalent(f, g) then
+        Put_Line (Standard_Error, "!!! Deep_copy / Equivalent test failed !!!");
+      end if;
+      Deep_delete(g);
+    end Copy_test;
+    --
   begin
     Put_Line ("*************** Testing formula: " & expr);
     f := Parse (expr);
+    Copy_test(f);
     declare
       im0 : constant String := Image (f);
       imn : constant String := Entropy_test (im0, 10);
@@ -59,6 +69,7 @@ procedure Test_Formulas is
     for count in 1 .. 4 loop
       Put ("Simplify #" & Integer'Image (count) & ": ");
       Simplify (f);
+      Copy_test(f);
       Put (f, style);
       if target /= "" then
         Put (";  target value is: " & target);

@@ -69,6 +69,7 @@ package Formulas is
   function Identical (fa, fb : Formula) return Boolean;
   procedure Simplify (f : in out Formula);
 
+  function Deep_copy(f : Formula) return Formula;
   procedure Deep_delete (f : in out Formula);
 
   Parse_Error,
