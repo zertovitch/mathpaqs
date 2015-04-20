@@ -555,6 +555,34 @@ package body Formulas is
     end if;
   end Equivalent;
 
+  --  Strict form of equivalence
+  function Identical(fa, fb : Formula) return Boolean is
+  begin
+    if fa = null then
+      return fb = null;
+    end if;
+    if fb = null then
+      return False;
+    end if;
+    -- fa and fb are not null, at this point
+    if fa.s /= fb.s then
+      return False;
+    end if;
+    --  Formulas' nodes a and b are of the same kind
+    case fa.s is
+      when nb =>
+        return Almost_zero(fa.n - fb.n);
+      when var =>
+        return fa.v = fb.v;  --  same names
+      when Unary =>
+        return Identical(fa.left, fb.left);
+      when Binary =>
+        return Identical(fa.left, fb.left) and then Identical(fa.right, fb.right);
+    end case;
+  end Identical;
+
+  ------------------------------- Simplify ----------------------------------
+
   function Is_constant(a: Formula; cst : Real) return Boolean is
   begin
     return a /= null and then a.s = nb and then a.n = cst;
@@ -569,8 +597,6 @@ package body Formulas is
       a.left.s = nb and then
       a.right.s = nb;
   end Is_constant_pair;
-
-  ------------------------------- Simplify ----------------------------------
 
   function Build_2X(X: Formula) return Formula is  --  returns 2*X
     aux: constant Formula:= new Formula_Rec(fois);

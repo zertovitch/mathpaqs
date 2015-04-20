@@ -66,6 +66,7 @@ package Formulas is
   function Evaluate (f : Formula; payload : Payload_type) return Real;
 
   function Equivalent (fa, fb : Formula) return Boolean;
+  function Identical (fa, fb : Formula) return Boolean;
   procedure Simplify (f : in out Formula);
 
   procedure Deep_delete (f : in out Formula);
