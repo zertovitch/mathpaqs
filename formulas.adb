@@ -84,6 +84,11 @@ package body Formulas is
     Ada.Text_IO.Put(t, Image(f, style));
   end;
 
+  function Almost_zero (x: Real) return Boolean is
+  begin
+    return abs x <= Real'Base'Model_Small;
+  end Almost_zero;
+
   function Image_simple (f : Formula; style : Output_style:= normal) return String is
     x : Real;
     use Ada.Text_IO, RIO;
@@ -95,7 +100,7 @@ package body Formulas is
     case f.s is
       when nb =>
         x:= f.n;
-        if x = Real'Floor (x) then
+        if Almost_zero(x - Real'Floor (x)) then
           return Trim(Integer'Image(Integer(x)),Left);
         else
           Put(s, x, 5,0);
@@ -159,11 +164,6 @@ package body Formulas is
   end Deep_delete;
 
   type Character_Set is array (Character) of Boolean;
-
-  function Almost_zero (x: Real) return Boolean is
-  begin
-    return abs x <= Real'Base'Model_Small;
-  end Almost_zero;
 
   Closing : constant array(Character) of Character:=
     ('(' => ')',
@@ -438,17 +438,15 @@ package body Formulas is
           return Evaluate(f.left, payload) / aux;
         end if;
       when puiss =>
-        aux:= Evaluate(f.left, payload);
-        if aux <= 0.0 then
-          raise Not_Pos_Power;
+        aux:= Evaluate(f.right, payload);
+        if Almost_zero(aux - Real'Floor (aux)) then
+          return Evaluate(f.left, payload) ** Integer(aux);
+          --  Negative arguments are possible in this case
+        else
+          return Evaluate(f.left, payload) ** aux;
         end if;
-        return Exp(Evaluate(f.right, payload)*Log(aux));
       when logn=>
-        aux:= Evaluate(f.left, payload);
-        if aux <= 0.0 then
-          raise Not_Pos_Power;
-        end if;
-        return Log(aux);
+        return Log(Evaluate(f.left, payload));
       when expn=>
         return Exp(Evaluate(f.left, payload));
       when sinus=>
@@ -558,13 +556,21 @@ package body Formulas is
 
   ------------------------------- Simplify ----------------------------------
 
-  function Build_X_pow_2(X: Formula) return Formula is
-    aux: Formula;
+  function Build_2X(X: Formula) return Formula is  --  returns 2*X
+    aux: constant Formula:= new Formula_Rec(fois);
   begin
-    aux:= new Formula_Rec(puiss);
+    aux.left:= new Formula_Rec(nb);
+    aux.left.n:= 2.0;
+    aux.right:= X;
+    return aux;
+  end Build_2X;
+
+  function Build_X_pow_2(X: Formula) return Formula is  --  returns X^2
+    aux: constant Formula:= new Formula_Rec(puiss);
+  begin
     aux.left:= X;
     aux.right:= new Formula_Rec(nb);
-    aux.right.n:= 2.0;           -- X^2 is constructed
+    aux.right.n:= 2.0;
     return aux;
   end Build_X_pow_2;
 
@@ -680,29 +686,18 @@ package body Formulas is
           Dispose(f);
           f:= aux;
         elsif Equivalent(f.left, f.right) then
-          aux:= new Formula_Rec(fois);                  --  X + X  ->  2*X
-          aux.left:= new Formula_Rec(nb);
-          aux.left.n:= 2.0;
-          aux.right:= f.right;
-          Deep_delete(f.left);
+          aux:= Build_2X(f.left);                       --  X + X  ->  2*X
+          Deep_delete(f.right);
           Dispose(f);
           f:= aux;
         elsif f.right.s = plus and then Equivalent(f.left, f.right.left) then
-          aux:= new Formula_Rec(fois);                  --  X + {X + Y}  ->  2*X + Y
-          aux.left:= new Formula_Rec(nb);
-          aux.left.n:= 2.0;
-          aux.right:= f.left;          -- 2*X is constructed
-          f.left:= aux;
+          f.left:= Build_2X(f.left);                    --  X + {X + Y}  ->  2*X + Y
           Deep_delete(f.right.left);   -- destroy 2nd occurence of X
           aux:= f.right.right;         -- keep Y
           Dispose(f.right);
           f.right:= aux;
         elsif f.right.s = plus and then Equivalent(f.left, f.right.right) then
-          aux:= new Formula_Rec(fois);                  --  X + {Y + X}  ->  2*X + Y
-          aux.left:= new Formula_Rec(nb);
-          aux.left.n:= 2.0;
-          aux.right:= f.left;          -- 2*X is constructed
-          f.left:= aux;
+          f.left:= Build_2X(f.left);                    --  X + {Y + X}  ->  2*X + Y
           Deep_delete(f.right.right);  -- destroy 2nd occurence of X
           aux:= f.right.left;          -- keep Y
           Dispose(f.right);

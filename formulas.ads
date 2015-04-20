@@ -71,8 +71,7 @@ package Formulas is
   procedure Deep_delete (f : in out Formula);
 
   Parse_Error,
-  Div_By_0,
-  Not_Pos_Power : exception;
+  Div_By_0 : exception;
 
 private
 

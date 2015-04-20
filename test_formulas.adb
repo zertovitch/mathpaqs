@@ -1,3 +1,5 @@
+--  Run "test_formulas >nul" to see eventual errors only
+
 with Formulas;
 
 with Ada.Text_IO; use Ada.Text_IO;
@@ -29,6 +31,7 @@ procedure Test_Formulas is
     f : Formula := null_formula;
     e0, e : Real;
     style : constant Output_style := normal;
+    --
     function Entropy_test (expr : String; level : Natural) return String is
     begin
       if level = 0 then
@@ -37,6 +40,7 @@ procedure Test_Formulas is
         return Image (Parse (Entropy_test (expr, level - 1)));
       end if;
     end Entropy_test;
+    --
   begin
     Put_Line ("*************** Testing formula: " & expr);
     f := Parse (expr);
@@ -45,7 +49,7 @@ procedure Test_Formulas is
       imn : constant String := Entropy_test (im0, 10);
     begin
       if im0 /= imn then
-        Put_Line ("!!! Parse / Image entropy test failed !!!");
+        Put_Line (Standard_Error, "!!! Parse / Image entropy test failed !!!");
       end if;
     end;
     Put ("Output...   : ");
@@ -62,7 +66,7 @@ procedure Test_Formulas is
       New_Line;
       e := Evaluate (f, dummy);
       if abs (e - e0) > 1.0e-10 then
-        Put_Line ("!!! Evaluation error !!!");
+        Put_Line (Standard_Error, "!!! Evaluation error !!!");
       end if;
     end loop;
     Put ("Final eval: "); Put (e, 0, 14, 0);
@@ -85,6 +89,7 @@ begin
   Test_1 ("x+y+x");
   Test_1 ("x*y*x");
   Test_1 ("x*y*x*y");
+  Test_1 ("[arctan(1+x*4) * sin(5*x)^5 * arctan(2*x+2*x+1)] * 8 * sin(x*5)");
   Test_1 ("tan(x+1+1)+tan(x+2)+y");
   Test_1 ("x * (x*x + 0)");
   Test_1 ("x*x*x");
