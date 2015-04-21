@@ -32,10 +32,8 @@
 
 -- TO DO:
 --   - implement user functions
---   - complete Simplify_functions
---   - improve Simplify (see misses at Test_Formulas)
---   - Deep_copy
---   - Deep_delete internal; Finalization
+--   - (never-ending) improve Simplify (see misses at Test_Formulas)
+--   - (perhaps) Deep_delete internal; Finalization
 
 with Ada.Strings.Unbounded;             use Ada.Strings.Unbounded;
 with Ada.Text_IO;
@@ -85,14 +83,14 @@ private
                  par, croch, accol,
                  -- vvv begin of built-in functions
                  expn, logn,
-                 sinus, cosinus, tg, arctg,
-                 sh, ch, th,
+                 sinus, arcsin, cosinus, arccos, tg, arctg,
+                 sh, arcsinh, ch, arccosh, th, arctanh,
                                                      --  2 arguments:
                  min, max,
                  -- ^^^ end of built-in functions
                  moins, plus, sur, fois, puiss);
 
-  subtype Unary is S_Form range moins_una .. th;
+  subtype Unary is S_Form range moins_una .. arctanh;
   subtype Binary is S_Form range min .. puiss;
 
   type Formula_Rec (s :  S_Form);

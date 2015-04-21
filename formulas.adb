@@ -33,12 +33,17 @@ package body Formulas is
       when expn    => return "Exp";
       when logn    => return "Log";
       when sinus   => return "Sin";
+      when arcsin  => return "Arcsin";
       when cosinus => return "Cos";
+      when arccos  => return "Arccos";
       when tg      => return "Tan";
       when arctg   => return "Arctan";
       when sh      => return "Sinh";
+      when arcsinh => return "Arcsinh";
       when ch      => return "Cosh";
+      when arccosh => return "Arccosh";
       when th      => return "Tanh";
+      when arctanh => return "Arctanh";
       when min     => return "Min";
       when max     => return "Max";
       when par     => return "(";
@@ -483,18 +488,28 @@ package body Formulas is
         return Exp(Evaluate(f.left, payload));
       when sinus=>
         return Sin(Evaluate(f.left, payload));
+      when arcsin =>
+        return Arcsin(Evaluate(f.left, payload));
       when cosinus=>
         return Cos(Evaluate(f.left, payload));
-      when sh=>
-        return Sinh(Evaluate(f.left, payload));
-      when ch=>
-        return Cosh(Evaluate(f.left, payload));
-      when th=>
-        return Tanh(Evaluate(f.left, payload));
-      when arctg=>
-        return Arctan(Evaluate(f.left, payload));
+      when arccos =>
+        return Arccos(Evaluate(f.left, payload));
       when tg=>
         return Tan(Evaluate(f.left, payload));
+      when arctg=>
+        return Arctan(Evaluate(f.left, payload));
+      when sh=>
+        return Sinh(Evaluate(f.left, payload));
+      when arcsinh =>
+        return Arcsinh(Evaluate(f.left, payload));
+      when ch=>
+        return Cosh(Evaluate(f.left, payload));
+      when arccosh =>
+        return Arccosh(Evaluate(f.left, payload));
+      when th=>
+        return Tanh(Evaluate(f.left, payload));
+      when arctanh =>
+        return Arctanh(Evaluate(f.left, payload));
       when min =>
         return Real'Min(Evaluate(f.left, payload), Evaluate(f.right, payload));
       when max =>
@@ -640,7 +655,6 @@ package body Formulas is
   procedure Simplify (f : in out Formula) is
     aux,
     nexp : Formula;
-    x    : Real;
 
     procedure left_replaces_f is
     begin
@@ -668,26 +682,67 @@ package body Formulas is
     use REF;
 
     procedure Simplify_functions is
+      x, y: Real;
       --  Assumes: f.s in Built_in_function
     begin
-      if f.left /= null then
-        if f.left.s = nb then        --  Evaluate "f(cst)" into f(cst)
-          x:= f.left.n;
-          case f.s is
-            when sinus=>
-              cst_replaces_f(Sin(x));
-            when cosinus=>
-              cst_replaces_f(Cos(x));
-            when expn=>
-              cst_replaces_f(Exp(x));
-            when logn=>
-              if x > 0.0 then
-                cst_replaces_f(Log(x));
-              end if;
-            when others=>
-              null;  -- [P2Ada]: no otherwise / else in Pascal
-          end case;
+      if f.left = null then
+        return;
+      end if;
+      if f.s in Binary then
+        if f.right = null then
+          return;
         end if;
+        if f.right.s = nb then
+          y:= f.right.n;
+        end if;
+      end if;
+      --
+      --  Arguments are constants, we can evaluate the function and put the result as constant.
+      --  Actually we could use the "Evaluate" function (for operators as well), but we then would
+      --  need a fake payload. We also choose not to simplify cases where evaluation would fail.
+      --
+      if f.left.s = nb then        --  Evaluate "f(cst)" into f(cst)
+        x:= f.left.n;
+        case Built_in_function(f.s) is
+          when sinus=>
+            cst_replaces_f(Sin(x));
+          when arcsin =>
+            cst_replaces_f(Arcsin(x));
+          when cosinus=>
+            cst_replaces_f(Cos(x));
+          when arccos =>
+            cst_replaces_f(Arccos(x));
+          when expn=>
+            cst_replaces_f(Exp(x));
+          when logn=>
+            if x > 0.0 then
+              cst_replaces_f(Log(x));
+            end if;
+          when Tg =>
+            cst_replaces_f(Tan(x));
+          when ArcTg =>
+            cst_replaces_f(Arctan(x));
+          when sh =>
+            cst_replaces_f(Sinh(x));
+          when arcsinh =>
+            cst_replaces_f(Arcsinh(x));
+          when ch =>
+            cst_replaces_f(Cosh(x));
+          when arccosh =>
+            cst_replaces_f(Arccosh(x));
+          when th =>
+            cst_replaces_f(Tanh(x));
+          when arctanh =>
+            cst_replaces_f(Arctanh(x));
+          when min =>
+            if f.right.s = nb then
+              cst_replaces_f(Real'Min(x,y));
+            end if;
+          when max =>
+            if f.right.s = nb then
+              cst_replaces_f(Real'Max(x,y));
+            end if;
+        end case;
       end if;
       if f.s = cosinus and then f.left /= null and then f.left.s = moins_una then
         aux:= f.left.left;                              --  Cos(-X)  ->  Cos(X)
