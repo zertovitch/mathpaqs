@@ -44,7 +44,7 @@ procedure Test_Formulas is
     procedure Copy_test(f: Formula) is
       g: Formula:= Deep_copy(f);
     begin
-      if not Equivalent(f, g) then
+      if not Identical(f, g) then
         Put_Line (Standard_Error, "!!! Deep_copy / Equivalent test failed !!!");
       end if;
       Deep_delete(g);
@@ -101,7 +101,7 @@ begin
   Test_1 ("x+y+x");
   Test_1 ("x*y*x");
   Test_1 ("x*y*x*y");
-  Test_1 ("[arctan(1+x*4) * sin(5*x)^5 * arctan(2*x+2*x+1)] * 8 * sin(x*5)");
+  Test_1 ("[arctan(1+x*4) * sin(5*x)**5 * arctan(2*x+2*x+1)] * 8 * sin(x*5)");
   Test_1 ("tan(x+1+1)+tan(x+2)+y");
   Test_1 ("x * (x*x + 0)");
   Test_1 ("x*x*x");

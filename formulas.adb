@@ -227,23 +227,33 @@ package body Formulas is
     Check(expected => Closing(open), found => close);
   end;
 
-  function Parse (s : String) return Formula is
-
-    function No_Spaces (s: String) return String is
-      t: String(s'Range);
-      j: Integer:= s'First - 1;
-    begin
-      for i in s'Range loop
-        case s(i) is
-          when ' ' | ASCII.HT | ASCII.CR | ASCII.LF =>
-            null;
-          when others =>
+  function No_Spaces (s: String) return String is
+    t: String(s'Range);
+    j: Integer:= s'First - 1;
+  begin
+    for i in s'Range loop
+      case s(i) is
+        when ' ' | ASCII.HT | ASCII.CR | ASCII.LF =>
+          null;
+        when '*' =>  --  Replace ** by ^
+          if i < s'Last and then s(i+1)='*' then      --  Next is '*' too
             j:= j + 1;
-            t(j):= s(i);
-        end case;
-      end loop;
-      return t(t'First .. j);
-    end No_Spaces;
+            t(j):= '^';
+          elsif i > s'First and then s(i-1)='*' then  --  Previous is '*' too
+            null;
+          else            --  No "**"
+            j:= j + 1;
+            t(j):= '*';
+          end if;
+        when others =>
+          j:= j + 1;
+          t(j):= s(i);
+      end case;
+    end loop;
+    return t(t'First .. j);
+  end No_Spaces;
+
+  function Parse (s : String) return Formula is
 
     str: constant String:= No_Spaces(s) & c_fin;
 
@@ -672,11 +682,11 @@ package body Formulas is
       f:= aux ;
     end right_replaces_f;
 
-    procedure cst_replaces_f (c: Real) is
+    procedure cst_replaces_f (cst: Real) is
     begin
       Deep_delete(f);
       f:= new Formula_Rec(nb);
-      f.n:= c ;
+      f.n:= cst;
     end cst_replaces_f;
 
     use REF;
@@ -781,10 +791,7 @@ package body Formulas is
           Dispose(f);
           f:= aux;
         elsif f.left.s = nb then
-          aux:= f.left;                                 --  -cst  ->  cst
-          aux.n:= -aux.n;
-          Dispose(f);
-          f:= aux;
+          cst_replaces_f(-f.left.n);                    --  -cst  ->  cst
         end if;
 
       when plus_una =>
