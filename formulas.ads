@@ -6,6 +6,8 @@
 --  Based on a Pascal university exercise (~1990's)
 --  Translated on 9-Apr-2015 by (New) P2Ada v. 28-Oct-2009
 --  Reworked further (generic, private types, exceptions, etc.)
+--  Latest version may be available at:
+--  http://mathpaqs.sf.net/ or http://sf.net/projects/mathpaqs/
 
 -- Copyright (c) Gautier de Montmollin 2015
 --
