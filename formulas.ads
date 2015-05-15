@@ -53,6 +53,15 @@ package Formulas is
   type Formula is private;
   null_formula : constant Formula;
 
+  function Parse (s : String) return Formula;
+  function Evaluate (f : Formula; payload : Payload_type) return Real;
+
+  function Equivalent (fa, fb : Formula) return Boolean;
+  function Identical (fa, fb : Formula) return Boolean;
+  procedure Simplify (f : in out Formula);
+
+  --  Display. Caution: the displayed constants may be rounded
+
   type Output_style is (
     normal,     --  Normal is infix, should be the closest to the parsed formula
     bracketed   --  Like normal, but displays a {} around every parse tree node
@@ -61,13 +70,6 @@ package Formulas is
   procedure Put (f : Formula; style : Output_style:= normal);
   procedure Put (t : in Ada.Text_IO.File_Type; f : Formula; style : Output_style:= normal);
   function Image (f : Formula; style : Output_style:= normal) return String;
-
-  function Parse (s : String) return Formula;
-  function Evaluate (f : Formula; payload : Payload_type) return Real;
-
-  function Equivalent (fa, fb : Formula) return Boolean;
-  function Identical (fa, fb : Formula) return Boolean;
-  procedure Simplify (f : in out Formula);
 
   function Deep_copy(f : Formula) return Formula;
   procedure Deep_delete (f : in out Formula);
@@ -79,7 +81,7 @@ private
 
   type S_Form is
                 (                                    --  0 argument (leaf, terminal nodes):
-                 nb, var,
+                 nb, pi, var,
                                                      --  1 argument:
                  moins_una, plus_una,
                  par, croch, accol,
@@ -102,7 +104,8 @@ private
 
   type Formula_Rec (s :  S_Form) is record
     case s is
-      when nb =>   n : Real;
+      when nb  =>  n : Real;
+      when pi  =>  null;
       when var =>  v : Unbounded_String;
       when Unary | Binary => left, right : Formula;
     end case;

@@ -54,6 +54,7 @@ procedure Test_Formulas is
     Put_Line ("*************** Testing formula: " & expr);
     f := Parse (expr);
     Copy_test(f);
+    -- Put (" [Testing Parse / Image entropy] ");
     declare
       im0 : constant String := Image (f);
       imn : constant String := Entropy_test (im0, 10);
@@ -69,12 +70,14 @@ procedure Test_Formulas is
     for count in 1 .. 4 loop
       Put ("Simplify #" & Integer'Image (count) & ": ");
       Simplify (f);
-      Copy_test(f);
       Put (f, style);
       if target /= "" then
         Put (";  target value is: " & target);
       end if;
+      -- Put (" [Testing Deep_copy] ");
+      Copy_test(f);
       New_Line;
+      -- Put (" [Testing Evaluate] ");
       e := Evaluate (f, dummy);
       if abs (e - e0) > abs (e) * 1.0e-10 then
         Put_Line (Standard_Error, "!!! Evaluation error !!!");
@@ -105,7 +108,8 @@ begin
   Test_1 ("tan(x+1+1)+tan(x+2)+y");
   Test_1 ("x * (x*x + 0)");
   Test_1 ("x*x*x");
-  Test_1 ("3 - +2 + -x");
+  Test_1 ("2*PI + 3 + +2 + +x");
+  Test_1 ("2*PI + 3 - +2 + -x");
   Test_1 ("Exp(1) + -1 - sin(-0.5)");
   Test_1 ("Exp(1) * 0 - 1");
   Test_1 ("Min(x,y*2) + Exp(1) * 0 - 1 + Min(y+y,x)");

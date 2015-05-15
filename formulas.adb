@@ -2,8 +2,7 @@
 
 with Ada.Characters.Handling;           use Ada.Characters.Handling;
 with Ada.Exceptions;                    use Ada.Exceptions;
--- This is for Pi :
--- with Ada.Numerics; use Ada.Numerics;
+with Ada.Numerics; use Ada.Numerics;
 with Ada.Numerics.Generic_Elementary_Functions;
 with Ada.Strings.Fixed;                 use Ada.Strings.Fixed, Ada.Strings;
 with Ada.Unchecked_Deallocation;
@@ -118,6 +117,8 @@ package body Formulas is
           end;
           return Trim(s,Left);
         end if;
+      when pi =>
+        return "pi";
       when var =>
         return To_String(f.v);
       when moins_una =>
@@ -166,6 +167,8 @@ package body Formulas is
     case f.s is
       when nb =>
         g.n:= f.n;
+      when pi =>
+        null;
       when var =>
         g.v:= f.v;
       when Unary =>
@@ -317,6 +320,8 @@ package body Formulas is
                   Check_brackets('(', str(i));
                   i:= i + 1;
                 end if;
+              elsif mch = "PI" then
+                n:= new Formula_Rec(pi);
               else
                 n:= new Formula_Rec(var);
                 n.v:= To_Unbounded_String(ch);
@@ -453,6 +458,8 @@ package body Formulas is
     case f.s is
       when nb=>
         return f.n;
+      when pi =>
+        return Ada.Numerics.Pi;
       when var=>
         return Evaluate_variable(To_String(f.v), payload);
       when moins_una =>
@@ -579,6 +586,8 @@ package body Formulas is
       case ga is
         when nb =>
           return Almost_zero(fa.n - fb.n);
+        when pi =>
+          return True;
         when var =>
           return fa.v = fb.v;  --  same names
         when Unary =>
@@ -618,6 +627,8 @@ package body Formulas is
     case fa.s is
       when nb =>
         return Almost_zero(fa.n - fb.n);
+      when pi =>
+        return True;
       when var =>
         return fa.v = fb.v;  --  same names
       when Unary =>
@@ -765,7 +776,7 @@ package body Formulas is
     if f = null then
       return;
     end if;
-    --  Simplify arguments
+    --  Simplify arguments first, before the formula itself
     case f.s is
       when Unary =>
         Simplify(f.left);
@@ -825,6 +836,11 @@ package body Formulas is
           f.left:= Build_2X(f.left);                    --  X + {Y + X}  ->  2*X + Y
           Deep_delete(f.right.right);  -- destroy 2nd occurence of X
           aux:= f.right.left;          -- keep Y
+          Dispose(f.right);
+          f.right:= aux;
+        elsif f.left.s = nb and then f.right.s = plus and then f.right.left.s = nb then
+          aux:= f.right.right;                          --  cst + {cst + X} -> cst + X
+          f.left.n:= f.left.n + f.right.left.n;
           Dispose(f.right);
           f.right:= aux;
         elsif f.right.s = nb and then f.right.n < 0.0 then
@@ -957,8 +973,12 @@ package body Formulas is
 
       when Built_in_function =>
         Simplify_functions;
-      when others=>
-        null;  -- [P2Ada]: no otherwise / else in Pascal
+
+      when pi =>
+        cst_replaces_f(Ada.Numerics.Pi);
+
+      when nb | var =>
+        null;
     end case;
   end Simplify;
 
