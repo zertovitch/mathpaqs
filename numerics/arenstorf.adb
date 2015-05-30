@@ -12,8 +12,8 @@ with Ada.Text_IO;                       use Ada.Text_IO;
 with Ada.Numerics;                      use Ada.Numerics;
 with Ada.Numerics.Generic_Elementary_functions;
 
-with Dormand_Prince_8, G_Matrices;                  -- MATHPAQS.ZIP
-with Graph;                             use Graph;  -- WIN- or DOS-GRAPH.ZIP
+with Dormand_Prince_8, G_Matrices;
+with Graph;                             use Graph;
 
 procedure Arenstorf is
 
