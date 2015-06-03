@@ -2,13 +2,13 @@
 -- SAMPLES --
 -------------
 -- Package for building samples of random values, then computing
--- statistics from these samples
+-- statistics from these samples (see Get_measures)
 -------------
 -- Author: G. de Montmollin, August 2007 and later
 --
 -- Legal licensing note:
 
---  Copyright (c) 2007..2012 Gautier de Montmollin
+--  Copyright (c) 2007..2015 Gautier de Montmollin
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -59,16 +59,21 @@ package Samples is
 
   Sample_not_initialized: exception;
 
-  --------------------------------------
-  -- (2) Add any number of occurences --
-  --------------------------------------
+  ---------------------------------------
+  -- (2) Add any number of occurrences --
+  ---------------------------------------
 
   procedure Add_occurence(s: in out Sample; value: Real);
   pragma Inline(Add_occurence);
 
   Value_out_of_sample_range: exception;
 
-  -- Getting measures from a sample after all occurences are recorded --
+  -- Getting measures from a sample after all occurrences are recorded.
+  --
+  -- The reason why Sample and Measure are separate is that Sample is
+  -- usually very large but short-lived (used only when gathering
+  -- occurrences) and Measure is kept for longer for display and storage.
+  -- Typically Sample is discarded right after a call to Get_measures.
 
   type Measure(quantile_levels: Positive) is record
     -------------
@@ -100,6 +105,8 @@ package Samples is
     s: in     Sample;
     m: in out Measure -- "in" are the quantile levels (m.level)
   );
+  --  Typically s can be discarded (and much memory freed) right
+  --  after a call to Get_measures.
 
   No_occurence                 : exception;
   Quantile_level_negative      : exception;
