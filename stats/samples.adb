@@ -42,9 +42,15 @@ package body Samples is
     s.sum:= s.sum + value;
     s.sum_sq:= s.sum_sq + value*value;
     pos:= 1 + Integer(Real'Floor(s.factor * (value - s.min)));
+    s.total_occurences:= s.total_occurences + 1;
     if pos in s.histogram'Range then
       s.histogram(pos):= s.histogram(pos) + 1;
-      s.total_occurences:= s.total_occurences + 1;
+    elsif fit_to_range then
+      if pos < s.histogram'First then
+        s.histogram(s.histogram'First):= s.histogram(s.histogram'First) + 1;
+      else
+        s.histogram(s.histogram'Last):= s.histogram(s.histogram'Last) + 1;
+      end if;
     else
       Raise_Exception
        (value_out_of_sample_range'Identity,

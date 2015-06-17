@@ -35,10 +35,13 @@ generic
 
   type Real is digits <>;
   type Quantile_table is array(Positive range <>) of Real;
+
   -- Try to correct sample bin location error compared to actual occurence
   -- value, by locating the quantile boundary *within* the histogram.
   -- It improves accuracy, but may look bad with discrete variables.
   use_sub_histogram_index: Boolean;
+
+  fit_to_range: Boolean:= False;
 
 package Samples is
 

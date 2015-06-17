@@ -134,7 +134,7 @@ begin
     RS.Add_occurence(s, u);
   end loop;
   RS.Get_measures(s,m);
-  Put_Line("Mean should converge to zero, std dev should converge to 10/sqrt(3) ~= 5.77350269.");
+  Put_Line("Mean should converge to 0.5, std dev should converge to 1/(2 sqrt(3)) ~= 0.288675.");
   Display_Measure(m);
   --
   Title("=== Easy test: Uniform [-10, 10]");
@@ -172,9 +172,10 @@ begin
     RS.Add_occurence(s, Real(Poisson(0.54321)));
   end loop;
   RS.Get_measures(s,m);
+  Put_Line("Mean should converge to lambda, std dev should converge to sqrt(lambda).");
   Display_Measure(m);
   --
-  Title("=== Fuzzy discrete sample");
+  Title("=== Fuzzy discrete sample: values 0, 1, 6 added n, 4n, 7n times");
   RS.Initialize(s, 0.0, 6.0);
   for i in 1..1*multi loop
     RS.Add_occurence(s, 0.0);
@@ -186,6 +187,7 @@ begin
     RS.Add_occurence(s, 6.0);
   end loop;
   RS.Get_measures(s,m);
+  Put_Line("Mean should converge to 23/6 ~= 3.833333.");
   Display_Measure(m);
   --
   Close(f);
