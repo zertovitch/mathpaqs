@@ -199,8 +199,6 @@ package body Formulas is
     end if;
   end Deep_delete;
 
-  type Character_Set is array (Character) of Boolean;
-
   Closing : constant array(Character) of Character:=
     ('(' => ')',
      '[' => ']',
@@ -262,10 +260,6 @@ package body Formulas is
 
     chiffres : constant Character_Set :=
       ('0' .. '9' | '.' => True, others => False);
-    lettres  : constant Character_Set :=
-      ('a' .. 'z' | 'A' .. 'Z' => True, others => False);
-    lettres_ext  : constant Character_Set :=
-      ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '.' => True, others => False);
 
     i : Integer;
 
@@ -294,7 +288,7 @@ package body Formulas is
             j:= i;
             loop
               i:= i + 1;
-              exit when not lettres_ext(str(i));
+              exit when not following_character(str(i));
             end loop;
             declare
               ch: constant String:= str(j..i-1);
@@ -338,7 +332,7 @@ package body Formulas is
           c:= str(i);
           if chiffres(c) then
             n:= Number;
-          elsif lettres(c) then
+          elsif letters(c) then
             n:= Variable_or_function;
           elsif c = '-' or c = '+' then
             n:= new Formula_Rec(conv_symb_una(c));

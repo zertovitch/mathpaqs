@@ -77,6 +77,16 @@ package Formulas is
   Parse_Error,
   Div_By_0 : exception;
 
+  type Character_Set is array (Character) of Boolean;
+
+  -- Custom variables or functions always begin with a letter:
+  letters  : constant Character_Set :=
+    ('a' .. 'z' | 'A' .. 'Z' => True, others => False);
+
+  -- Set of following characters in custom variables or functions names is defined here:
+  following_character  : constant Character_Set :=
+    ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '.' => True, others => False);
+
 private
 
   type S_Form is
