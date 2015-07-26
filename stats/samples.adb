@@ -24,7 +24,7 @@ package body Samples is
     s.histogram:= (others => 0);
     s.min:= min;
     s.max:= max;
-    s.total_occurences:= 0;
+    s.total_occurrences:= 0;
     s.bins_r:= Real(s.bins);
     s.bins_inv:= 1.0 / s.bins_r;
     s.factor:= (s.bins_r - eps) / (max-min);
@@ -33,7 +33,7 @@ package body Samples is
     s.initialized:= True;
   end Initialize;
 
-  procedure Add_occurence(s: in out Sample; value: Real) is
+  procedure Add_occurrence(s: in out Sample; value: Real) is
     pos: Integer;
   begin
     if not s.initialized then
@@ -42,7 +42,7 @@ package body Samples is
     s.sum:= s.sum + value;
     s.sum_sq:= s.sum_sq + value*value;
     pos:= 1 + Integer(Real'Floor(s.factor * (value - s.min)));
-    s.total_occurences:= s.total_occurences + 1;
+    s.total_occurrences:= s.total_occurrences + 1;
     if pos in s.histogram'Range then
       s.histogram(pos):= s.histogram(pos) + 1;
     elsif fit_to_range then
@@ -62,7 +62,12 @@ package body Samples is
         "; histogram'Last = " & Integer'Image(s.histogram'Last)
        );
     end if;
-  end Add_occurence;
+  end Add_occurrence;
+
+  function Occurrences(s: Sample) return Natural is
+  begin
+    return s.total_occurrences;
+  end;
 
   procedure Get_measures(
     s: in     Sample;
@@ -76,12 +81,12 @@ package body Samples is
     truncated_mu: array(s.histogram'Range) of Real;
     sub_histo_idx: Real range 0.0..1.0:= 0.0;
   begin
-    if s.total_occurences = 0 then
-      raise no_occurence;
+    if s.total_occurrences = 0 then
+      raise no_occurrence;
     end if;
-    n:= Real(s.total_occurences);
+    n:= Real(s.total_occurrences);
     inv_n  := 1.0 / n;
-    inv_nm1:= 1.0 / Real(s.total_occurences - 1);
+    inv_nm1:= 1.0 / Real(s.total_occurrences - 1);
     f:= (s.max-s.min) * s.bins_inv;
     ql:= m.level(q_idx) * n;
     if ql < 0.0 then

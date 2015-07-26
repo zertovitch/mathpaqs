@@ -36,7 +36,7 @@ generic
   type Real is digits <>;
   type Quantile_table is array(Positive range <>) of Real;
 
-  -- Try to correct sample bin location error compared to actual occurence
+  -- Try to correct sample bin location error compared to actual occurrence
   -- value, by locating the quantile boundary *within* the histogram.
   -- It improves accuracy, but may look bad with discrete variables.
   use_sub_histogram_index: Boolean;
@@ -66,14 +66,20 @@ package Samples is
   -- (2) Add any number of occurrences --
   ---------------------------------------
 
-  procedure Add_occurence(s: in out Sample; value: Real);
-  pragma Inline(Add_occurence);
+  procedure Add_occurrence(s: in out Sample; value: Real);
+  pragma Inline(Add_occurrence);
 
   Value_out_of_sample_range: exception;
 
+  function Occurrences(s: Sample) return Natural;
+
+  ---------------------------------------------------------------
+  --  After the gathering of data: time to measure statistics  --
+  ---------------------------------------------------------------
+
   -- Getting measures from a sample after all occurrences are recorded.
   --
-  -- The reason why Sample and Measure are separate is that Sample is
+  -- The reason why types Sample and Measure are separate is that Sample is
   -- usually very large but short-lived (used only when gathering
   -- occurrences) and Measure is kept for longer for display and storage.
   -- Typically Sample is discarded right after a call to Get_measures.
@@ -111,7 +117,7 @@ package Samples is
   --  Typically s can be discarded (and much memory freed) right
   --  after a call to Get_measures.
 
-  No_occurence                 : exception;
+  No_occurrence                 : exception;
   Quantile_level_negative      : exception;
   Quantile_levels_not_ascending: exception;
   Unexpected_case              : exception;
@@ -124,7 +130,7 @@ private
     histogram       : Histogram_type(1..bins);
     min, max        : Real;
     width_inv       : Real;
-    total_occurences: Natural;
+    total_occurrences: Natural;
     bins_r          : Real;
     bins_inv        : Real;
     factor          : Real;
