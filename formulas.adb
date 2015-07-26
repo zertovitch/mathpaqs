@@ -14,7 +14,7 @@ package body Formulas is
 
   subtype Leaf is S_Form range nb .. var;
   subtype Neutral is Unary range plus_una .. accol;
-  subtype Built_in_function is S_Form range expn .. max;
+  subtype Built_in_function is S_Form range abso .. max;
   subtype Binary_operator is Binary range moins .. puiss;
   subtype Term_operator is Binary_operator range moins .. plus;
   subtype Factor_operator is Binary_operator range sur .. fois;
@@ -29,6 +29,9 @@ package body Formulas is
     case s is
       when plus_una   => return "+";
       when moins_una  => return "-";
+      when abso    => return "Abs";
+      when sign    => return "Sign";
+      when step    => return "Step";
       when expn    => return "Exp";
       when logn    => return "Log";
       when sinus   => return "Sin";
@@ -442,6 +445,26 @@ package body Formulas is
 
   ---------------------------------- Evaluate ---------------------------------
 
+  function Sign (x: Real) return Real is
+  begin
+    if x < 0.0 then
+      return -1.0;
+    elsif x > 0.0 then
+      return +1.0;
+    else
+      return 0.0;
+    end if;
+  end Sign;
+
+  function Step (x: Real) return Real is
+  begin
+    if x < 0.0 then
+      return 0.0;
+    else
+      return 1.0;
+    end if;
+  end Step;
+
   function Evaluate (f: Formula; payload: Payload_type) return Real is
     aux: Real;
     use REF;
@@ -493,6 +516,12 @@ package body Formulas is
         else
           return Evaluate(f.left, payload) ** aux;
         end if;
+      when abso =>
+        return abs Evaluate(f.left, payload);
+      when sign =>
+        return Sign(Evaluate(f.left, payload));
+      when step =>
+        return Step(Evaluate(f.left, payload));
       when logn=>
         return Log(Evaluate(f.left, payload));
       when expn=>
@@ -719,6 +748,12 @@ package body Formulas is
       if f.left.s = nb then        --  Evaluate "f(cst)" into f(cst)
         x:= f.left.n;
         case Built_in_function(f.s) is
+          when abso =>
+            cst_replaces_f(abs x);
+          when sign =>
+            cst_replaces_f(Sign(x));
+          when step =>
+            cst_replaces_f(Step(x));
           when sinus=>
             cst_replaces_f(Sin(x));
           when arcsin =>

@@ -96,6 +96,7 @@ private
                  moins_una, plus_una,
                  par, croch, accol,
                  -- vvv begin of built-in functions
+                 abso, sign, step,
                  expn, logn,
                  sinus, arcsin, cosinus, arccos, tg, arctg,
                  sh, arcsinh, ch, arccosh, th, arctanh,
