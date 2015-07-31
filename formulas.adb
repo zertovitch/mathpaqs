@@ -32,6 +32,10 @@ package body Formulas is
       when abso    => return "Abs";
       when sign    => return "Sign";
       when step    => return "Step";
+      when round   => return "Round";
+      when trunc   => return "Trunc";
+      when floor   => return "Floor";
+      when ceiling => return "Ceiling";
       when expn    => return "Exp";
       when logn    => return "Log";
       when sinus   => return "Sin";
@@ -522,6 +526,14 @@ package body Formulas is
         return Sign(Evaluate(f.left, payload));
       when step =>
         return Step(Evaluate(f.left, payload));
+      when round =>
+        return Real'Rounding(Evaluate(f.left, payload));
+      when trunc =>
+        return Real'Truncation(Evaluate(f.left, payload));
+      when floor =>
+        return Real'Floor(Evaluate(f.left, payload));
+      when ceiling =>
+        return Real'Ceiling(Evaluate(f.left, payload));
       when logn=>
         return Log(Evaluate(f.left, payload));
       when expn=>
@@ -754,6 +766,14 @@ package body Formulas is
             cst_replaces_f(Sign(x));
           when step =>
             cst_replaces_f(Step(x));
+          when round =>
+            cst_replaces_f(Real'Rounding(x));
+          when trunc =>
+            cst_replaces_f(Real'Truncation(x));
+          when floor =>
+            cst_replaces_f(Real'Floor(x));
+          when ceiling =>
+            cst_replaces_f(Real'Ceiling(x));
           when sinus=>
             cst_replaces_f(Sin(x));
           when arcsin =>

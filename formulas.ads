@@ -97,6 +97,7 @@ private
                  par, croch, accol,
                  -- vvv begin of built-in functions
                  abso, sign, step,
+                 round, trunc, floor, ceiling,
                  expn, logn,
                  sinus, arcsin, cosinus, arccos, tg, arctg,
                  sh, arcsinh, ch, arccosh, th, arctanh,
