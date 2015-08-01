@@ -28,7 +28,7 @@ procedure Test_Formulas is
 
   procedure Test_1 (expr : String; target : String := "") is
     use My_Formulas;
-    f : Formula := null_formula;
+    f : Formula;
     e0, e : Real;
     style : constant Output_style := normal;
     --
@@ -42,25 +42,30 @@ procedure Test_Formulas is
     end Entropy_test;
     --
     procedure Copy_test(f: Formula) is
-      g: Formula:= Deep_copy(f);
+      g: constant Formula:= f;  --  NB: copy is always deep thanks to Adjust.
     begin
       if not Identical(f, g) then
-        Put_Line (Standard_Error, "!!! Deep_copy / Equivalent test failed !!!");
+        Put_Line (Standard_Error, "!!! ""Copy / Identical"" test failed !!!");
+        raise Program_Error;
       end if;
-      Deep_delete(g);
     end Copy_test;
     --
   begin
     Put_Line ("*************** Testing formula: " & expr);
     f := Parse (expr);
+    --  Put_Line("Parsing done.");
+    --  Put_Line("Image(f) = " & Image(f, bracketed));
+    --  Put_Line("(Deep) copy test now.");
     Copy_test(f);
-    -- Put (" [Testing Parse / Image entropy] ");
+    --  Put (" [Testing Parse / Image entropy] ");
+    --  Put_Line("Image(f) = " & Image(f, bracketed));
     declare
       im0 : constant String := Image (f);
       imn : constant String := Entropy_test (im0, 10);
     begin
       if im0 /= imn then
-        Put_Line (Standard_Error, "!!! Parse / Image entropy test failed !!!");
+        Put_Line (Standard_Error, "!!! ""Parse / Image"" entropy test failed !!!");
+        raise Program_Error;
       end if;
     end;
     Put ("Output...   : ");
@@ -81,6 +86,7 @@ procedure Test_Formulas is
       e := Evaluate (f, dummy);
       if abs (e - e0) > abs (e) * 1.0e-10 then
         Put_Line (Standard_Error, "!!! Evaluation error !!!");
+        raise Program_Error;
       end if;
     end loop;
     Put ("Final eval: "); Put (e, 0, 14, 0);

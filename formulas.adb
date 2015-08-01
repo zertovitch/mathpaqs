@@ -100,7 +100,9 @@ package body Formulas is
     return abs x <= Real'Base'Model_Small;
   end Almost_zero;
 
-  function Image_simple (f : Formula; style : Output_style:= normal) return String is
+  function Image (f : p_Formula_Rec; style : Output_style) return String;
+
+  function Image_simple (f : p_Formula_Rec; style : Output_style) return String is
     x : Real;
     use Ada.Text_IO, RIO;
     s: String(1..40);
@@ -152,7 +154,7 @@ package body Formulas is
     end case;
   end Image_simple;
 
-  function Image (f : Formula; style : Output_style:= normal) return String is
+  function Image (f : p_Formula_Rec; style : Output_style) return String is
   begin
     if f = null then
       return "";
@@ -164,8 +166,13 @@ package body Formulas is
     end if;
   end Image;
 
-  function Deep_copy(f : Formula) return Formula is
-    g: Formula;
+  function Image (f : Formula; style : Output_style:= normal) return String is
+  begin
+    return Image(f.root, style);
+  end Image;
+
+  function Deep_copy(f : p_Formula_Rec) return p_Formula_Rec is
+    g: p_Formula_Rec;
   begin
     if f = null then
       return null;
@@ -187,9 +194,9 @@ package body Formulas is
     return g;
   end Deep_copy;
 
-  procedure Dispose is new Ada.Unchecked_Deallocation (Formula_Rec, Formula);
+  procedure Dispose is new Ada.Unchecked_Deallocation (Formula_Rec, p_Formula_Rec);
 
-  procedure Deep_delete (f: in out Formula) is
+  procedure Deep_delete (f: in out p_Formula_Rec) is
   begin
     if f /= null then
       case f.s is
@@ -270,12 +277,12 @@ package body Formulas is
 
     i : Integer;
 
-    function Expression return Formula is
-      function Term return Formula is
-        function Factor return Formula is
+    function Expression return p_Formula_Rec is
+      function Term return p_Formula_Rec is
+        function Factor return p_Formula_Rec is
           --
-          function Number return Formula is
-            n : Formula;
+          function Number return p_Formula_Rec is
+            n : p_Formula_Rec;
             j : Integer;
           begin
             n:= new Formula_Rec(nb);
@@ -288,8 +295,8 @@ package body Formulas is
             return n;
           end Number;
 
-          function Variable_or_function return Formula is
-            n: Formula;
+          function Variable_or_function return p_Formula_Rec is
+            n: p_Formula_Rec;
             j: Integer;
           begin
             j:= i;
@@ -332,7 +339,7 @@ package body Formulas is
           end Variable_or_function;
 
           --  Factor
-          n, n1 : Formula;
+          n, n1 : p_Formula_Rec;
           c     : Character;
         begin
           n:= null;
@@ -376,7 +383,7 @@ package body Formulas is
         end Factor;
 
         --  Term
-        n, left : Formula;
+        n, left : p_Formula_Rec;
         c : Character;
       begin
         left:= Factor;
@@ -404,7 +411,7 @@ package body Formulas is
       end Term;
 
       --  Expression
-      n, left : Formula;
+      n, left : p_Formula_Rec;
       c : Character;
     begin
       left:= Term;
@@ -435,15 +442,15 @@ package body Formulas is
 
   begin
     i:= 1;
-    f:= Expression;
+    f.root:= Expression;
     if str(i) /= c_fin then
-      Deep_delete(f);
+      Deep_delete(f.root);
       Raise_Exception(Parse_Error'Identity, "Unexpected end in formula (extra symbols)");
     end if;
     return f;
   exception
     when E: Parse_Error =>
-      Deep_delete(f);
+      Deep_delete(f.root);
       Raise_Exception(Parse_Error'Identity, Exception_Message(E));
   end Parse;
 
@@ -469,7 +476,7 @@ package body Formulas is
     end if;
   end Step;
 
-  function Evaluate (f: Formula; payload: Payload_type) return Real is
+  function Evaluate (f: p_Formula_Rec; payload: Payload_type) return Real is
     aux: Real;
     use REF;
   begin
@@ -569,7 +576,14 @@ package body Formulas is
     end case;
   end Evaluate;
 
+  function Evaluate (f: Formula; payload: Payload_type) return Real is
+  begin
+    return Evaluate(f.root, payload);
+  end Evaluate;
+
   ------------------------------- Compare -----------------------------------
+
+  function Equivalent(fa, fb : p_Formula_Rec) return Boolean;
 
   --  Special cases.
   --    We check these equivalences because the concerned formula
@@ -578,7 +592,7 @@ package body Formulas is
   --    the equivalence.
 
   --  X * cst, or cst * X, equivalent to X / (1/cst)
-  function Equivalent_Times_Div(fa, fb : Formula) return Boolean is
+  function Equivalent_Times_Div(fa, fb : p_Formula_Rec) return Boolean is
   begin
     return
       fa /= null and then fb /= null and then
@@ -600,7 +614,7 @@ package body Formulas is
   end Equivalent_Times_Div;
 
   --  General case:
-  function Equivalent(fa, fb : Formula) return Boolean is
+  function Equivalent(fa, fb : p_Formula_Rec) return Boolean is
     ga, gb : S_Form;
   begin
     if fa = null then
@@ -645,8 +659,13 @@ package body Formulas is
     end if;
   end Equivalent;
 
+  function Equivalent(fa, fb : Formula) return Boolean is
+  begin
+    return Equivalent(fa.root, fb.root);
+  end Equivalent;
+
   --  Strict form of equivalence
-  function Identical(fa, fb : Formula) return Boolean is
+  function Identical(fa, fb : p_Formula_Rec) return Boolean is
   begin
     if fa = null then
       return fb = null;
@@ -673,14 +692,19 @@ package body Formulas is
     end case;
   end Identical;
 
+  function Identical(fa, fb : Formula) return Boolean is
+  begin
+    return Identical(fa.root, fb.root);
+  end Identical;
+
   ------------------------------- Simplify ----------------------------------
 
-  function Is_constant(a: Formula; cst : Real) return Boolean is
+  function Is_constant(a: p_Formula_Rec; cst : Real) return Boolean is
   begin
     return a /= null and then a.s = nb and then a.n = cst;
   end;
 
-  function Is_constant_pair (a: Formula) return Boolean is
+  function Is_constant_pair (a: p_Formula_Rec) return Boolean is
   begin
     return
       a.s in Binary and then
@@ -690,8 +714,8 @@ package body Formulas is
       a.right.s = nb;
   end Is_constant_pair;
 
-  function Build_2X(X: Formula) return Formula is  --  returns 2*X
-    aux: constant Formula:= new Formula_Rec(fois);
+  function Build_2X(X: p_Formula_Rec) return p_Formula_Rec is  --  returns 2*X
+    aux: constant p_Formula_Rec:= new Formula_Rec(fois);
   begin
     aux.left:= new Formula_Rec(nb);
     aux.left.n:= 2.0;
@@ -699,8 +723,8 @@ package body Formulas is
     return aux;
   end Build_2X;
 
-  function Build_X_pow_2(X: Formula) return Formula is  --  returns X^2
-    aux: constant Formula:= new Formula_Rec(puiss);
+  function Build_X_pow_2(X: p_Formula_Rec) return p_Formula_Rec is  --  returns X^2
+    aux: constant p_Formula_Rec:= new Formula_Rec(puiss);
   begin
     aux.left:= X;
     aux.right:= new Formula_Rec(nb);
@@ -708,9 +732,9 @@ package body Formulas is
     return aux;
   end Build_X_pow_2;
 
-  procedure Simplify (f : in out Formula) is
+  procedure Simplify (f : in out p_Formula_Rec) is
     aux,
-    nexp : Formula;
+    nexp : p_Formula_Rec;
 
     procedure left_replaces_f is
     begin
@@ -1030,6 +1054,21 @@ package body Formulas is
         null;
     end case;
   end Simplify;
+
+  procedure Simplify (f : in out Formula) is
+  begin
+    Simplify(f.root);
+  end Simplify;
+
+  procedure Adjust(f: in out Formula) is
+  begin
+    f.root:= Deep_copy(f.root);
+  end;
+
+  procedure Finalize(f: in out Formula) is
+  begin
+    Deep_delete(f.root);
+  end;
 
 end Formulas;
 -- Translated on 9-Apr-2015 by (New) P2Ada v. 28-Oct-2009

@@ -35,8 +35,8 @@
 -- TO DO:
 --   - implement user functions
 --   - (never-ending) improve Simplify (see misses at Test_Formulas)
---   - (perhaps) Deep_delete internal; Finalization
 
+with Ada.Finalization;
 with Ada.Strings.Unbounded;             use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
@@ -51,7 +51,6 @@ generic
 package Formulas is
 
   type Formula is private;
-  null_formula : constant Formula;
 
   function Parse (s : String) return Formula;
   function Evaluate (f : Formula; payload : Payload_type) return Real;
@@ -60,6 +59,9 @@ package Formulas is
   function Identical (fa, fb : Formula) return Boolean;
   procedure Simplify (f : in out Formula);
 
+  --  Deep_copy and Deep_delete are no more needed and
+  --  were removed, it is done now automatically.
+  
   --  Display. Caution: the displayed constants may be rounded
 
   type Output_style is (
@@ -70,9 +72,6 @@ package Formulas is
   procedure Put (f : Formula; style : Output_style:= normal);
   procedure Put (t : in Ada.Text_IO.File_Type; f : Formula; style : Output_style:= normal);
   function Image (f : Formula; style : Output_style:= normal) return String;
-
-  function Deep_copy(f : Formula) return Formula;
-  procedure Deep_delete (f : in out Formula);
 
   Parse_Error,
   Div_By_0 : exception;
@@ -110,17 +109,22 @@ private
   subtype Binary is S_Form range min .. puiss;
 
   type Formula_Rec (s :  S_Form);
-
-  type Formula is access Formula_Rec;
-  null_formula : constant Formula := null;
+  type p_Formula_Rec is access Formula_Rec;
 
   type Formula_Rec (s :  S_Form) is record
     case s is
       when nb  =>  n : Real;
       when pi  =>  null;
       when var =>  v : Unbounded_String;
-      when Unary | Binary => left, right : Formula;
+      when Unary | Binary => left, right : p_Formula_Rec;
     end case;
   end record;
+
+  type Formula is new Ada.Finalization.Controlled with record
+    root: p_Formula_Rec:= null;
+  end record;
+
+  procedure Adjust(f: in out Formula);
+  procedure Finalize(f: in out Formula);
 
 end Formulas;
