@@ -1,30 +1,12 @@
 --  Run "test_formulas >nul" to see eventual errors only
 
-with Formulas;
+with Test_Formulas_Pkg; use Test_Formulas_Pkg;
 
 with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Test_Formulas is
 
-  subtype Real is Long_Float;
-
-  package RIO is new Ada.Text_IO.Float_IO (Real);
   use RIO;
-
-  type Dummy_type is new Integer;
-  dummy : constant Dummy_type := 0;
-
-  function Evaluate_variable (name : String; dummy : Dummy_type) return Real is
-  begin
-    if name = "x" then
-      return 1.234;
-    elsif name = "y" then
-      return 4.321;
-    end if;
-    return 0.0;
-  end Evaluate_variable;
-
-  package My_Formulas is new Formulas (Real, Dummy_type, Evaluate_variable);
 
   procedure Test_1 (expr : String; target : String := "") is
     use My_Formulas;
@@ -49,6 +31,11 @@ procedure Test_Formulas is
         raise Program_Error;
       end if;
     end Copy_test;
+    --
+    function Almost_zero (x: Real) return Boolean is
+    begin
+      return abs x <= Real'Base'Model_Small;
+    end Almost_zero;
     --
   begin
     Put_Line ("*************** Testing formula: " & expr);
@@ -84,8 +71,16 @@ procedure Test_Formulas is
       New_Line;
       -- Put (" [Testing Evaluate] ");
       e := Evaluate (f, dummy);
-      if abs (e - e0) > abs (e) * 1.0e-10 then
-        Put_Line (Standard_Error, "!!! Evaluation error !!!");
+      if abs (e - e0) > abs (e) * 1.0e-10 and then  --  Relative difference
+        not (Almost_zero(e) and Almost_zero(e0))    --  <- filter OA 7.2.2 false positive
+      then
+        Put_Line (Standard_Error, "!!! Evaluation mismatch !!!");
+        Put (Standard_Error, "e0 =");
+        Put (Standard_Error, e0);
+        New_Line (Standard_Error);
+        Put (Standard_Error, "e  =");
+        Put (Standard_Error, e);
+        New_Line (Standard_Error);
         raise Program_Error;
       end if;
     end loop;
@@ -94,6 +89,9 @@ procedure Test_Formulas is
   end Test_1;
 
 begin
+  Put ("Digits: ");
+  Put (Integer'Image(Real'Digits));
+  New_Line;
   Put ("x=");
   Put (Evaluate_variable ("x", dummy), 0, 3, 0);
   Put (", y=");
