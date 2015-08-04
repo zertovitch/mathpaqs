@@ -5,7 +5,9 @@
 
 --  Based on a Pascal university exercise (~1990's)
 --  Translated on 9-Apr-2015 by (New) P2Ada v. 28-Oct-2009
---  Reworked further (generic, private types, exceptions, etc.)
+--  Reworked further: generic, private types, exceptions,
+--  automatic memory management, etc.
+--
 --  Latest version may be available at:
 --  http://mathpaqs.sf.net/ or http://sf.net/projects/mathpaqs/
 
@@ -44,7 +46,7 @@ generic
 
   type Real is digits <>;
 
-  type Payload_type is private; -- This can be a container type for user variables
+  type Payload_type is private; -- This can be a helper type for user variables
 
   with function Evaluate_variable (name : String; payload: Payload_type) return Real;
 
@@ -52,8 +54,19 @@ package Formulas is
 
   type Formula is private;
 
+  ---------------------------------------------------
+  --  The parsing of the formula is done once      --
+  --  The evaluation is quick and done many times  --
+  ---------------------------------------------------
+
   function Parse (s : String) return Formula;
   function Evaluate (f : Formula; payload : Payload_type) return Real;
+
+  Parse_Error, Div_By_0 : exception;
+
+  -----------------------------------
+  --  Comparison / simplification  --
+  -----------------------------------
 
   function Equivalent (fa, fb : Formula) return Boolean;
   function Identical (fa, fb : Formula) return Boolean;
@@ -62,7 +75,9 @@ package Formulas is
   --  Deep_copy and Deep_delete are no more needed and
   --  were removed, it is done now automatically.
   
-  --  Display. Caution: the displayed constants may be rounded
+  ----------------------------------------------------------------
+  --  Display. Caution: the displayed constants may be rounded  --
+  ----------------------------------------------------------------
 
   type Output_style is (
     normal,     --  Normal is infix, should be the closest to the parsed formula
@@ -73,8 +88,20 @@ package Formulas is
   procedure Put (t : in Ada.Text_IO.File_Type; f : Formula; style : Output_style:= normal);
   function Image (f : Formula; style : Output_style:= normal) return String;
 
-  Parse_Error,
-  Div_By_0 : exception;
+  -----------------
+  --  Utilities  --
+  -----------------
+
+  type List_proc is access procedure (name: String; parameters: Natural);
+
+  procedure Enumerate_custom (f: Formula; lp: List_proc);
+  --  This will find all custom variables or functions appearing
+  --  in a formula and list it through List_proc.
+  --  A name will be listed as many times as it appears in the formula.
+
+  ---------------------------------------------------
+  --  Character set used for defining identifiers  --
+  ---------------------------------------------------
 
   type Character_Set is array (Character) of Boolean;
 

@@ -1060,6 +1060,30 @@ package body Formulas is
     Simplify(f.root);
   end Simplify;
 
+  procedure Enumerate_custom (f: Formula; lp: List_proc) is
+    procedure EC (f: p_Formula_Rec) is
+    begin
+      if f /= null then
+        case f.s is
+          when var =>
+            lp(To_String(f.v), 0);
+          when Unary =>
+            EC(f.left);
+          when Binary =>
+            EC(f.left);
+            EC(f.right);
+          when others=>
+            null;
+        end case;
+      end if;
+    end EC;
+    --
+  begin
+    if lp /= null then
+      EC(f.root);
+    end if;
+  end Enumerate_custom;
+
   procedure Adjust(f: in out Formula) is
   begin
     f.root:= Deep_copy(f.root);

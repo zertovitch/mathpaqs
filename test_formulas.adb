@@ -40,6 +40,7 @@ procedure Test_Formulas is
   begin
     Put_Line ("*************** Testing formula: " & expr);
     f := Parse (expr);
+    Enumerate_custom (f, Show_name'Access);
     --  Put_Line("Parsing done.");
     --  Put_Line("Image(f) = " & Image(f, bracketed));
     --  Put_Line("(Deep) copy test now.");
