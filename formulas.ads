@@ -52,13 +52,14 @@ generic
 
 package Formulas is
 
-  type Formula is private;
+  type Formula is tagged private;
 
   ---------------------------------------------------
   --  The parsing of the formula is done once      --
   --  The evaluation is quick and done many times  --
   ---------------------------------------------------
 
+  procedure Parse (f : out Formula; s : String);
   function Parse (s : String) return Formula;
   function Evaluate (f : Formula; payload : Payload_type) return Real;
 
