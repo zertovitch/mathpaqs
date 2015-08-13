@@ -268,17 +268,17 @@ package body Formulas is
     return t(t'First .. j);
   end No_Spaces;
 
+  chiffres : constant Character_Set :=
+    ('0' .. '9' | '.' | 'e' | 'E' => True, others => False);
+
   procedure Parse (f : out Formula; s : String) is
-
     str: constant String:= No_Spaces(s) & c_fin;
-
-    chiffres : constant Character_Set :=
-      ('0' .. '9' | '.' => True, others => False);
-
     i : Integer;
-
+    --
     function Expression return p_Formula_Rec is
+      --
       function Term return p_Formula_Rec is
+        --
         function Factor return p_Formula_Rec is
           --
           function Number return p_Formula_Rec is
@@ -286,10 +286,16 @@ package body Formulas is
             j : Integer;
           begin
             n:= new Formula_Rec(nb);
-            j:=i;
+            j:= i;
             loop
               i:= i + 1;
-              exit when not chiffres(str(i));
+              if (str(i)='+' or str(i)='-') and then
+                 (str(i-1)='e' or str(i-1)='E')
+              then
+                null;
+              else
+                exit when not chiffres(str(i));
+              end if;
             end loop;
             n.n:= Real'Value(str(j..i-1));
             return n;
