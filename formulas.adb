@@ -421,7 +421,7 @@ package body Formulas is
     end Expression;
 
     generic
-      oper: S_Form;  --  - or /
+      oper: S_Form;  --  - or / : these operators are left-associative only !
       sibl: S_Form;  --  + or *
     procedure Left_Assoc(n: in out p_Formula_Rec);
 
