@@ -16,8 +16,6 @@ package body Formulas is
   subtype Neutral is Unary range plus_una .. accol;
   subtype Built_in_function is S_Form range abso .. max;
   subtype Binary_operator is Binary range moins .. puiss;
-  subtype Term_operator is Binary_operator range moins .. plus;
-  subtype Factor_operator is Binary_operator range sur .. fois;
 
   type S_Form_Set is array (S_Form) of Boolean;
   par_or_terminal : constant S_Form_Set := (par|croch|accol|nb|var => True, others => False);
@@ -159,7 +157,7 @@ package body Formulas is
     if f = null then
       return "";
     end if;
-    if style = bracketed then
+    if style = bracketed and then f.s not in Leaf then
       return '{' & Image_simple(f, style) & '}';
     else
       return Image_simple(f, style);
@@ -399,18 +397,7 @@ package body Formulas is
           n:= new Formula_Rec(conv_symb(c));
           n.left:= left;
           n.right:= Term;
-          --  Left-associativity case
-          if c = '/' and then
-            n.right /= null and then n.right.s in Factor_operator
-          then
-            --  This has been parsed as X / {Y * Z} or  X / {Y / Z},
-            --  should be {X / Y} * Z or {X / Y} / Z.
-            left:= n.right.left;  --  Remember Y
-            n.right.left:= n;
-            n:= n.right;
-            n.left.right:= left;
-          end if;
-            return n;
+          return n;
         else
           return left;
         end if;
@@ -427,27 +414,61 @@ package body Formulas is
         n:= new Formula_Rec(conv_symb(c));
         n.left:= left;
         n.right:= Expression;
-        --  Left-associativity case
-        if c = '-' and then
-          n.right /= null and then n.right.s in Term_operator
-        then
-          --  This has been parsed as X - {Y + Z} or  X - {Y - Z},
-          --  should be {X - Y} + Z or {X - Y} - Z.
-          left:= n.right.left;  --  Remember Y
-          n.right.left:= n;
-          n:= n.right;
-          n.left.right:= left;
-        end if;
         return n;
       else
         return left;
       end if;
     end Expression;
 
+    generic
+      oper: S_Form;  --  - or /
+      sibl: S_Form;  --  + or *
+    procedure Left_Assoc(n: in out p_Formula_Rec);
+
+    procedure Left_Assoc(n: in out p_Formula_Rec) is
+      left: p_Formula_Rec;
+    begin
+      if n = null then  --  Should not happen, but who knows...
+        return;
+      end if;
+      --
+      --  Recursion
+      --
+      case n.s is
+        when Leaf =>
+          null;
+        when Unary =>
+          Left_Assoc(n.left);
+        when Binary =>
+          Left_Assoc(n.left);
+          Left_Assoc(n.right);
+      end case;
+      if n.s = oper then
+        if n.right /= null and then (n.right.s = oper or n.right.s = sibl) then
+          --  This has been parsed as X - {Y + Z} or  X - {Y - Z},
+          --  should be {X - Y} + Z or {X - Y} - Z.
+          left:= n.right.left;  --  Remember Y
+          n.right.left:= n;
+          n:= n.right;
+          n.left.right:= left;
+          --
+          --  Redo on children. See 9-4-3-2 example...
+          --
+          Left_Assoc(n.left);
+          Left_Assoc(n.right);
+        end if;
+      end if;
+    end Left_Assoc;
+
+    procedure Left_Assoc_Minus is new Left_Assoc(moins, plus);
+    procedure Left_Assoc_Divide is new Left_Assoc(sur, fois);
+
   begin
     i:= 1;
     Deep_delete(f.root);
     f.root:= Expression;
+    Left_Assoc_Minus(f.root);
+    Left_Assoc_Divide(f.root);
     if str(i) /= c_fin then
       Deep_delete(f.root);
       Raise_Exception(Parse_Error'Identity, "Unexpected end in formula (extra symbols)");

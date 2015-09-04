@@ -42,7 +42,7 @@ procedure Test_Formulas is
     Parse (f, expr);
     --  Enumerate_custom (f, Show_name'Access);
     --  Put_Line("Parsing done.");
-    --  Put_Line("Image(f) = " & Image(f, bracketed));
+    Put_Line("Image(f) = " & Image(f, bracketed));
     --  Put_Line("(Deep) copy test now.");
     Copy_test(f);
     --  Put (" [Testing Parse / Image entropy] ");
@@ -100,6 +100,9 @@ begin
   New_Line;
   Test_1 ("-12345");   --  - {12345}  ->  negative constant -12345
   Test_1 ("6-3+2", "5");
+  Test_1 ("9-4-3", "2");
+  Test_1 ("9-4-3-2", "0");
+  Test_1 ("1000/10/10/10", "1");
   Test_1 ("21/3*5/7/5-1", "0");
   Test_1 ("2 -4 +6 -1 -1- 0 +8", "10");
   Test_1 ("2*3*4/8 -   5/2*4 +  6 + 0/3", "-1");
