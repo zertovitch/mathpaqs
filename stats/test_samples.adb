@@ -98,7 +98,7 @@ begin
   -- t <- sample(c(0),1000,TRUE)
   RS.Initialize(s, 0.0, 1000.0);
   for i in 1..10_000 loop
-    RS.Add_occurence(s, 0.0);
+    RS.Add_occurrence(s, 0.0);
   end loop;
   RS.Get_measures(s,m);
   Put_Line("Mean should be zero, std dev should be zero.");
@@ -107,7 +107,7 @@ begin
   Title("=== Trivial test: add only 0.123 as occurence");
   RS.Initialize(s, 0.0, 1000.0); -- !! narrow it
   for i in 1..100_000 loop
-    RS.Add_occurence(s, 0.0123);
+    RS.Add_occurrence(s, 0.0123);
   end loop;
   RS.Get_measures(s,m);
   Put_Line("Mean should be 0.0123, std dev should be zero.");
@@ -118,8 +118,8 @@ begin
   -- t <- sample(c(-10,10),100000,TRUE)
   RS.Initialize(s, -10.0, 10.0);
   for i in 1..100_000 loop
-    RS.Add_occurence(s, -10.0);
-    RS.Add_occurence(s,  10.0);
+    RS.Add_occurrence(s, -10.0);
+    RS.Add_occurrence(s,  10.0);
   end loop;
   RS.Get_measures(s,m);
   Put_Line("Mean should be zero, std dev should converge to 10.");
@@ -131,7 +131,7 @@ begin
   RS.Initialize(s, 0.0, 1.0);
   for i in 0..large_1 loop
     u:= Real(i) / Real(large_1);
-    RS.Add_occurence(s, u);
+    RS.Add_occurrence(s, u);
   end loop;
   RS.Get_measures(s,m);
   Put_Line("Mean should converge to 0.5, std dev should converge to 1/(2 sqrt(3)) ~= 0.288675.");
@@ -143,7 +143,7 @@ begin
   RS.Initialize(s, -10.0, 10.0);
   for i in 0..large_1 loop
     u:= Real(i) / Real(large_1);
-    RS.Add_occurence(s, 20.0 * u - 10.0);
+    RS.Add_occurrence(s, 20.0 * u - 10.0);
   end loop;
   RS.Get_measures(s,m);
   Put_Line("Mean should converge to zero, std dev should converge to 10/sqrt(3) ~= 5.77350269.");
@@ -153,13 +153,13 @@ begin
   -- R:
   -- t <- rnorm(1000000,0,1)
   RS.Initialize(s, -100.0, 100.0);
-  RS.Add_occurence(s, -100.0); -- !!
+  RS.Add_occurrence(s, -100.0); -- !!
   RUR.Reset(Gen);
   for i in 1..1_000_000 loop
     u1:= Uni01;
     u2:= Uni01;
     GRF.Box_Muller(u1,u2,n1,n2);
-    RS.Add_occurence(s, n1);
+    RS.Add_occurrence(s, n1);
   end loop;
   RS.Get_measures(s,m);
   Put_Line("Mean should converge to zero, std dev should converge to 1.");
@@ -169,7 +169,7 @@ begin
   RS.Initialize(s, 0.0, 100.0);
   RUR.Reset(Gen);
   for i in 1..1_000_000 loop
-    RS.Add_occurence(s, Real(Poisson(0.54321)));
+    RS.Add_occurrence(s, Real(Poisson(0.54321)));
   end loop;
   RS.Get_measures(s,m);
   Put_Line("Mean should converge to lambda, std dev should converge to sqrt(lambda).");
@@ -178,13 +178,13 @@ begin
   Title("=== Fuzzy discrete sample: values 0, 1, 6 added n, 4n, 7n times");
   RS.Initialize(s, 0.0, 6.0);
   for i in 1..1*multi loop
-    RS.Add_occurence(s, 0.0);
+    RS.Add_occurrence(s, 0.0);
   end loop;
   for i in 1..4*multi loop
-    RS.Add_occurence(s, 1.0);
+    RS.Add_occurrence(s, 1.0);
   end loop;
   for i in 1..7*multi loop
-    RS.Add_occurence(s, 6.0);
+    RS.Add_occurrence(s, 6.0);
   end loop;
   RS.Get_measures(s,m);
   Put_Line("Mean should converge to 23/6 ~= 3.833333.");

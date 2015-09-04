@@ -122,8 +122,8 @@ begin
       sum_X:= sum_X + X;
       sum_Y:= sum_Y + Y;
     else
-      Add_occurence(samp_X, X);
-      Add_occurence(samp_Y, Y);
+      Add_occurrence(samp_X, X);
+      Add_occurrence(samp_Y, Y);
     end if;
   end loop;
   if only_mean then

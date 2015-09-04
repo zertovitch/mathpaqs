@@ -74,10 +74,10 @@ procedure Arenstorf is
   niter: array(t_meth) of Positive;
 
   function f(x:vector4) return vector4 is
-    x1p: prec_float:= x(1)+mu;
-    x1m: prec_float:= x(1)-mup;
+    x1p: constant prec_float:= x(1)+mu;
+    x1m: constant prec_float:= x(1)-mup;
     D1: constant prec_float:= sqrt(( x1p**2 + x(2)**2  )**3);
-    mup_sur_D1: prec_float:= mup/D1;
+    mup_sur_D1: constant prec_float:= mup/D1;
     D2: constant prec_float:= sqrt(( x1m**2 + x(2)**2  )**3);
     mu_sur_D2:  constant prec_float:= mu /D2;
   begin

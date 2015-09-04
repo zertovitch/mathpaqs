@@ -268,8 +268,12 @@ package body Formulas is
     return t(t'First .. j);
   end No_Spaces;
 
-  chiffres : constant Character_Set :=
-    ('0' .. '9' | '.' | 'e' | 'E' => True, others => False);
+  digit         : constant Character_Set := ('0' .. '9' | '.' => True, others => False);
+  expo          : constant Character_Set := ('e' | 'E' => True, others => False);
+  digit_or_expo : constant Character_Set := digit or expo;
+
+  first_symbol_after_expo : constant Character_Set :=
+    ('0' .. '9' | '+' | '-' => True, others => False);
 
   procedure Parse (f : out Formula; s : String) is
     str: constant String:= No_Spaces(s) & c_fin;
@@ -287,15 +291,11 @@ package body Formulas is
           begin
             n:= new Formula_Rec(nb);
             j:= i;
+            while
+              digit_or_expo(str(i)) or else
+              (expo(str(i-1)) and then first_symbol_after_expo(str(i)))
             loop
               i:= i + 1;
-              if (str(i)='+' or str(i)='-') and then
-                 (str(i-1)='e' or str(i-1)='E')
-              then
-                null;
-              else
-                exit when not chiffres(str(i));
-              end if;
             end loop;
             n.n:= Real'Value(str(j..i-1));
             return n;
@@ -350,7 +350,7 @@ package body Formulas is
         begin
           n:= null;
           c:= str(i);
-          if chiffres(c) then
+          if digit(c) then
             n:= Number;
           elsif letters(c) then
             n:= Variable_or_function;
