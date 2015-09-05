@@ -421,8 +421,8 @@ package body Formulas is
     end Expression;
 
     generic
-      oper: S_Form;  --  - or /
-      sibl: S_Form;  --  + or *
+      oper: S_Form;  --  - or / : these operators are left-associative only !
+      ivrs: S_Form;  --  + or *
     procedure Left_Assoc(n: in out p_Formula_Rec);
 
     procedure Left_Assoc(n: in out p_Formula_Rec) is
@@ -444,7 +444,7 @@ package body Formulas is
           Left_Assoc(n.right);
       end case;
       if n.s = oper then
-        if n.right /= null and then (n.right.s = oper or n.right.s = sibl) then
+        if n.right /= null and then (n.right.s = oper or n.right.s = ivrs) then
           --  This has been parsed as X - {Y + Z} or  X - {Y - Z},
           --  should be {X - Y} + Z or {X - Y} - Z.
           left:= n.right.left;  --  Remember Y
