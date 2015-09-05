@@ -36,6 +36,7 @@ package body Formulas is
       when ceiling => return "Ceiling";
       when expn    => return "Exp";
       when logn    => return "Log";
+      when sqrt    => return "Sqrt";
       when sinus   => return "Sin";
       when arcsin  => return "Arcsin";
       when cosinus => return "Cos";
@@ -589,6 +590,8 @@ package body Formulas is
         return Log(Evaluate(f.left, payload));
       when expn=>
         return Exp(Evaluate(f.left, payload));
+      when sqrt =>
+        return Sqrt(Evaluate(f.left, payload));
       when sinus=>
         return Sin(Evaluate(f.left, payload));
       when arcsin =>
@@ -856,6 +859,8 @@ package body Formulas is
             if x > 0.0 then
               cst_replaces_f(Log(x));
             end if;
+          when sqrt =>
+            cst_replaces_f(Sqrt(x));
           when Tg =>
             cst_replaces_f(Tan(x));
           when ArcTg =>

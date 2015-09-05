@@ -129,6 +129,7 @@ private
                  abso, sign, step,
                  round, trunc, floor, ceiling,
                  expn, logn,
+                 sqrt,
                  sinus, arcsin, cosinus, arccos, tg, arctg,
                  sh, arcsinh, ch, arccosh, th, arctanh,
                                                      --  2 arguments:
