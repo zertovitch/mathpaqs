@@ -60,7 +60,10 @@ package Formulas is
   ---------------------------------------------------
 
   procedure Parse (f : out Formula; s : String);
-  function Parse (s : String) return Formula;
+  function Parse (s : String) return Formula;  --  NB: a bit slower than the procedure
+  procedure Parse (f : out Formula; u : Unbounded_String);
+  function Parse (u : Unbounded_String) return Formula;  --  NB: a bit slower than the procedure
+  
   function Evaluate (f : Formula; payload : Payload_type) return Real;
 
   Parse_Error, Div_By_0 : exception;

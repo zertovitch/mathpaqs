@@ -421,7 +421,7 @@ package body Formulas is
     end Expression;
 
     generic
-      oper: S_Form;  --  - or / : these operators are left-associative only !
+      oper: S_Form;  --  - or /
       sibl: S_Form;  --  + or *
     procedure Left_Assoc(n: in out p_Formula_Rec);
 
@@ -482,7 +482,19 @@ package body Formulas is
   function Parse (s : String) return Formula is
     f: Formula;
   begin
-    Parse(f,s);
+    Parse(f, s);
+    return f;
+  end Parse;
+
+  procedure Parse (f : out Formula; u : Unbounded_String) is
+  begin
+    Parse(f, To_String(u));
+  end Parse;
+
+  function Parse (u : Unbounded_String) return Formula is
+    f: Formula;
+  begin
+    Parse(f, u);
     return f;
   end Parse;
 
