@@ -28,6 +28,8 @@ project Mathpaqs is
          "test_generic_real_linear_equations.adb",
        -- *** Algebra
          "test_ert.adb",
+       -- ** Numerics
+         "test_gamma.adb",
        -- *** Multiple precision integers
          "gnat_int.adb", "test_rsa.adb",
        -- *** Formulas
