@@ -9,6 +9,7 @@ package body Gamma_function is
   use REF;
 
   --  This uses Stirling's approximation of n!
+  --  http://en.wikipedia.org/wiki/Stirling%27s_approximation
   --
   function GammaStirF(x : Real) return Real is
     y, w, v: Real;
@@ -18,13 +19,13 @@ package body Gamma_function is
     Stir :=  7.87311395793093628397E-4;
     Stir := -2.29549961613378126380E-4 + w*Stir;
     Stir := -2.68132617805781232825E-3 + w*Stir;
-    Stir :=  3.47222221605458667310E-3 + w*Stir;
-    Stir :=  8.33333333333482257126E-2 + w*Stir;
+    Stir :=  3.47222221605458667310E-3 + w*Stir;  --  1/288
+    Stir :=  8.33333333333482257126E-2 + w*Stir;  --  1/12
     w := 1.0 + w*Stir;
     y := Exp(x);
     if x > 143.01608 then
       v := x ** (0.5*x-0.25);
-      y := v*(v/y);
+      y := v * (v/y);
     else
       y := x ** (x-0.5) / y;
     end if;
@@ -165,7 +166,7 @@ function Log_Gamma(x : Real) return Real is
   LogPi: constant := 1.14472988584940017414;
   LS2PI: constant := 0.91893853320467274178;
   -- SgnGam : Real;
-begin
+  begin
     -- SgnGam := 1.0;
     if xv < -34.0 then    
       q := -xv;
@@ -190,14 +191,14 @@ begin
       p := 0.0;
       u := xv;
       while u >= 3.0 loop        
-          p := p - 1.0;
-          u := xv + p;
-          z := z * u;
+        p := p - 1.0;
+        u := xv + p;
+        z := z * u;
       end loop;
       while u < 2.0 loop
-          z := z/u;
-          p := p + 1.0;
-          u := xv+p;
+        z := z/u;
+        p := p + 1.0;
+        u := xv+p;
       end loop;
       if z < 0.0 then
         -- sgngam := -1.0;
@@ -233,18 +234,19 @@ begin
     end if;
     p := 1.0 / (xv*xv);
     if xv >= 1000.0 then    
-        q := q +
+      q := q +
          (
-           (7.9365079365079365079365*0.0001*p-2.7777777777777777777778*0.001) * p + 
+           (    7.9365079365079365079365 * 0.0001 * p 
+              - 2.7777777777777777777778 * 0.001 ) * p + 
            0.0833333333333333333333
          ) / xv;
     else
-        A :=  8.11614167470508450300*0.0001;
-        A := -5.95061904284301438324*0.0001+ p*A;
-        A :=  7.93650340457716943945*0.0001+ p*A;
-        A := -2.77777777730099687205*0.001 + p*A;
-        A :=  8.33333333333331927722*0.01  + p*A;
-        q := q + A/xv;
+      A :=  8.11614167470508450300 * 0.0001;
+      A := -5.95061904284301438324 * 0.0001 + p*A;
+      A :=  7.93650340457716943945 * 0.0001 + p*A;
+      A := -2.77777777730099687205 * 0.001  + p*A;
+      A :=  8.33333333333331927722 * 0.01   + p*A;
+      q := q + A/xv;
     end if;
     return q;
   end Log_Gamma;
