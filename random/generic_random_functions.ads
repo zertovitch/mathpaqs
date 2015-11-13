@@ -56,9 +56,12 @@ package Generic_Random_Functions is
   -- 1.1 Continuous random distributions --
   -----------------------------------------
 
-  --------------------------
-  -- Normal distributions --
-  --------------------------
+  -------------------------
+  -- Normal distribution --
+  -------------------------
+
+  function Normal_inverse_CDF(y0: Real) return Real;
+  pragma Inline(Normal_inverse_CDF);
 
   -- Box-Muller: returns a pair of
   -- independent N(0,1) normal variables from
@@ -67,9 +70,9 @@ package Generic_Random_Functions is
   procedure Box_Muller(u1, u2: in Real; n1, n2: out Real);
   pragma Inline(Box_Muller);
 
-  --------------------------
-  -- Pareto distributions --
-  --------------------------
+  -------------------------
+  -- Pareto distribution --
+  -------------------------
 
   function Pareto_inverse_CDF(q, threshold, minus_inv_alpha: Real) return Real;
   pragma Inline(Pareto_inverse_CDF);
@@ -83,9 +86,9 @@ package Generic_Random_Functions is
   -- 1.2 Discrete random distributions --
   ---------------------------------------
 
-  ---------------------------
-  -- Poisson distributions --
-  ---------------------------
+  --------------------------
+  -- Poisson distribution --
+  --------------------------
 
   -- lambda is the frequency. E(N) = lambda when N ~ Poisson(lambda)
   -- U is meant to be an U(0,1) uniform generator
@@ -108,16 +111,16 @@ package Generic_Random_Functions is
   -- 2.1 Continuous random distributions --
   -----------------------------------------
 
-  --------------------------
-  -- Normal distributions --
-  --------------------------
+  -------------------------
+  -- Normal distribution --
+  -------------------------
 
   function Normal_CDF(x: Real) return Real;
   pragma Inline(Normal_CDF);
 
-  --------------------------
-  -- Pareto distributions --
-  --------------------------
+  -------------------------
+  -- Pareto distribution --
+  -------------------------
 
   function Pareto_CDF(x, threshold, alpha: Real) return Real;
 
