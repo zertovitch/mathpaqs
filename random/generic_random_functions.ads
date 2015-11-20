@@ -7,11 +7,10 @@
 -- The purpose here is a direct, "ad-hoc" utility.
 -------------
 --
--- Author: G. de Montmollin, February 2010 and later
---
 -- Legal licensing note:
 
---  Copyright (c) 2010..2013 Gautier de Montmollin
+--  Copyright (c) 2010 .. 2015 Gautier de Montmollin
+--  Parts originally created by Stephen L. Moshier (see implementation for details)
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
