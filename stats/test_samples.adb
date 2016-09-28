@@ -77,7 +77,9 @@ procedure Test_Samples is
 
   large_1: constant:= 100_000;
   multi: constant:= 10;
-  u, u1, u2, n1, n2: Real;
+  u, n1, n2: Real;
+
+  type Sim_Norm is (Cephes, Box_Muller_X, Box_Muller_Y);
 
 begin
   m.level:= level;
@@ -149,21 +151,29 @@ begin
   Put_Line("Mean should converge to zero, std dev should converge to 10/sqrt(3) ~= 5.77350269.");
   Display_Measure(m);
   --
-  Title("=== Random test: Normal(0, 1)");
-  -- R:
-  -- t <- rnorm(1000000,0,1)
-  RS.Initialize(s, -100.0, 100.0);
-  RS.Add_occurrence(s, -100.0); -- !!
-  RUR.Reset(Gen);
-  for i in 1..1_000_000 loop
-    u1:= Uni01;
-    u2:= Uni01;
-    GRF.Box_Muller(u1,u2,n1,n2);
-    RS.Add_occurrence(s, n1);
+  for meth in Sim_Norm loop
+    Title("=== Random test: Normal(0, 1) using " & Sim_Norm'Image(meth));
+    -- R:
+    -- t <- rnorm(1000000,0,1)
+    RS.Initialize(s, -100.0, 100.0);
+    RS.Add_occurrence(s, -100.0); -- !!
+    RUR.Reset(Gen);
+    for i in 1..1_000_000 loop
+      case meth is
+        when Cephes =>
+          n1:= GRF.Normal_inverse_CDF(Uni01);
+        when Box_Muller_X =>
+          GRF.Box_Muller(Uni01,Uni01,n1,n2);
+        when Box_Muller_Y =>
+          GRF.Box_Muller(Uni01,Uni01,n1,n2);
+          n1:= n2;
+      end case;
+      RS.Add_occurrence(s, n1);
+    end loop;
+    RS.Get_measures(s,m);
+    Put_Line("Mean should converge to zero, std dev should converge to 1.");
+    Display_Measure(m);
   end loop;
-  RS.Get_measures(s,m);
-  Put_Line("Mean should converge to zero, std dev should converge to 1.");
-  Display_Measure(m);
   --
   Title("=== Random test: Poisson(lambda = 0.54321)");
   RS.Initialize(s, 0.0, 100.0);
