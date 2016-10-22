@@ -16,6 +16,6 @@ package Test_Formulas_Pkg is
 
   package My_Formulas is new Formulas (Real, Dummy_type, Evaluate_variable);
 
-  procedure Show_name (name: String; parameters: Natural);
+  procedure Show_name (name : String; parameters : Natural);
 
 end Test_Formulas_Pkg;

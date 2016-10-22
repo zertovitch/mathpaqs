@@ -10,19 +10,19 @@ procedure Test_Copulas is
   subtype Real is Long_Float;
   type Integer_Vector is array (Integer range <>) of Integer;
 
-  package RIO is new Float_IO(Real);
+  package RIO is new Float_IO (Real);
 
-  package GRA is new Ada.Numerics.Generic_Real_Arrays(Real);
-  package GRLE is new Generic_Real_Linear_Equations(Real, GRA, Integer_Vector);
+  package GRA is new Ada.Numerics.Generic_Real_Arrays (Real);
+  package GRLE is new Generic_Real_Linear_Equations (Real, GRA, Integer_Vector);
 
-  package Real_U_Rand is new U_Rand(Real);
+  package Real_U_Rand is new U_Rand (Real);
 
   -- *** Choice of a random generator: A.N.F_R, or U_Rand (faster), or...:
   package RRand renames
     -- Ada.Numerics.Float_Random;
     Real_U_Rand;
 
-  package RCopulas is new Copulas(
+  package RCopulas is new Copulas (
     Real,
     RRand.Uniformly_Distributed,
     RRand.Generator,
@@ -33,41 +33,41 @@ procedure Test_Copulas is
 
   use GRA, GRLE, RIO;
 
-  procedure Put(A: Real_Matrix) is
+  procedure Put (A: Real_Matrix) is
   begin
     for i in A'Range(1) loop
       for j in A'Range(2) loop
-        Put(A(i,j), 4, Real'Digits,0);
+        Put (A(i,j), 4, Real'Digits, 0);
       end loop;
       New_Line;
     end loop;
   end Put;
 
-  procedure Test(A: Real_Matrix; res_name: String) is
-    dim_dep: constant Integer:= A'Length(1);
-    dim_indep: constant:= 3;
-    U01: Real_Vector(1..dim_dep + dim_indep);
-    gen: RRand.Generator;
+  procedure Test (A: Real_Matrix; res_name: String) is
+    dim_dep : constant Integer:= A'Length(1);
+    dim_indep : constant:= 3;
+    U01 : Real_Vector(1..dim_dep + dim_indep);
+    gen : RRand.Generator;
     use RCopulas;
-    copula: Copula_access;
-    f: File_Type;
-    L, B: Real_Matrix(A'Range(1), A'Range(2));
+    copula : Copula_access;
+    f : File_Type;
+    L, B : Real_Matrix(A'Range(1), A'Range(2));
   begin
-    RRand.Reset(gen, 1);
-    Construct_as_Gauss(copula, U01'Length, A);
-    Create(f, Out_File, res_name & ".csv");
-    for i in 1..dim_dep loop
-      Put(f, "dep;");
+    RRand.Reset (gen, 1);
+    Construct_as_Gauss (copula, U01'Length, A);
+    Create (f, Out_File, res_name & ".csv");
+    for i in 1 .. dim_dep loop
+      Put (f, "dep;");
     end loop;
-    for i in 1..dim_indep loop
-      Put(f, "indep;");
+    for i in 1 .. dim_indep loop
+      Put (f, "indep;");
     end loop;
     New_Line(f);
-    for n in 1..60_000 loop
-      U01:= Simulate(copula.all, gen);
+    for n in 1 .. 60_000 loop
+      U01 := Simulate(copula.all, gen);
       for i in U01'Range loop
-        Put(f, U01(i));
-        Put(f, ';');
+        Put (f, U01(i));
+        Put (f, ';');
       end loop;
       New_Line(f);
     end loop;

@@ -10,11 +10,11 @@ package body Test_Formulas_Pkg is
     return 0.0;
   end Evaluate_variable;
 
-  procedure Show_name (name: String; parameters: Natural) is
+  procedure Show_name (name : String; parameters : Natural) is
   begin
-    Put_Line(
-      "Custom variable/function: " & name & 
-      "; parameters:" & Integer'Image(parameters)
+    Put_Line (
+      "Custom variable/function: " & name &
+      "; parameters:" & Integer'Image (parameters)
     );
   end Show_name;
 

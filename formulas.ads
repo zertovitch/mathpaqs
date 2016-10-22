@@ -5,13 +5,15 @@
 
 --  Based on a Pascal university exercise (~1990's)
 --  Translated on 9-Apr-2015 by (New) P2Ada v. 28-Oct-2009
+--
 --  Reworked further: generic, private types, exceptions,
---  automatic memory management, etc.
+--  automatic memory management, automatic deep copy & delete,
+--  improved formula simplification, etc.
 --
 --  Latest version may be available at:
 --  http://mathpaqs.sf.net/ or http://sf.net/projects/mathpaqs/
 
--- Copyright (c) Gautier de Montmollin 2015
+-- Copyright (c) Gautier de Montmollin 2015 .. 2016
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -46,9 +48,12 @@ generic
 
   type Real is digits <>;
 
-  type Payload_type is private; -- This can be a helper type for user variables
+  --  Payload can be a helper for user variables.
+  --  For instance, formulas can be associated to different objects where
+  --  user variables may have different values.
+  type Payload_type is private;
 
-  with function Evaluate_variable (name : String; payload: Payload_type) return Real;
+  with function Evaluate_variable (name : String; payload : Payload_type) return Real;
 
 package Formulas is
 
@@ -63,7 +68,7 @@ package Formulas is
   function Parse (s : String) return Formula;  --  NB: a bit slower than the procedure
   procedure Parse (f : out Formula; u : Unbounded_String);
   function Parse (u : Unbounded_String) return Formula;  --  NB: a bit slower than the procedure
-  
+
   function Evaluate (f : Formula; payload : Payload_type) return Real;
 
   Parse_Error, Div_By_0 : exception;
@@ -73,12 +78,13 @@ package Formulas is
   -----------------------------------
 
   function Equivalent (fa, fb : Formula) return Boolean;
+  --  Strict form of formula equivalence:
   function Identical (fa, fb : Formula) return Boolean;
   procedure Simplify (f : in out Formula);
 
   --  Deep_copy and Deep_delete are no more needed and
   --  were removed, it is done now automatically.
-  
+
   ----------------------------------------------------------------
   --  Display. Caution: the displayed constants may be rounded  --
   ----------------------------------------------------------------
@@ -88,17 +94,17 @@ package Formulas is
     bracketed   --  Like normal, but displays a {} around every parse tree node
   );
 
-  procedure Put (f : Formula; style : Output_style:= normal);
-  procedure Put (t : in Ada.Text_IO.File_Type; f : Formula; style : Output_style:= normal);
-  function Image (f : Formula; style : Output_style:= normal) return String;
+  procedure Put (f : Formula; style : Output_style := normal);
+  procedure Put (t : in Ada.Text_IO.File_Type; f : Formula; style : Output_style := normal);
+  function Image (f : Formula; style : Output_style := normal) return String;
 
   -----------------
   --  Utilities  --
   -----------------
 
-  type List_proc is access procedure (name: String; parameters: Natural);
+  type List_proc is access procedure (name : String; parameters : Natural);
 
-  procedure Enumerate_custom (f: Formula; lp: List_proc);
+  procedure Enumerate_custom (f : Formula; lp : List_proc);
   --  This will find all custom variables or functions appearing
   --  in a formula and list it through List_proc.
   --  A name will be listed as many times as it appears in the formula.
@@ -122,7 +128,7 @@ private
   type S_Form is
                 (                                    --  0 argument (leaf, terminal nodes):
                  nb, pi, var,
-                                                     --  1 argument:
+                 --                                      1 argument:
                  moins_una, plus_una,
                  par, croch, accol,
                  -- vvv begin of built-in functions
@@ -132,7 +138,7 @@ private
                  sqrt,
                  sinus, arcsin, cosinus, arccos, tg, arctg,
                  sh, arcsinh, ch, arccosh, th, arctanh,
-                                                     --  2 arguments:
+                 --                                      2 arguments:
                  min, max,
                  -- ^^^ end of built-in functions
                  moins, plus, sur, fois, puiss);
@@ -153,10 +159,10 @@ private
   end record;
 
   type Formula is new Ada.Finalization.Controlled with record
-    root: p_Formula_Rec:= null;
+    root : p_Formula_Rec := null;
   end record;
 
-  procedure Adjust(f: in out Formula);
-  procedure Finalize(f: in out Formula);
+  procedure Adjust (f : in out Formula);
+  procedure Finalize (f : in out Formula);
 
 end Formulas;

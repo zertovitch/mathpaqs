@@ -23,16 +23,16 @@ procedure Test_Formulas is
       end if;
     end Entropy_test;
     --
-    procedure Copy_test(f: Formula) is
-      g: constant Formula:= f;  --  NB: copy is always deep thanks to Adjust.
+    procedure Copy_test (f : Formula) is
+      g : constant Formula := f;  --  NB: copy is always deep thanks to Adjust.
     begin
-      if not Identical(f, g) then
+      if not Identical (f, g) then
         Put_Line (Standard_Error, "!!! ""Copy / Identical"" test failed !!!");
         raise Program_Error;
       end if;
     end Copy_test;
     --
-    function Almost_zero (x: Real) return Boolean is
+    function Almost_zero (x : Real) return Boolean is
     begin
       return abs x <= Real'Base'Model_Small;
     end Almost_zero;
@@ -42,9 +42,9 @@ procedure Test_Formulas is
     Parse (f, expr);
     --  Enumerate_custom (f, Show_name'Access);
     --  Put_Line("Parsing done.");
-    Put_Line("Image(f) = " & Image(f, bracketed));
+    Put_Line ("Image(f) = " & Image (f, bracketed));
     --  Put_Line("(Deep) copy test now.");
-    Copy_test(f);
+    Copy_test (f);
     --  Put (" [Testing Parse / Image entropy] ");
     --  Put_Line("Image(f) = " & Image(f, bracketed));
     declare
@@ -68,12 +68,12 @@ procedure Test_Formulas is
         Put (";  target value is: " & target);
       end if;
       -- Put (" [Testing Deep_copy] ");
-      Copy_test(f);
+      Copy_test (f);
       New_Line;
       -- Put (" [Testing Evaluate] ");
       e := Evaluate (f, dummy);
       if abs (e - e0) > abs (e) * 1.0e-10 and then  --  Relative difference
-        not (Almost_zero(e) and Almost_zero(e0))    --  <- filter OA 7.2.2 false positive
+        not (Almost_zero (e) and Almost_zero (e0))    --  <- filter OA 7.2.2 false positive
       then
         Put_Line (Standard_Error, "!!! Evaluation mismatch !!!");
         Put (Standard_Error, "e0 =");
@@ -91,7 +91,7 @@ procedure Test_Formulas is
 
 begin
   Put ("Digits: ");
-  Put (Integer'Image(Real'Digits));
+  Put (Integer'Image (Real'Digits));
   New_Line;
   Put ("x=");
   Put (Evaluate_variable ("x", dummy), 0, 3, 0);
@@ -102,7 +102,8 @@ begin
   Test_1 ("6-3+2", "5");
   Test_1 ("9-4-3", "2");
   Test_1 ("9-4-3-2", "0");
-  Test_1 ("-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1", "-40");
+  Test_1 ("-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1" &
+          "-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1", "-40");
   Test_1 ("1000000/10/10/10/10/10/10", "1");
   Test_1 ("21/3*5/7/5-1", "0");
   Test_1 ("2 -4 +6 -1 -1- 0 +8", "10");

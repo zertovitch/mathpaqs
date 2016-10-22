@@ -13,12 +13,12 @@ procedure Test_Normal is
   -- 15 for Long_Float (double);
   -- 18 max. for GNAT on x86
 
-  package GRF is new Generic_Random_Functions(Real);
-  package RIO is new Float_IO(Real);
+  package GRF is new Generic_Random_Functions (Real);
+  package RIO is new Float_IO (Real);
   use GRF, RIO;
 
-  max: constant := 2000;
-  bound: constant:= 8.0;
+  max : constant := 2000;
+  bound : constant:= 8.0;
 
   x, y, z, diff, max_diff, sum_diff, avg_diff: Real;
 
