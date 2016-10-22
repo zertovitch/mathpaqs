@@ -1,10 +1,11 @@
 -- !! replace all = 0.0 and x = y by almost_zero tests
 
 with Ada.Text_IO; use Ada.Text_IO; -- for debug
---with INTEGER_ARRAYS_IO;  -- for debug
---with REAL_ARRAYS_IO; -- for debug
-with Ada.Numerics.GENERIC_ELEMENTARY_FUNCTIONS;
-package body GENERIC_REAL_LINEAR_EQUATIONS is
+-- with INTEGER_ARRAYS_IO;  -- for debug
+-- with REAL_ARRAYS_IO; -- for debug
+with Ada.Numerics.Generic_Elementary_Functions;
+
+package body Generic_Real_Linear_Equations is
 
   function Almost_zero(x: Real) return Boolean is
   begin
@@ -21,8 +22,8 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
 --                            (Integer, Integer_Arrays); -- for debug
 --  use INT_IO; -- for debug
 
-  function LINEAR_EQUATIONS ( A : REAL_MATRIX ;
-                              Y : REAL_VECTOR ) return REAL_VECTOR is
+  function Linear_Equations ( A : Real_Matrix ;
+                              Y : Real_Vector ) return Real_Vector is
 
     --      PURPOSE : SOLVE THE LINEAR SYSTEM OF EQUATIONS WITH REAL
     --                COEFFICIENTS   [A] * |X| = |Y|
@@ -45,31 +46,31 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --      revised 10/8/88 for nested generics
     --      revised 8/8/90 for ISO NRG proposed standard packages interface
 
-    N : constant INTEGER := A'LENGTH(1) ; -- NUMBER OF EQUATIONS
-    X : REAL_VECTOR ( 1 .. N ) ;          -- RESULT BEING COMPUTED
-    B : REAL_MATRIX ( 1 .. N , 1 .. N + 1 ) ;  -- WORKING MATRIX
-    ROW : array ( 1 .. N ) of INTEGER ;   -- ROW INTERCHANGE INDICIES
-    HOLD , I_PIVOT : INTEGER ;            -- PIVOT INDICIES
-    PIVOT : REAL ;                        -- PIVOT ELEMENT VALUE
-    ABS_PIVOT : REAL ;                    -- ABS OF PIVOT ELEMENT
-    NORM1 : REAL := 0.0 ;                 -- 1 NORM OF MATRIX
+    N : constant Integer := A'Length(1) ; -- NUMBER OF EQUATIONS
+    X : Real_Vector ( 1 .. N ) ;          -- RESULT BEING COMPUTED
+    B : Real_Matrix ( 1 .. N , 1 .. N + 1 ) ;  -- WORKING MATRIX
+    ROW : array ( 1 .. N ) of Integer ;   -- ROW INTERCHANGE INDICIES
+    HOLD , I_PIVOT : Integer ;            -- PIVOT INDICIES
+    PIVOT : Real ;                        -- PIVOT ELEMENT VALUE
+    ABS_PIVOT : Real ;                    -- ABS OF PIVOT ELEMENT
+    NORM1 : Real := 0.0 ;                 -- 1 NORM OF MATRIX
   begin
-    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+    if A'Length ( 1 ) /= A'Length ( 2 ) then
       raise Constraint_Error with "Matrix A is not square";
     end if ;
-    if A'LENGTH ( 1 ) /= Y'LENGTH then
+    if A'Length ( 1 ) /= Y'Length then
       raise Constraint_Error with "Matrix A row count is different than vector Y's";
     end if ;
 
     --                               BUILD WORKING DATA STRUCTURE
     for I in 1 .. N loop
       for J in 1 .. N loop
-        B ( I , J ) := A ( I - 1 + A'FIRST( 1 ) , J - 1 + A'FIRST ( 2 )) ;
+        B ( I , J ) := A ( I - 1 + A'First( 1 ) , J - 1 + A'First ( 2 )) ;
         if abs B ( I , J ) > NORM1 then
           NORM1 := abs B ( I , J ) ;
         end if;
       end loop ;
-      B ( I , N + 1 ) := Y ( I - 1 + Y'FIRST ) ;
+      B ( I , N + 1 ) := Y ( I - 1 + Y'First ) ;
     end loop ;
 
     --                               SET UP ROW  INTERCHANGE VECTORS
@@ -93,8 +94,8 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       end loop ;
 
       --                             CHECK FOR NEAR SINGULAR
-      if ABS_PIVOT < REAL'EPSILON * NORM1 then
-        raise MATRIX_DATA_ERROR with "Matrix is near singular";
+      if ABS_PIVOT < Real'Epsilon * NORM1 then
+        raise Matrix_Data_Error with "Matrix is near singular";
       end if;
 
       --                             HAVE PIVOT, INTERCHANGE ROW POINTERS
@@ -125,10 +126,10 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       X ( I ) := B ( ROW( I ) , N + 1) ;
     end loop ;
     return X ;
-  end LINEAR_EQUATIONS ;
+  end Linear_Equations ;
 
-  function LINEAR_EQUATIONS ( A : REAL_MATRIX ;
-                              Y : REAL_MATRIX ) return REAL_MATRIX is
+  function Linear_Equations ( A : Real_Matrix ;
+                              Y : Real_Matrix ) return Real_Matrix is
 
     --      PURPOSE : SOLVE THE LINEAR SYSTEM OF EQUATIONS WITH REAL
     --                COEFFICIENTS   [A] * [X] = [Y]
@@ -147,33 +148,33 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --                  Constraint_Error IF 'A' IS NOT SQUARE OR
     --                                       ROWS OF 'Y' /= ROWS OF 'A'
 
-    N : constant INTEGER := A'LENGTH(1) ;      -- NUMBER OF EQUATIONS
-    M : constant INTEGER := Y'LENGTH(2) ;      -- NUMBER OF SOLUTIONS REQUESTED
-    X : REAL_MATRIX ( 1 .. N , 1 .. M ) ;      -- RESULT BEING COMPUTED
-    B : REAL_MATRIX ( 1 .. N , 1 .. N + M ) ;  -- WORKING MATRIX
-    ROW : array ( 1 .. N ) of INTEGER ;        -- ROW INTERCHANGE INDICIES
-    HOLD , I_PIVOT : INTEGER ;                 -- PIVOT INDICIES
-    PIVOT : REAL ;                             -- PIVOT ELEMENT VALUE
-    ABS_PIVOT : REAL ;                         -- ABS OF PIVOT ELEMENT
-    NORM1 : REAL := 0.0 ;                      -- 1 NORM OF MATRIX
+    N : constant Integer := A'Length(1) ;      -- NUMBER OF EQUATIONS
+    M : constant Integer := Y'Length(2) ;      -- NUMBER OF SOLUTIONS REQUESTED
+    X : Real_Matrix ( 1 .. N , 1 .. M ) ;      -- RESULT BEING COMPUTED
+    B : Real_Matrix ( 1 .. N , 1 .. N + M ) ;  -- WORKING MATRIX
+    ROW : array ( 1 .. N ) of Integer ;        -- ROW INTERCHANGE INDICIES
+    HOLD , I_PIVOT : Integer ;                 -- PIVOT INDICIES
+    PIVOT : Real ;                             -- PIVOT ELEMENT VALUE
+    ABS_PIVOT : Real ;                         -- ABS OF PIVOT ELEMENT
+    NORM1 : Real := 0.0 ;                      -- 1 NORM OF MATRIX
   begin
-    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+    if A'Length ( 1 ) /= A'Length ( 2 ) then
       raise Constraint_Error with "Matrix A is not square";
     end if ;
-    if A'LENGTH ( 1 ) /= Y'LENGTH ( 1 ) then
+    if A'Length ( 1 ) /= Y'Length ( 1 ) then
       raise Constraint_Error with "Matrix A row count is different than matrix Y's";
     end if ;
 
     --                               BUILD WORKING DATA STRUCTURE
     for I in 1 .. N loop
       for J in 1 .. N loop
-        B ( I , J ) := A ( I - 1 + A'FIRST( 1 ) , J - 1 + A'FIRST ( 2 )) ;
+        B ( I , J ) := A ( I - 1 + A'First( 1 ) , J - 1 + A'First ( 2 )) ;
         if abs B ( I , J ) > NORM1 then
           NORM1 := abs B ( I , J ) ;
         end if ;
       end loop ;
       for J in 1 .. M loop
-        B ( I , N + J ) := Y ( I - 1 + Y'FIRST(1), J - 1 + Y'FIRST(2) ) ;
+        B ( I , N + J ) := Y ( I - 1 + Y'First(1), J - 1 + Y'First(2) ) ;
       end loop ;
     end loop ;
 
@@ -198,15 +199,14 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       end loop ;
 
       --                             CHECK FOR NEAR SINGULAR
-      if ABS_PIVOT < REAL'EPSILON * NORM1 then
-        raise MATRIX_DATA_ERROR with "Matrix is near singular";
+      if ABS_PIVOT < Real'Epsilon * NORM1 then
+        raise Matrix_Data_Error with "Matrix is near singular";
       end if;
 
       --                             HAVE PIVOT, INTERCHANGE ROW POINTERS
       HOLD := ROW ( K ) ;
       ROW ( K ) := ROW ( I_PIVOT ) ;
       ROW ( I_PIVOT ) := HOLD ;
-
 
       --                             REDUCE ABOUT PIVOT
       for J in K + 1 .. N + M loop
@@ -232,9 +232,9 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       end loop ;
     end loop ;
     return X ;
-  end LINEAR_EQUATIONS ;
+  end Linear_Equations ;
 
-  function DETERMINANT_JS ( A : REAL_MATRIX ) return REAL is
+  function Determinant_JS ( A : Real_Matrix ) return Real is
 
     --      PURPOSE : COMPUTE THE DETERMINANT OF A MATRIX
     --
@@ -251,15 +251,15 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      WRITTEN BY : JON SQUIRE , 28 MAY 1983
 
-    N : constant INTEGER := A'LENGTH(1) ;  -- NUMBER OF ROWS
-    D : REAL := 1.0 ;                      -- DETERMINANT
-    B : REAL_MATRIX ( 1 .. N , 1 .. N ) ;  -- WORKING MATRIX
-    ROW : array ( 1 .. N ) of INTEGER ;    -- ROW INTERCHANGE INDICIES
-    HOLD , I_PIVOT : INTEGER ;             -- PIVOT INDICIES
-    PIVOT : REAL ;                         -- PIVOT ELEMENT VALUE
-    ABS_PIVOT : REAL ;                     -- ABS OF PIVOT ELEMENT
+    N : constant Integer := A'Length(1) ;  -- NUMBER OF ROWS
+    D : Real := 1.0 ;                      -- DETERMINANT
+    B : Real_Matrix ( 1 .. N , 1 .. N ) ;  -- WORKING MATRIX
+    ROW : array ( 1 .. N ) of Integer ;    -- ROW INTERCHANGE INDICIES
+    HOLD , I_PIVOT : Integer ;             -- PIVOT INDICIES
+    PIVOT : Real ;                         -- PIVOT ELEMENT VALUE
+    ABS_PIVOT : Real ;                     -- ABS OF PIVOT ELEMENT
   begin
-    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+    if A'Length ( 1 ) /= A'Length ( 2 ) then
       raise Constraint_Error with "Matrix A is not square";
     end if ;
     B := A ;
@@ -313,12 +313,11 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     end loop ;
     return D * B ( ROW( N ) , N) ;
   exception
-    when CONSTRAINT_ERROR => -- catches overflow
+    when Constraint_Error => -- catches overflow
       return 0.0 ;
-  end DETERMINANT_JS ;
+  end Determinant_JS ;
 
-
-  function INVERSE_JS ( A : REAL_MATRIX ) return REAL_MATRIX is
+  function Inverse_JS ( A : Real_Matrix ) return Real_Matrix is
 
     --      PURPOSE : INVERT AN N BY N MATRIX
     --
@@ -337,16 +336,16 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      WRITTEN BY : JON SQUIRE , 3 FEB 1983
 
-    N : constant INTEGER := A'LENGTH ;        -- SIZE OF MATRIX
-    AA : REAL_MATRIX ( 1 .. N , 1 .. N ) ;    -- WORKING MATRIX
-    TEMP : REAL_VECTOR ( 1 .. N ) ;           -- TEMPORARY FOR UNSCRAMBLING ROWS
-    ROW , COL : array ( 1 .. N ) of INTEGER ; -- ROW,COLUMN INTERCHANGE INDICIES
-    HOLD , I_PIVOT , J_PIVOT : INTEGER ;      -- PIVOT INDICIES
-    PIVOT : REAL ;                            -- PIVOT ELEMENT VALUE
-    ABS_PIVOT : REAL ;                        -- ABS OF PIVOT ELEMENT
-    NORM1 : REAL := 0.0 ;                     -- 1 NORM OF MATRIX
+    N : constant Integer := A'Length ;        -- SIZE OF MATRIX
+    AA : Real_Matrix ( 1 .. N , 1 .. N ) ;    -- WORKING MATRIX
+    TEMP : Real_Vector ( 1 .. N ) ;           -- TEMPORARY FOR UNSCRAMBLING ROWS
+    ROW , COL : array ( 1 .. N ) of Integer ; -- ROW,COLUMN INTERCHANGE INDICIES
+    HOLD , I_PIVOT , J_PIVOT : Integer ;      -- PIVOT INDICIES
+    PIVOT : Real ;                            -- PIVOT ELEMENT VALUE
+    ABS_PIVOT : Real ;                        -- ABS OF PIVOT ELEMENT
+    NORM1 : Real := 0.0 ;                     -- 1 NORM OF MATRIX
   begin
-    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+    if A'Length ( 1 ) /= A'Length ( 2 ) then
       raise Constraint_Error with "Matrix A is not square";
     end if ;
 
@@ -385,8 +384,8 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       end loop ;
 
       --                            TEST FOR SINGULAR
-      if ABS_PIVOT < REAL'EPSILON * NORM1 then
-        raise MATRIX_DATA_ERROR with "Matrix is singular";
+      if ABS_PIVOT < Real'Epsilon * NORM1 then
+        raise Matrix_Data_Error with "Matrix is singular";
       end if ;
 
       HOLD := ROW ( K ) ;
@@ -442,9 +441,9 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       end loop ;
     end loop ;
     return AA ;
-  end INVERSE_JS ;
+  end Inverse_JS ;
 
-  procedure INVERSE_JS ( A : in out REAL_MATRIX ) is
+  procedure Inverse_JS ( A : in out Real_Matrix ) is
 
     --      PURPOSE : INVERT AN N BY N MATRIX IN PLACE
     --
@@ -460,16 +459,16 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      SAMPLE USE :  INVERSE ( SOME_MATRIX ) ;
 
-    N : constant INTEGER := A'LENGTH ;        -- SIZE OF MATRIX
-    AA : REAL_MATRIX ( 1 .. N , 1 .. N ) ;    -- WORKING MATRIX
-    ROW , COL : array ( 1 .. N ) of INTEGER ; -- ROW,COLUMN INTERCHANGE INDICIES
-    TEMP : REAL_VECTOR ( 1 .. N ) ;           -- TEMP ARRAY FOR UNSCRAMBLING
-    HOLD , I_PIVOT , J_PIVOT : INTEGER ;      -- PIVOT INDICIES
-    PIVOT : REAL ;  -- PIVOT ELEMENT VALUE    -- PIVOT ELEMENT
-    ABS_PIVOT : REAL ;                        -- ABS OF PIVOT ELEMENT
-    NORM1 : REAL := 0.0 ;                     -- 1 NORM OF MATRIX
+    N : constant Integer := A'Length ;        -- SIZE OF MATRIX
+    AA : Real_Matrix ( 1 .. N , 1 .. N ) ;    -- WORKING MATRIX
+    ROW , COL : array ( 1 .. N ) of Integer ; -- ROW,COLUMN INTERCHANGE INDICIES
+    TEMP : Real_Vector ( 1 .. N ) ;           -- TEMP ARRAY FOR UNSCRAMBLING
+    HOLD , I_PIVOT , J_PIVOT : Integer ;      -- PIVOT INDICIES
+    PIVOT : Real ;  -- PIVOT ELEMENT VALUE    -- PIVOT ELEMENT
+    ABS_PIVOT : Real ;                        -- ABS OF PIVOT ELEMENT
+    NORM1 : Real := 0.0 ;                     -- 1 NORM OF MATRIX
   begin
-    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+    if A'Length ( 1 ) /= A'Length ( 2 ) then
       raise Constraint_Error with "Matrix A is not square";
     end if ;
 
@@ -508,8 +507,8 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       end loop ;
 
       --                            CHECK FOR SINGULAR
-      if ABS_PIVOT < REAL'EPSILON * NORM1 then
-        raise MATRIX_DATA_ERROR;
+      if ABS_PIVOT < Real'Epsilon * NORM1 then
+        raise Matrix_Data_Error;
       end if ;
 
       HOLD := ROW ( K ) ;
@@ -565,10 +564,10 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
       end loop ;
     end loop ;
     A := AA ;
-  end INVERSE_JS ;
+  end Inverse_JS ;
 
-  function CROUT_SOLVE ( A : REAL_MATRIX ;
-                         Y : REAL_VECTOR ) return REAL_VECTOR is
+  function Crout_Solve ( A : Real_Matrix ;
+                         Y : Real_Vector ) return Real_Vector is
 
     --      PURPOSE : SOLVE THE LINEAR SYSTEM OF EQUATIONS WITH REAL
     --                COEFFICIENTS   [A] * |X| = |Y|
@@ -589,17 +588,17 @@ package body GENERIC_REAL_LINEAR_EQUATIONS is
     --
     --      WRITTEN BY : JON SQUIRE , 11/30/88
 
-    N : constant INTEGER := A'LENGTH ;         -- NUMBER OF EQUATIONS
-    X : REAL_VECTOR ( 1 .. N ) ;               -- RESULT BEING COMPUTED
-    Z : REAL_VECTOR ( 1 .. N ) ;               -- TEMPORARY IN BACK SUB
-    YY : REAL_VECTOR ( 1 .. N ) ;              -- TEMPORARY IN BACK SUB
-    B : REAL_MATRIX ( 1 .. N , 1 .. N ) ;      -- WORKING MATRIX
-    ROW : INTEGER_VECTOR( 1 .. N ) ;           -- ROW INTERCHANGE INDICIES
-    HOLD , I_PIVOT : INTEGER ;                 -- PIVOT INDICIES
-    PIVOT : REAL ;                             -- PIVOT ELEMENT VALUE
-    ABS_PIVOT : REAL ;                         -- ABS OF PIVOT ELEMENT
-    NORM1 : REAL := 0.0 ;                      -- 1 NORM OF MATRIX
-    SUM : REAL ;                               -- TEMP VARIBLE
+    N : constant Integer := A'Length ;         -- NUMBER OF EQUATIONS
+    X : Real_Vector ( 1 .. N ) ;               -- RESULT BEING COMPUTED
+    Z : Real_Vector ( 1 .. N ) ;               -- TEMPORARY IN BACK SUB
+    YY : Real_Vector ( 1 .. N ) ;              -- TEMPORARY IN BACK SUB
+    B : Real_Matrix ( 1 .. N , 1 .. N ) ;      -- WORKING MATRIX
+    ROW : Integer_Vector( 1 .. N ) ;           -- ROW INTERCHANGE INDICIES
+    HOLD , I_PIVOT : Integer ;                 -- PIVOT INDICIES
+    PIVOT : Real ;                             -- PIVOT ELEMENT VALUE
+    ABS_PIVOT : Real ;                         -- ABS OF PIVOT ELEMENT
+    NORM1 : Real := 0.0 ;                      -- 1 NORM OF MATRIX
+    SUM : Real ;                               -- TEMP VARIBLE
   begin
     if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
       raise Constraint_Error with "Matrix A is not square";

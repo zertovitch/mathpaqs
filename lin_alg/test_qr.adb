@@ -61,7 +61,7 @@ procedure Test_QR is
     Put(res);
     New_Line;
     Put_Line("**** QR solver");
-    x_solved:= QR_SOLVE(Q,R,y);
+    x_solved:= QR_Solve(Q,R,y);
     Put_Line("  solution x  :");
     Put(x_solved);
     Put_Line("  x should be :");
@@ -82,14 +82,13 @@ procedure Test_QR is
   x_a: constant Real_Vector:= (1.0, 2.0, 3.0);
   y_a: constant Real_Vector:= A33 * x_a;
 
-  A32: constant Real_Matrix(1..3, 1..2):=
-        ((  2.0, 1.0),
-         (  4.0, 5.0),
-         (  3.0, 7.0));
+  --  A32: constant Real_Matrix(1..3, 1..2):=
+  --        ((  2.0, 1.0),
+  --         (  4.0, 5.0),
+  --         (  3.0, 7.0));
 
-  x_b: constant Real_Vector:= (123.0, 456.0);
-  y_b: constant Real_Vector:= A32 * x_b;
-
+  --  x_b: constant Real_Vector:= (123.0, 456.0);
+  --  y_b: constant Real_Vector:= A32 * x_b;
 
 begin
   Test( A33, x_a, y_a );

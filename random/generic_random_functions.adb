@@ -98,7 +98,7 @@ package body Generic_Random_Functions is
     if X < 0.0 then
       return 2.0 - ErfC(-X);
     end if;
-    if X < 0.5 then    
+    if X < 0.5 then
       return 1.0 - Erf(X);
     end if;
     if X >= 10.0 then
@@ -133,7 +133,7 @@ package body Generic_Random_Functions is
     Q: Real;
   begin
     X := abs X;
-    if X < 0.5 then    
+    if X < 0.5 then
       XSq := X*X;
       P := 0.007547728033418631287834;
       P := 0.288805137207594084924010+XSq*P;
@@ -186,7 +186,7 @@ package body Generic_Random_Functions is
   --  Cephes Math Library Release 2.8:  June, 2000
   --  Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
   --  ************************************************************************
-  
+
   function Normal_CDF(x: Real) return Real is
   begin
     return 0.5*(Erf(x/1.41421356237309504880)+1.0);
@@ -254,7 +254,7 @@ package body Generic_Random_Functions is
         Q0 :=  15.9056225126211695515+y2*Q0;
         Q0 := -1.18331621121330003142+y2*Q0;
         x := y+y*y2*P0/Q0;
-        return x*s2pi;
+        return x*S2Pi;
     end if;
     x := Sqrt(-2.0*Log(y));
     x0 := x - Log(x)/x;
@@ -317,7 +317,7 @@ package body Generic_Random_Functions is
     n1:= r * Cos(phi);
     n2:= r * Sin(phi);
   end Box_Muller;
-  
+
   function Poisson(lambda: Real) return Natural is
     lower_limit, product: Real;
     k: Integer;
@@ -328,7 +328,7 @@ package body Generic_Random_Functions is
     -- Knuth (whom else ?!), The Art of Computer Programming,
     -- Volume 2, Seminumerical algorithms, 3.4.1. Numerical Distributions,
     -- F. Important integer-valued distributions.
-    lower_limit:= exp(-lambda);
+    lower_limit:= Exp(-lambda);
     k:= -1;
     product:= 1.0;
     loop

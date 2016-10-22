@@ -17,7 +17,6 @@
 -- 15-Feb-2002: "zero" and 1st index in Divide_absolute_normalized
 --                 bugs fixed by Duncan Sands (D.S.)
 
-
 -- To-do/bug symbol: !!
 
 with Multi_precision_integers.Check;
@@ -52,32 +51,32 @@ package body Multi_precision_integers is
 
   type compar is (smaller, equal, greater);
 
-  function Min(a,b: Index_int) return Index_int is
-  begin if a<b then return a; else return b; end if; end Min;
+  function Min (a,b: Index_int) return Index_int is
+  begin if a < b then return a; else return b; end if; end Min;
 
-  function Max(a,b: Index_int) return Index_int is
-  begin if a>b then return a; else return b; end if; end Max;
+  function Max (a,b: Index_int) return Index_int is
+  begin if a > b then return a; else return b; end if; end Max;
 
-  procedure Reduce_last_nonzero( n: in out Multi_int ) is
-    old_last: constant Index_int:= n.last_used;
+  procedure Reduce_last_nonzero ( n: in out Multi_int ) is
+    old_last : constant Index_int:= n.last_used;
   begin
-    if DEBUG then Check_internal.Test(n, test_last=> False); end if;
+    if Debug then Check_internal.Test(n, test_last=> False); end if;
 
     if n.zero then -- We avoid de-zeroing accidentally
       return;      -- and returning a false non-zero with rubbish :-)
     end if;
 
-    n.zero:= True;
+    n.zero := True;
     for i in 0 .. old_last loop -- after old_last it *is* rubbish anyway.
       if n.blk(i) /= 0 then
-        n.zero:= False;
-        n.last_used:= i;
+        n.zero := False;
+        n.last_used := i;
       end if;
     end loop;
   end Reduce_last_nonzero;
 
-  function Compare_absolute (i1,i2: Multi_int) return compar is
-    l1, l2: Index_int;
+  function Compare_absolute (i1, i2: Multi_int) return compar is
+    l1, l2 : Index_int;
   begin
     -- On ne compare que ABS(i1) et ABS(i2)
     l1:= i1.last_used;
@@ -215,7 +214,7 @@ package body Multi_precision_integers is
   procedure Fill(what: out Multi_int; with_smaller:Multi_int) is
     l: constant Index_int:= with_smaller.last_used;
   begin
-    if DEBUG then Check_internal.Test(with_smaller); end if;
+    if Debug then Check_internal.Test(with_smaller); end if;
     what.zero:= with_smaller.zero;
 
     if with_smaller.zero then
@@ -267,7 +266,7 @@ package body Multi_precision_integers is
   function "Abs" (i: Multi_int) return Multi_int is
     abs_i: Multi_int(i.n):= i; -- copy + stack :-(
   begin
-    if DEBUG then Check_internal.Test(i); end if;
+    if Debug then Check_internal.Test(i); end if;
     abs_i.neg:= False;
     return abs_i;
   end "Abs";
@@ -304,7 +303,7 @@ package body Multi_precision_integers is
     s: Long_Block_type:= 0;
     retenue_finale: Block_type;
   begin
-    if DEBUG then Check_internal.Test(i1); Check_internal.Test(i2); end if;
+    if Debug then Check_internal.Test(i1); Check_internal.Test(i2); end if;
 
     if max_ind > i3.n then
       raise Result_undersized;
@@ -364,7 +363,7 @@ package body Multi_precision_integers is
     s: Block_type;
     retenue_finale: Long_Block_type;
   begin
-    if DEBUG then Check_internal.Test(i1); Check_internal.Test(i2); end if;
+    if Debug then Check_internal.Test(i1); Check_internal.Test(i2); end if;
 
     if max_ind > i3.n then raise Result_undersized; end if; -- 17-Feb-2002
 
@@ -549,7 +548,7 @@ package body Multi_precision_integers is
     end if;
 
     if copy then
-      res:= new block_array( 0..last_max );
+      res:= new Block_array( 0..last_max );
       for k in res'Range loop res(k):= 0; end loop;
       -- Seems slower :-( :  res:= new Block_array'( 0..last_max => 0);
     else
@@ -640,7 +639,7 @@ package body Multi_precision_integers is
     end if;
 
     if copy then
-      res:= new block_array( 0..last_max );
+      res:= new Block_array( 0..last_max );
       for k in res'Range loop res(k):= 0; end loop;
       -- Seems slower :-( :  res:= new Block_array'( 0..last_max => 0);
     else
@@ -696,7 +695,7 @@ package body Multi_precision_integers is
   procedure Multiply(i1,i2: in Multi_int; i3: in out Multi_int) is
     use System;
   begin
-    if DEBUG then
+    if Debug then
       declare
         m1: constant Multi_int:= i1;
         m2: constant Multi_int:= i2;
@@ -718,7 +717,7 @@ package body Multi_precision_integers is
   procedure Multiply(i1: in Multi_int; i2: Basic_int; i3: in out Multi_int) is
     use System;
   begin
-    if DEBUG then
+    if Debug then
       declare
         m1: constant Multi_int:= i1;
         m2: constant Basic_int:= i2;
@@ -788,7 +787,7 @@ package body Multi_precision_integers is
   begin
     q:= a / b;
     r:= a - b*q;
-    if DEBUG and then r /= (a rem b) then
+    if Debug and then r /= (a rem b) then
       raise Conflict_with_REM;
     end if;
   end Div_Rem;
@@ -796,17 +795,17 @@ package body Multi_precision_integers is
   procedure Divide_absolute_normalized ( u: in out Multi_int; -- output: u = r
                                          v: in     Multi_int;
                                          q: in out Multi_int  ) is
-    qi: index_int:= u.last_used - v.last_used - 1; -- was: q.n; D.S. Feb-2002
+    qi: Index_int:= u.last_used - v.last_used - 1; -- was: q.n; D.S. Feb-2002
     v1: constant Long_Block_type:= Long_Block_type(v.blk(v.last_used  ));
     v2: constant Long_Block_type:= Long_Block_type(v.blk(v.last_used-1));
 
-    vlast     : constant index_int:= v.last_used;
+    vlast     : constant Index_int:= v.last_used;
     v1L       : constant Long_Block_type := v1;
     guess,
     comparand : Long_Block_type ;
 
-    function Divide_subtract ( ustart: index_int ) return Block_type is
-      ui    : index_int;
+    function Divide_subtract ( ustart: Index_int ) return Block_type is
+      ui    : Index_int;
       carry : Long_Block_type;
     begin
       if guess = 0 then
@@ -869,7 +868,7 @@ package body Multi_precision_integers is
         end loop;
 
         if icarry = 1 then
-          u.blk(ui) := Block_Type((Long_Block_type(u.blk(ui))+1) and maxblock);
+          u.blk(ui) := Block_type((Long_Block_type(u.blk(ui))+1) and maxblock);
         end if;
       end;
 
@@ -920,7 +919,7 @@ package body Multi_precision_integers is
 
     q.zero:= is_q_zero;
 
-    if DEBUG then Check_internal.Test(q); end if;
+    if Debug then Check_internal.Test(q); end if;
 
   end Divide_absolute_normalized;
 
@@ -930,7 +929,7 @@ package body Multi_precision_integers is
                                         r:      out Long_Block_type ) is
     n: Long_Block_type;
     Quotient_constraint_error: exception;
-    last_u_nz:  constant index_int:= u.last_used;
+    last_u_nz:  constant Index_int:= u.last_used;
     u_zero: constant Boolean:= u.zero;
     -- in case u and q are the same variables
     is_q_zero: Boolean:= True;
@@ -982,7 +981,7 @@ package body Multi_precision_integers is
     rneg: Boolean;
     lai2, lr: Long_Block_type;
   begin
-    if DEBUG then Check_internal.Test(i1); end if;
+    if Debug then Check_internal.Test(i1); end if;
     if i2=0 then raise Division_by_zero; end if;
 
     if i1.zero then -- 15-Feb-2002: 0/i2
@@ -1021,13 +1020,13 @@ package body Multi_precision_integers is
       procedure Normalization ( source: in     Multi_int;
                                 target: in out Multi_int ) is
         carry: Block_type:= 0;
-        tl: constant index_int:= target.last_used;
+        tl: constant Index_int:= target.last_used;
         blk:  Block_type;
       begin
         for i in 0 .. source.last_used loop
           blk:= source.blk(i);
-          target.blk(i) := Shift_left(blk, shift) + carry;
-          carry         := Shift_right(blk, Block_type_bits - shift);
+          target.blk(i) := Shift_Left(blk, shift) + carry;
+          carry         := Shift_Right(blk, Block_type_bits - shift);
         end loop;
         if source.last_used < tl then
           target.blk(source.last_used+1):= carry;
@@ -1043,14 +1042,14 @@ package body Multi_precision_integers is
       begin
         for i in reverse 0 .. m.last_used loop
           blk:= m.blk(i);
-          m.blk(i) := Shift_right(blk, shift) + carry;
-          carry    := Shift_left(blk, Block_type_bits - shift);
+          m.blk(i) := Shift_Right(blk, shift) + carry;
+          carry    := Shift_Left(blk, Block_type_bits - shift);
         end loop;
       end Unnormalization;
 
     begin -- Divide_absolute (multi u / multi v)
 
-      if DEBUG then
+      if Debug then
         if v.zero then raise v_zero; end if;
         if v1=0 then raise v1_zero; end if;
       end if;
@@ -1110,8 +1109,8 @@ package body Multi_precision_integers is
 
     end Divide_absolute;
 
-    l1: constant index_int:= i1.last_used;
-    l2: constant index_int:= i2.last_used;
+    l1: constant Index_int:= i1.last_used;
+    l2: constant Index_int:= i2.last_used;
     rl: Long_Block_type;
   begin -- Div_Rem_internal
     if i2.zero then raise Division_by_zero; end if;
@@ -1196,7 +1195,7 @@ package body Multi_precision_integers is
 
   procedure Div_Rem (i1,i2: in Multi_int; q,r: out Multi_int) is
   begin
-    if DEBUG then
+    if Debug then
       declare
         m1: constant Multi_int:= i1;
         m2: constant Multi_int:= i2;
@@ -1211,7 +1210,7 @@ package body Multi_precision_integers is
 
   procedure Divide (i1,i2: in Multi_int; q: out Multi_int) is
   begin
-    if DEBUG then
+    if Debug then
       declare
         m1: constant Multi_int:= i1;
         m2: constant Multi_int:= i2;
@@ -1345,7 +1344,7 @@ package body Multi_precision_integers is
   end Power;
 
   function "**" (i: Multi_int; n: Natural) return Multi_int is
-    ipn: Multi_int( (1+i.last_used) * index_int(n)+2 );
+    ipn: Multi_int( (1+i.last_used) * Index_int(n)+2 );
   begin
     Power(i,n,ipn);
     return ipn;
@@ -1396,11 +1395,11 @@ package body Multi_precision_integers is
           if Even(nn) then                -- x^(2 c) = (x^2) ^c
             Mult(i0,i0, i0);
             Div_Rem(nn, 2, nn, dummy_b);  -- nn:= nn/2
-            Div_rem(i0,modulo,dummy,i0);  -- i0:= i0 mod modulo
+            Div_Rem(i0,modulo,dummy,i0);  -- i0:= i0 mod modulo
           else
             Mult(i0,ii, ii);
             Subtract( nn, one, nn );      -- nn:= nn - 1;
-            Div_rem(ii,modulo,dummy,ii);  -- ii:= ii mod modulo
+            Div_Rem(ii,modulo,dummy,ii);  -- ii:= ii mod modulo
           end if;
         end loop;
         Fill( ipn, ii);

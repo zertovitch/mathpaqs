@@ -11,71 +11,70 @@
 with Ada.Numerics.Generic_Real_Arrays;
 
 generic
-  type Real is digits <> ;
-  with package Real_Arrays is new Ada.Numerics.Generic_Real_Arrays(Real);
+  type Real is digits <>;
+  with package Real_Arrays is new Ada.Numerics.Generic_Real_Arrays (Real);
   type Integer_Vector is array (Integer range <>) of Integer;
 
 package Generic_Real_Linear_Equations is
 
   use Real_Arrays;
 
-  function Linear_Equations ( A : REAL_MATRIX ;
-                              Y : REAL_VECTOR ) return REAL_VECTOR ;
+  function Linear_Equations ( A : Real_Matrix ;
+                              Y : Real_Vector ) return Real_Vector ;
 
-  function Linear_Equations ( A : REAL_MATRIX ;
-                              Y : REAL_MATRIX ) return REAL_MATRIX ;
+  function Linear_Equations ( A : Real_Matrix ;
+                              Y : Real_Matrix ) return Real_Matrix ;
 
-  function Determinant_JS ( A : REAL_MATRIX ) return REAL ;
-  -- Added "_JS" to address ambiguity with
-  -- Ada.Numerics.Generic_Real_Arrays.Determinant
+  --  Suffix "_JS" was added to address ambiguity with
+  --  Ada 2005's Ada.Numerics.Generic_Real_Arrays.Determinant and .Inverse
 
-  function Inverse_JS ( A : REAL_MATRIX ) return REAL_MATRIX ;
-  -- Added "_JS" to address ambiguity with
-  -- Ada.Numerics.Generic_Real_Arrays.Inverse
+  function Determinant_JS ( A : Real_Matrix ) return Real ;
 
-  procedure Inverse_JS ( A : in out REAL_MATRIX ) ;
+  function Inverse_JS ( A : Real_Matrix ) return Real_Matrix ;
 
-  function Crout_Solve ( A : REAL_MATRIX ;
-                         Y : REAL_VECTOR ) return REAL_VECTOR ;
-  -- !! Flawed !!
+  procedure Inverse_JS ( A : in out Real_Matrix ) ;
 
-  function Cholesky_Decomposition ( A : REAL_MATRIX) return REAL_MATRIX ;
+  -- !! Crout_Solve is flawed !!
+  function Crout_Solve ( A : Real_Matrix ;
+                         Y : Real_Vector ) return Real_Vector ;
 
-  function Cholesky_Solve ( L : REAL_MATRIX ;
-                            Y : REAL_VECTOR ) return REAL_VECTOR ;
+  function Cholesky_Decomposition ( A : Real_Matrix) return Real_Matrix ;
 
-  procedure LU_Decomposition ( A : REAL_MATRIX ;
-                               L : in out REAL_MATRIX ;
-                               U : in out REAL_MATRIX ;
-                               P : in out INTEGER_VECTOR) ;
+  function Cholesky_Solve ( L : Real_Matrix ;
+                            Y : Real_Vector ) return Real_Vector ;
 
-  function LU_Solve ( L : REAL_MATRIX ;
-                      U : REAL_MATRIX ;
-                      P : INTEGER_VECTOR ;
-                      Y : REAL_VECTOR ) return REAL_VECTOR ;
+  procedure LU_Decomposition ( A : Real_Matrix ;
+                               L : in out Real_Matrix ;
+                               U : in out Real_Matrix ;
+                               P : in out Integer_Vector) ;
 
-  procedure QR_Decomposition ( A : REAL_MATRIX ;
-                               Q : in out REAL_MATRIX ;
-                               R : in out REAL_MATRIX ) ;
-  -- !! Fixed, but still implemented only for square matrices !!
+  function LU_Solve ( L : Real_Matrix ;
+                      U : Real_Matrix ;
+                      P : Integer_Vector ;
+                      Y : Real_Vector ) return Real_Vector ;
 
-  function QR_Solve ( Q : REAL_MATRIX ;
-                      R : REAL_MATRIX ;
-                      Y : REAL_VECTOR ) return REAL_VECTOR ;
+  -- !! QR_Decomposition fixed, but still implemented only for square matrices !!
+  procedure QR_Decomposition ( A : Real_Matrix ;
+                               Q : in out Real_Matrix ;
+                               R : in out Real_Matrix ) ;
 
-  procedure SV_Decomposition ( A : REAL_MATRIX ;
-                               UU : in out REAL_MATRIX ;
-                               VV : in out REAL_MATRIX ;
-                               WW : in out REAL_VECTOR ) ;
-  -- !! Caution - not tested !!
+  function QR_Solve ( Q : Real_Matrix ;
+                      R : Real_Matrix ;
+                      Y : Real_Vector ) return Real_Vector ;
 
-  function SV_SOLVE ( U : REAL_MATRIX ;
-                      V : REAL_MATRIX ;
-                      W : REAL_VECTOR ;
-                      Y : REAL_VECTOR ) return REAL_VECTOR ;
-  -- !! Caution - not tested !!
+  -- !! SV_Decomposition: Caution - not tested !!
+  procedure SV_Decomposition ( A : Real_Matrix ;
+                               UU : in out Real_Matrix ;
+                               VV : in out Real_Matrix ;
+                               WW : in out Real_Vector ) ;
 
-  Matrix_Data_Error : exception; -- raised for singular, non positive definate,
-                                 -- not symmetric, etc.
+  -- !! SV_Solve: Caution - not tested !!
+  function SV_Solve ( U : Real_Matrix ;
+                      V : Real_Matrix ;
+                      W : Real_Vector ;
+                      Y : Real_Vector ) return Real_Vector ;
+
+  --  Matrix_Data_Error is raised for singular, non positive definate, not symmetric, etc.
+  Matrix_Data_Error : exception;
 
 end Generic_Real_Linear_Equations ;

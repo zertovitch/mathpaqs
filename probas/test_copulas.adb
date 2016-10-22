@@ -33,7 +33,7 @@ procedure Test_Copulas is
 
   use GRA, GRLE, RIO;
 
-  procedure Put (A: Real_Matrix) is
+  procedure Put (A : Real_Matrix) is
   begin
     for i in A'Range(1) loop
       for j in A'Range(2) loop
@@ -43,15 +43,15 @@ procedure Test_Copulas is
     end loop;
   end Put;
 
-  procedure Test (A: Real_Matrix; res_name: String) is
-    dim_dep : constant Integer:= A'Length(1);
-    dim_indep : constant:= 3;
-    U01 : Real_Vector(1..dim_dep + dim_indep);
+  procedure Test (A : Real_Matrix; res_name: String) is
+    dim_dep : constant Integer := A'Length(1);
+    dim_indep : constant := 3;
+    U01 : Real_Vector (1..dim_dep + dim_indep);
     gen : RRand.Generator;
     use RCopulas;
     copula : Copula_access;
     f : File_Type;
-    L, B : Real_Matrix(A'Range(1), A'Range(2));
+    L, B : Real_Matrix (A'Range(1), A'Range(2));
   begin
     RRand.Reset (gen, 1);
     Construct_as_Gauss (copula, U01'Length, A);

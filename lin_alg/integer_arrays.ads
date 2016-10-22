@@ -1,3 +1,2 @@
-with GENERIC_INTEGER_ARRAYS;
-package INTEGER_ARRAYS is new GENERIC_INTEGER_ARRAYS(INTEGER);
-
+with Generic_Integer_Arrays;
+package Integer_Arrays is new Generic_Integer_Arrays(Integer);

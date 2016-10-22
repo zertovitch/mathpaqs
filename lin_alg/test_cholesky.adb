@@ -27,7 +27,7 @@ procedure Test_Cholesky is
 
   procedure Test(A: Real_Matrix) is
     L: constant Real_Matrix:= Cholesky_Decomposition(A);
-    Z: Real_Matrix:= L * Transpose(L) - A;
+    Z: constant Real_Matrix:= L * Transpose(L) - A;
     res: Real:= 0.0;
   begin
     Put_Line("**** Cholesky test A -> LLt. L is:");
@@ -104,7 +104,6 @@ procedure Test_Cholesky is
      (0.220941872,0.125058374,0.771433321,0.126700801,0.357096234,0.223206125,0.34655883,0.590969335,0.106564872,1.0,0.336377923),
      (0.58522569,0.241961514,0.459226654,0.442256325,0.587073948,0.7051084,0.68599411,0.270136942,0.219436259,0.336377923,1.0)
     );
-
 
 begin
   Test( A33 );

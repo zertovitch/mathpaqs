@@ -1,4 +1,4 @@
--- integer_arrays_io.adb    generic package body 
+-- integer_arrays_io.adb    generic package body
 
 package body Integer_Arrays_IO is
 

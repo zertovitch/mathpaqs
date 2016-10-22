@@ -11,83 +11,80 @@ with Ada.Text_IO;
 with IO_Exceptions;
 with Generic_Integer_Arrays;
 
-generic 
- 
+generic
+
   type Integer_Type is range <>;
   with package Integer_Arrays is new Generic_Integer_Arrays(Integer_Type);
 
+package Integer_Arrays_IO is
 
-package INTEGER_ARRAYS_IO is
- 
   use Integer_Arrays;
 
   package INTEGER_TYPE_IO is new Ada.Text_IO.INTEGER_IO(INTEGER_TYPE);
      -- to get DEFAULT_FORE, DEFAULT_AFT and DEFAULT_EXP for specifications
      -- later used in body for actual GET's and PUT's of array components
- 
-  procedure GET (FILE  : in  Ada.Text_IO.FILE_TYPE;
-                 ITEM  : out INTEGER_TYPE;
-                 WIDTH : in Ada.Text_IO.FIELD := 0)
+
+  procedure Get (FILE  : in  Ada.Text_IO.File_Type;
+                 ITEM  : out Integer_Type;
+                 WIDTH : in Ada.Text_IO.Field := 0)
                                                  renames INTEGER_TYPE_IO.GET;
- 
-  procedure GET (ITEM : out INTEGER_TYPE; 
-                 WIDTH : in Ada.Text_IO.FIELD := 0)
+
+  procedure Get (ITEM : out Integer_Type;
+                 WIDTH : in Ada.Text_IO.Field := 0)
                                                  renames INTEGER_TYPE_IO.GET;
- 
-  procedure PUT (FILE  : in  Ada.Text_IO.FILE_TYPE;
-                 ITEM  : in INTEGER_TYPE;
-                 WIDTH : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_WIDTH;
-                 BASE  : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_BASE)
+
+  procedure Put (FILE  : in  Ada.Text_IO.File_Type;
+                 ITEM  : in Integer_Type;
+                 WIDTH : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Width;
+                 BASE  : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Base)
                                                  renames INTEGER_TYPE_IO.PUT;
- 
-  procedure PUT (ITEM : in INTEGER_TYPE;
-                 WIDTH : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_WIDTH;
-                 BASE  : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_BASE)
+
+  procedure Put (ITEM  : in Integer_Type;
+                 WIDTH : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Width;
+                 BASE  : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Base)
                                                  renames INTEGER_TYPE_IO.PUT;
- 
-  procedure GET (FROM : in STRING; 
-                 ITEM : out INTEGER_TYPE;
-                 LAST : out POSITIVE) renames INTEGER_TYPE_IO.GET;
- 
-  procedure PUT (TO   : out STRING;
-                 ITEM : in INTEGER_TYPE;
-                 BASE  : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_BASE)
+
+  procedure Get (FROM : in String;
+                 ITEM : out Integer_Type;
+                 LAST : out Positive) renames INTEGER_TYPE_IO.GET;
+
+  procedure Put (TO    : out String;
+                 ITEM  : in Integer_Type;
+                 BASE  : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Base)
                                                  renames INTEGER_TYPE_IO.PUT;
- 
 
-  procedure PUT (A    : in INTEGER_MATRIX ;
-                 WIDTH : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_WIDTH;
-                 BASE  : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_BASE);
+  procedure Put (A     : in Integer_Matrix ;
+                 WIDTH : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Width;
+                 BASE  : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Base);
 
-  procedure PUT (V    : in INTEGER_VECTOR ;
-                 WIDTH : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_WIDTH;
-                 BASE  : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_BASE);
+  procedure Put (V     : in Integer_Vector ;
+                 WIDTH : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Width;
+                 BASE  : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Base);
 
-  procedure GET (A     : out INTEGER_MATRIX ;
-                 WIDTH : in Ada.Text_IO.FIELD := 0);
+  procedure Get (A     : out Integer_Matrix ;
+                 WIDTH : in Ada.Text_IO.Field := 0);
 
-  procedure GET (V     : out INTEGER_VECTOR ;
-                 WIDTH : in Ada.Text_IO.FIELD := 0);
+  procedure Get (V     : out Integer_Vector ;
+                 WIDTH : in Ada.Text_IO.Field := 0);
 
+  procedure Put (FILE  : in  Ada.Text_IO.File_Type;
+                 A     : in Integer_Matrix ;
+                 WIDTH : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Width;
+                 BASE  : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Base);
 
-  procedure PUT (FILE  : in  Ada.Text_IO.FILE_TYPE;
-                 A    : in INTEGER_MATRIX ;
-                 WIDTH : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_WIDTH;
-                 BASE  : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_BASE);
+  procedure Put (FILE  : in  Ada.Text_IO.File_Type;
+                 V     : in Integer_Vector ;
+                 WIDTH : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Width;
+                 BASE  : in Ada.Text_IO.Field := INTEGER_TYPE_IO.Default_Base);
 
-  procedure PUT (FILE  : in  Ada.Text_IO.FILE_TYPE;
-                 V    : in INTEGER_VECTOR ;
-                 WIDTH : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_WIDTH;
-                 BASE  : in Ada.Text_IO.FIELD := INTEGER_TYPE_IO.DEFAULT_BASE);
+  procedure Get (FILE  : in  Ada.Text_IO.File_Type;
+                 A     : out Integer_Matrix ;
+                 WIDTH : in Ada.Text_IO.Field := 0);
 
-  procedure GET (FILE  : in  Ada.Text_IO.FILE_TYPE;
-                 A     : out INTEGER_MATRIX ;
-                 WIDTH : in Ada.Text_IO.FIELD := 0);
+  procedure Get (FILE  : in  Ada.Text_IO.File_Type;
+                 V     : out Integer_Vector ;
+                 WIDTH : in Ada.Text_IO.Field := 0);
 
-  procedure GET (FILE  : in  Ada.Text_IO.FILE_TYPE;
-                 V     : out INTEGER_VECTOR ;
-                 WIDTH : in Ada.Text_IO.FIELD := 0);
+  End_Error : exception renames IO_Exceptions.End_Error ;
 
-  End_Error : exception renames IO_EXCEPTIONS.END_ERROR ;
- 
 end Integer_Arrays_IO;

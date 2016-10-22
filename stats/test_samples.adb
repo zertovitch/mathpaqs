@@ -8,18 +8,18 @@ procedure Test_Samples is
   type Real is digits 14;
   type Quantile_table is array(Positive range <>) of Real;
 
-  package RS is new Samples(Real, Quantile_table, True);
+  package RS is new Samples (Real, Quantile_table, True);
 
-  package GRF is new Generic_Random_Functions(Real);
-  package RUR is new U_Rand(Real);
-  Gen: RUR.Generator;
+  package GRF is new Generic_Random_Functions (Real);
+  package RUR is new U_Rand (Real);
+  Gen : RUR.Generator;
 
-  function Uni01 return Real is begin return RUR.Random(Gen); end;
-  function Poisson is new GRF.Poisson(Uni01);
+  function Uni01 return Real is begin return RUR.Random (Gen); end Uni01;
+  function Poisson is new GRF.Poisson (Uni01);
 
-  s: RS.Sample(10_000);
+  s : RS.Sample(10_000);
 
-  level: constant Quantile_table:=
+  level : constant Quantile_table:=
    (0.0, 0.0001, 0.001, 0.01,
     0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09,
     0.1, 0.2, 0.25,
@@ -37,22 +37,22 @@ procedure Test_Samples is
   -- write.csv2(quantile(t, c(0.0, 0.0001, 0.001, 0.01, ...)),file="quant.csv")
   -- ^ this is written in the R commands file
 
-  m: RS.Measure(level'Last);
+  m : RS.Measure(level'Last);
 
-  package RIO is new Ada.Text_IO.Float_IO(Real);
+  package RIO is new Ada.Text_IO.Float_IO (Real);
   use RIO;
 
-  f, r_commands: File_Type;
+  f, r_commands : File_Type;
 
-  sep: constant Character:= ';';
+  sep : constant Character:= ';';
 
-  procedure Title(t: String) is
+  procedure Title (t: String) is
   begin
-    Put_Line(t);
-    Put_Line(f, t & sep & "------------");
+    Put_Line (t);
+    Put_Line (f, t & sep & "------------");
   end Title;
 
-  procedure Display_Measure(m: RS.Measure) is
+  procedure Display_Measure (m: RS.Measure) is
   begin
     Put("Mean:"); Put(m.mean); New_Line;
     Put("Std dev:"); Put(m.std_dev); New_Line;

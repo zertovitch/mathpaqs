@@ -18,9 +18,9 @@ procedure Test_Normal is
   use GRF, RIO;
 
   max : constant := 2000;
-  bound : constant:= 8.0;
+  bound : constant := 8.0;
 
-  x, y, z, diff, max_diff, sum_diff, avg_diff: Real;
+  x, y, z, diff, max_diff, sum_diff, avg_diff : Real;
 
 begin
   Put_Line("Real'Digits =" & Integer'Image(Real'Digits));

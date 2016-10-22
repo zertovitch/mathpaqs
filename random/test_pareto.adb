@@ -12,27 +12,27 @@ procedure Test_Pareto is
 
   -- Several choices there:
   type Real is digits 15;
-  only_mean: constant Boolean:= False;
+  only_mean : constant Boolean:= False;
   -- use_pow  : constant Boolean:= True;
 
-  package Real_U_Rand is new U_Rand(Real);
+  package Real_U_Rand is new U_Rand (Real);
 
   -- *** Choice of a random generator: A.N.F_R, or U_Rand (faster), or...:
   package RRand renames Real_U_Rand;
   use RRand;
 
-  package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
+  package REF is new Ada.Numerics.Generic_Elementary_Functions (Real);
   use REF;
 
   -- function Pow (X, Y : Long_Float) return Long_Float is
   -- pragma Import (C, Pow, "pow");
 
-  package RRF is new Generic_Random_Functions(Real);
+  package RRF is new Generic_Random_Functions (Real);
   use RRF;
 
   type Quantile_table is array(Positive range <>) of Real;
 
-  quantiles: constant Quantile_table:=
+  quantiles : constant Quantile_table:=
   (
     0.1,
     0.2,
@@ -72,19 +72,19 @@ procedure Test_Pareto is
     1.0       -- infinity...
   );
 
-  iter: constant:= 4_000_000;
-  bins: constant:= 200_000;
+  iter : constant:= 4_000_000;
+  bins : constant:= 200_000;
 
-  scale: constant:= 100.0; -- 1_000_000.0;
+  scale : constant:= 100.0; -- 1_000_000.0;
 
-  minimum: constant:= scale * 5.0;
-  maximum: constant:= scale * 10.0;
-  big_maximum: constant:= maximum * 100.0;
+  minimum : constant:= scale * 5.0;
+  maximum : constant:= scale * 10.0;
+  big_maximum : constant:= maximum * 100.0;
 
-  threshold: constant:=  scale;
-  alpha    : constant:=  1.5;
+  threshold : constant :=  scale;
+  alpha     : constant :=  1.5;
 
-  package My_Samples is new Samples(Real, Quantile_table, True);
+  package My_Samples is new Samples (Real, Quantile_table, True);
   use My_Samples;
 
   samp_X, samp_Y: Sample(bins);
@@ -132,8 +132,8 @@ begin
   else
     meas_X.level:= quantiles;
     meas_Y.level:= quantiles;
-    Get_Measures(samp_X, meas_X);
-    Get_Measures(samp_Y, meas_Y);
+    Get_measures(samp_X, meas_X);
+    Get_measures(samp_Y, meas_Y);
   end if;
   T1:= Clock;
   --

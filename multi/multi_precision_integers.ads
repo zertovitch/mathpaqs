@@ -42,7 +42,7 @@ package Multi_precision_integers is
 
   -- THE multi-precision integer type --
 
-  type Multi_int(n: Index_int) is private;
+  type Multi_int (n: Index_int) is private;
 
   -- Integer type for small values --
 
@@ -54,33 +54,33 @@ package Multi_precision_integers is
   -- CAUTION: Debug = True reduces monstruously the performance --
   ----------------------------------------------------------------
 
-  Debug: constant Boolean:= False;
+  Debug : constant Boolean:= False;
 
   ---------------------------------------------
   ----- Informations, conversions, filling ----
   ---------------------------------------------
 
   -- Convert Basic_int to Multi_int
-  function Multi(small: Basic_int) return Multi_int;
+  function Multi (small: Basic_int) return Multi_int;
 
   -- Convert Multi_int to Basic_int (when possible, else: Cannot_fit raised)
-  function Basic(large: Multi_int) return Basic_int;
+  function Basic (large: Multi_int) return Basic_int;
 
   -- Fill an Multi_int of greater array dimension with a smaller one
-  procedure Fill(what: out Multi_int; with_smaller: Multi_int);
-  procedure Fill(what: out Multi_int; with_basic: Basic_int);
+  procedure Fill (what: out Multi_int; with_smaller: Multi_int);
+  procedure Fill (what: out Multi_int; with_basic: Basic_int);
 
   -- Comparisons
-  function Equal (i1,i2: Multi_int) return boolean;
-  function Equal (i1: Multi_int; i2:Basic_int) return boolean;
-  function ">" (i1,i2: Multi_int) return Boolean;
-  function ">" (i1: Multi_int; i2:Basic_int) return Boolean;
-  function "<" (i1,i2: Multi_int) return Boolean;
-  function "<" (i1: Multi_int; i2:Basic_int) return Boolean;
-  function ">=" (i1,i2: Multi_int) return Boolean;
-  function ">=" (i1: Multi_int; i2:Basic_int) return Boolean;
-  function "<=" (i1,i2: Multi_int) return Boolean;
-  function "<=" (i1: Multi_int; i2:Basic_int) return Boolean;
+  function Equal (i1, i2: Multi_int) return Boolean;
+  function Equal (i1 : Multi_int; i2:Basic_int) return Boolean;
+  function ">" (i1, i2: Multi_int) return Boolean;
+  function ">" (i1 : Multi_int; i2:Basic_int) return Boolean;
+  function "<" (i1, i2: Multi_int) return Boolean;
+  function "<" (i1 : Multi_int; i2:Basic_int) return Boolean;
+  function ">=" (i1, i2: Multi_int) return Boolean;
+  function ">=" (i1 : Multi_int; i2:Basic_int) return Boolean;
+  function "<=" (i1, i2: Multi_int) return Boolean;
+  function "<=" (i1 : Multi_int; i2:Basic_int) return Boolean;
 
   -- Other informations
   function Bits_per_block return Positive;
@@ -94,16 +94,16 @@ package Multi_precision_integers is
   ----- Unary operators -----
   ---------------------------
 
-  procedure Opp(i: in out Multi_int);
-  function "+" (i: Multi_int) return Multi_int;
-  function "-" (i: Multi_int) return Multi_int;
+  procedure Opp (i: in out Multi_int);
+  function "+" (i : Multi_int) return Multi_int;
+  function "-" (i : Multi_int) return Multi_int;
 
-  procedure Abso(i: in out Multi_int);
-  function "ABS" (i: Multi_int) return Multi_int;
+  procedure Abso (i: in out Multi_int);
+  function "ABS" (i : Multi_int) return Multi_int;
 
-  function Sign(i: Multi_int) return Basic_int;
-  function Even(i: Multi_int) return Boolean;
-  function Odd (i: Multi_int) return Boolean;
+  function Sign (i: Multi_int) return Basic_int;
+  function Even (i: Multi_int) return Boolean;
+  function Odd (i : Multi_int) return Boolean;
 
   ----------------------------
   ----- Binary operators -----
@@ -113,64 +113,64 @@ package Multi_precision_integers is
   -- Addition, subtraction --
   ---------------------------
 
-  procedure Add(i1,i2: in Multi_int; i3: in out Multi_int);
+  procedure Add (i1,i2: in Multi_int; i3: in out Multi_int);
 
-  function "+" (i1,i2: Multi_int) return Multi_int;
-  function "+" (i1: Multi_int; i2: Basic_int) return Multi_int;
-  function "+" (i1: Basic_int; i2: Multi_int) return Multi_int;
+  function "+" (i1, i2: Multi_int) return Multi_int;
+  function "+" (i1 : Multi_int; i2: Basic_int) return Multi_int;
+  function "+" (i1 : Basic_int; i2: Multi_int) return Multi_int;
 
-  procedure Sub     (i1,i2: in Multi_int; i3: in out Multi_int);
-  procedure Subtract(i1,i2: in Multi_int; i3: in out Multi_int)
+  procedure Sub      (i1, i2: in Multi_int; i3: in out Multi_int);
+  procedure Subtract (i1,i2: in Multi_int; i3: in out Multi_int)
     renames Sub;
 
-  function "-" (i1,i2: Multi_int) return Multi_int;
-  function "-" (i1: Multi_int; i2: Basic_int) return Multi_int;
-  function "-" (i1: Basic_int; i2: Multi_int) return Multi_int;
+  function "-" (i1, i2: Multi_int) return Multi_int;
+  function "-" (i1 : Multi_int; i2: Basic_int) return Multi_int;
+  function "-" (i1 : Basic_int; i2: Multi_int) return Multi_int;
 
   --------------------
   -- Multiplication --
   --------------------
 
-  procedure Multiply(i1,i2: in Multi_int; i3: in out Multi_int);
-  procedure Mult    (i1,i2: in Multi_int; i3: in out Multi_int)
+  procedure Multiply (i1,i2: in Multi_int; i3: in out Multi_int);
+  procedure Mult     (i1, i2: in Multi_int; i3: in out Multi_int)
     renames Multiply;
 
-  procedure Multiply(i1: in Multi_int; i2: Basic_int; i3: in out Multi_int);
-  procedure Mult    (i1: in Multi_int; i2: Basic_int; i3: in out Multi_int)
+  procedure Multiply (i1: in Multi_int; i2: Basic_int; i3: in out Multi_int);
+  procedure Mult     (i1 : in Multi_int; i2: Basic_int; i3: in out Multi_int)
     renames Multiply;
 
-  function "*" (i1,i2: Multi_int) return Multi_int;
-  function "*" (i1: Multi_int; i2: Basic_int) return Multi_int;
-  function "*" (i1: Basic_int; i2: Multi_int) return Multi_int;
+  function "*" (i1, i2: Multi_int) return Multi_int;
+  function "*" (i1 : Multi_int; i2: Basic_int) return Multi_int;
+  function "*" (i1 : Basic_int; i2: Multi_int) return Multi_int;
 
   -------------------------
   -- Division, Remainder --
   -------------------------
 
-  procedure Div_Rem (i1: in     Multi_int; i2: in     Basic_int;
-                     q :    out Multi_int;  r:    out Basic_int);
-  procedure Div_Rem (i1,i2: in Multi_int; q,r:    out Multi_int);
+  procedure Div_Rem (i1 : in     Multi_int; i2: in     Basic_int;
+                     q  :    out Multi_int; r :    out Basic_int);
+  procedure Div_Rem (i1, i2: in Multi_int;  q,r:   out Multi_int);
 
-  procedure Divide (i1,i2: in Multi_int; q: out Multi_int);
+  procedure Divide (i1, i2: in Multi_int; q: out Multi_int);
 
-  function "/" (i1,i2: Multi_int) return Multi_int;
-  function "/" (i1: Multi_int; i2: Basic_int) return Multi_int;
-  function "Rem" (i1,i2: Multi_int) return Multi_int;
-  function "Rem" (i1: Multi_int; i2: Basic_int) return Multi_int;
-  function "Rem" (i1: Multi_int; i2: Basic_int) return Basic_int;
-  function "Mod" (i1,i2: Multi_int) return Multi_int;
-  function "Mod" (i1: Multi_int; i2: Basic_int) return Multi_int;
-  function "Mod" (i1: Multi_int; i2: Basic_int) return Basic_int;
+  function "/" (i1, i2: Multi_int) return Multi_int;
+  function "/" (i1 : Multi_int; i2: Basic_int) return Multi_int;
+  function "Rem" (i1, i2: Multi_int) return Multi_int;
+  function "Rem" (i1 : Multi_int; i2: Basic_int) return Multi_int;
+  function "Rem" (i1 : Multi_int; i2: Basic_int) return Basic_int;
+  function "Mod" (i1, i2: Multi_int) return Multi_int;
+  function "Mod" (i1 : Multi_int; i2: Basic_int) return Multi_int;
+  function "Mod" (i1 : Multi_int; i2: Basic_int) return Basic_int;
 
   -----------
   -- Power --
   -----------
 
-  procedure Power (i: Multi_int; n: Natural; ipn: out Multi_int);
-  function "**" (i: Multi_int; n: Natural) return Multi_int;
+  procedure Power (i : Multi_int; n: Natural; ipn: out Multi_int);
+  function "**" (i : Multi_int; n: Natural) return Multi_int;
   -- + 26-Mar-2002 :
-  procedure Power (i: Multi_int; n: Multi_int; ipn: out Multi_int;
-                   modulo: Multi_int);
+  procedure Power (i : Multi_int; n: Multi_int; ipn: out Multi_int;
+                   modulo : Multi_int);
 
   Cannot_fit, Empty_multi_int : exception;
 
@@ -178,13 +178,12 @@ package Multi_precision_integers is
 
   Result_undersized,
   Quotient_undersized,
-  Remainder_undersized: exception;
+  Remainder_undersized : exception;
 
+  Division_by_zero : exception;
 
-  Division_by_zero: exception;
-
-  Zero_power_zero, Power_negative: exception;
-  Power_modulo_non_positive: exception;
+  Zero_power_zero, Power_negative : exception;
+  Power_modulo_non_positive : exception;
 
 private
 

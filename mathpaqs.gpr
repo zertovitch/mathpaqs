@@ -61,7 +61,7 @@ project Mathpaqs is
                 "-gnatybfhiu",  --  Style: check b:no blanks at end of lines, f:no ff/vtabs, h: no htabs, i:if-then layout, u:no unnecessary blank lines
                 "-gnatyx",      --  Style: check x:no extra parens
                 "-gnatye",      --  Style: check e:end/exit labels present
-                "-gnaty2CM100OSt"
+                "-gnaty2CM100OS"  --  disabled: t (token sep.)
               );
          when "Fast" =>
             for Default_Switches ("ada") use Common_Options & Fast_Options;
