@@ -11,7 +11,7 @@ package body Copulas is
 
   use GRF, GRLE;
 
-  function Simulate(C: Independent_Copula; gen: Generator) return Real_Vector is
+  overriding function Simulate(C: Independent_Copula; gen: Generator) return Real_Vector is
     r: Real_Vector(1..C.dim);
   begin
     -- Build an independent U(0,1) vector
@@ -21,7 +21,17 @@ package body Copulas is
     return r;
   end Simulate;
 
-  function Simulate(C: Gauss_Copula; gen: Generator) return Real_Vector is
+  overriding function Simulate(C: Independent_Copula; gen: Generator_Vector) return Real_Vector is
+    r: Real_Vector(1..C.dim);
+  begin
+    -- Build an independent U(0,1) vector
+    for z in r'Range loop
+      r(z):= Real(Random(gen(z)));
+    end loop;
+    return r;
+  end Simulate;
+
+  overriding function Simulate(C: Gauss_Copula; gen: Generator) return Real_Vector is
     r: Real_Vector(1..C.dim);
   begin
     -- Start with an independent U(0,1) vector
@@ -44,6 +54,27 @@ package body Copulas is
       r(z):= Normal_CDF(r(z));
     end loop;
     --      Now r is U(0,1) with a Gaussian dependence on 1..dim_dep
+    return r;
+  end Simulate;
+
+  --  This version is identical to the single-generator one, except there is one generator
+  --  per dimension
+  --
+  overriding function Simulate(C: Gauss_Copula; gen: Generator_Vector) return Real_Vector is
+    r: Real_Vector(1..C.dim);
+  begin
+    for z in r'Range loop
+      r(z):= Real(Random(gen(z)));
+    end loop;
+    for z in 1..C.dim_dep loop
+      r(z):= Normal_inverse_CDF(r(z));
+    end loop;
+    if C.dim_dep > 0 then
+      r(1..C.dim_dep):= C.Sqrt_Correl_Matrix.all * r(1..C.dim_dep);
+    end if;
+    for z in 1..C.dim_dep loop
+      r(z):= Normal_CDF(r(z));
+    end loop;
     return r;
   end Simulate;
 
@@ -90,6 +121,6 @@ package body Copulas is
   procedure Dispose(C: in out Copula_access) is
   begin
     Dispose_internal(C);
-  end;
+  end Dispose;
 
 end Copulas;

@@ -8,11 +8,11 @@
 --   separately from the random distributions themselves.
 --
 -- Author: G. de Montmollin, January 2009 and later
---         http://gautiersblog.blogspot.com/
+--         http://gautiersblog.blogspot.ch/search/label/Ada
 --
 -- Legal licensing note:
 --
---  Copyright (c) 2009..2013 Gautier de Montmollin
+--  Copyright (c) 2009 .. 2016 Gautier de Montmollin
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -76,8 +76,15 @@ package Copulas is
   -- Produce a uniform U(0,1) pseudo-random vector generated
   -- by seed in 'gen' and having dependencies from copula 'C'.
 
-  function Simulate (C: Copula; gen: Generator) return Real_Vector
-  is abstract;
+  function Simulate (C: Copula; gen: Generator) return Real_Vector is abstract;
+
+  type Generator_Vector is array (Integer range <>) of Generator;
+
+  --  Variant with a vector of pseudo-random generators instead of a single generator.
+  --  This is useful if you want to attach one separate generator
+  --  to each dimension. This allows to reproduce results even when some dimensions disappear
+  --  or are inserted from a simulation to the next one.
+  function Simulate (C: Copula; gen: Generator_Vector) return Real_Vector is abstract;
 
   type Copula_access is access Copula'Class;
   procedure Dispose (C: in out Copula_access);
@@ -87,14 +94,16 @@ package Copulas is
   ------------------------
 
   type Independent_Copula is new Copula with private;
-  function Simulate (C: Independent_Copula; gen: Generator) return Real_Vector;
+  overriding function Simulate (C: Independent_Copula; gen: Generator) return Real_Vector;
+  overriding function Simulate (C: Independent_Copula; gen: Generator_Vector) return Real_Vector;
 
   ---------------------
   -- Gaussian copula --
   ---------------------
 
   type Gauss_Copula is new Copula with private;
-  function Simulate (C: Gauss_Copula; gen: Generator) return Real_Vector;
+  overriding function Simulate (C: Gauss_Copula; gen: Generator) return Real_Vector;
+  overriding function Simulate (C: Gauss_Copula; gen: Generator_Vector) return Real_Vector;
 
   procedure Construct_as_Gauss (
     C    : out Copula_access;
