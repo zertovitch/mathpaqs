@@ -31,13 +31,11 @@ package body Copulas is
     return r;
   end Simulate;
 
-  overriding function Simulate(C: Gauss_Copula; gen: Generator) return Real_Vector is
-    r: Real_Vector(1..C.dim);
+  --  Input  : independent U(0,1) vector
+  --  Output : U(0,1) vector with C's Gaussian dependency.
+  --
+  procedure Make_dependent(C: Gauss_Copula; r: in out Real_Vector) is
   begin
-    -- Start with an independent U(0,1) vector
-    for z in r'Range loop
-      r(z):= Real(Random(gen));
-    end loop;
     -- Treat the dimensions having dependencies.
     --   1) Uniform -> Normal
     for z in 1..C.dim_dep loop
@@ -54,27 +52,26 @@ package body Copulas is
       r(z):= Normal_CDF(r(z));
     end loop;
     --      Now r is U(0,1) with a Gaussian dependence on 1..dim_dep
+  end Make_dependent;
+
+  overriding function Simulate(C: Gauss_Copula; gen: Generator) return Real_Vector is
+    r: Real_Vector(1..C.dim);
+  begin
+    -- Start with an independent U(0,1) vector
+    for z in r'Range loop
+      r(z):= Real(Random(gen));
+    end loop;
+    Make_dependent(C, r);
     return r;
   end Simulate;
 
-  --  This version is identical to the single-generator one, except there is one generator
-  --  per dimension
-  --
   overriding function Simulate(C: Gauss_Copula; gen: Generator_Vector) return Real_Vector is
     r: Real_Vector(1..C.dim);
   begin
     for z in r'Range loop
       r(z):= Real(Random(gen(z)));
     end loop;
-    for z in 1..C.dim_dep loop
-      r(z):= Normal_inverse_CDF(r(z));
-    end loop;
-    if C.dim_dep > 0 then
-      r(1..C.dim_dep):= C.Sqrt_Correl_Matrix.all * r(1..C.dim_dep);
-    end if;
-    for z in 1..C.dim_dep loop
-      r(z):= Normal_CDF(r(z));
-    end loop;
+    Make_dependent(C, r);
     return r;
   end Simulate;
 

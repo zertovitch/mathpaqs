@@ -71,14 +71,15 @@ procedure Test_Copulas is
       end loop;
       New_Line(f);
     end loop;
-    Put_Line("Results in file: " & Name(f));
+    Put_Line("Results are stored in this file: " & Name(f));
     L:= Get_Cholesky_Matrix(Gauss_Copula(copula.all));
     B:= L * Transpose(L);
-    Put_Line("Matrix test (bitwise) " & Boolean'Image(A = B));
+    Put_Line("B:= L*Lt.");
+    Put_Line("A = B Matrix equality test (bitwise) " & Boolean'Image(A = B));
     Put_Line("A =");
     Put(A);
     New_Line;
-    Put_Line("B:= L*Lt =");
+    Put_Line("B =");
     Put(B);
     New_Line;
     Put_Line("L =");
