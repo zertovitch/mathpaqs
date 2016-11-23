@@ -6,8 +6,8 @@ package body U_Rand is
     CD     : constant := 7654321.0/16777216.0 ;
     CM     : constant := 16777213.0/16777216.0 ;
 
-    subtype RANGE_1 is INTEGER range 0..M1-1 ;
-    subtype RANGE_2 is INTEGER range 0..M2-1 ;
+    subtype RANGE_1 is Integer range 0..M1-1 ;
+    subtype RANGE_2 is Integer range 0..M2-1 ;
 
     procedure Start(Gen   : out Generator;
                     New_I : SEED_RANGE_1 := Default_I ;
@@ -22,8 +22,8 @@ package body U_Rand is
         L : RANGE_2 ;
     begin
         I := New_I ; J := New_J ; K := New_K ; L := New_L ;
-        Gen.NI := RANGE_3'last ;
-        Gen.NJ := (RANGE_3'last/3) + 1 ;
+        Gen.NI := RANGE_3'Last ;
+        Gen.NJ := (RANGE_3'Last/3) + 1 ;
         Gen.C := Init_C ;
 
         for II in RANGE_3 loop
@@ -41,21 +41,34 @@ package body U_Rand is
         end loop ;
     end Start ;
 
-    procedure Reset (Gen : out Generator; Initiator : Seed_Range_1) is
+    procedure Reset (Gen : out Generator; Initiator : Seed_range_for_Reset) is
+      ini: Seed_range_for_Reset:= Initiator;
+      I : SEED_RANGE_1;
+      J : SEED_RANGE_1;
+      K : SEED_RANGE_1;
+      L : SEED_RANGE_2;
     begin
-      Start(Gen, Initiator);
+      I:= 1 + ini mod (M1-1);
+      ini:= ini / (M1-1);
+      J:= 1 + ini mod (M1-1);
+      ini:= ini / (M1-1);
+      K:= 1 + ini mod (M1-1);
+      ini:= ini / (M1-1);
+      L:= 1 + ini mod (M2-1);
+      Start(Gen, I, J, K, L);
     end Reset;
 
     procedure Randomize (Gen : out Generator) is
       use Ada.Calendar;
       Day_Seconds: constant Day_Duration:= Seconds(Clock);
       All_Sec_Float, All_Sec_Trunc, Intra_Sec: Float;
-      All_Sec, Hour, Min, Sec, Cent : Integer;
+      All_Sec, Hour, Min, Sec, Cent, Ten_thousand : Integer;
     begin
       All_Sec_Float:= Float(Day_Seconds);
       All_Sec_Trunc:= Float'Floor(All_Sec_Float);
       Intra_Sec:= All_Sec_Float - All_Sec_Trunc;
       Cent:= Integer(Float'Floor(100.0 * Intra_Sec));
+      Ten_thousand:= Integer(Float'Floor(10_000.0 * Intra_Sec));
       All_Sec := Integer(All_Sec_Trunc);
       Hour:= All_Sec/3600;
       Min := (All_Sec/60) rem 60;
@@ -63,10 +76,10 @@ package body U_Rand is
       -- I, J, K must fit in 1..178; L must fit in 1..168.
       Start(
         Gen,
-        New_I => Hour + 1,
+        New_I => Hour + Cent + 1,
         New_J => Min + 1,
         New_K => Sec + 1,
-        New_L => Cent + 1
+        New_L => (Ten_thousand mod 100) + 1
       );
     end Randomize;
 
@@ -86,11 +99,11 @@ package body U_Rand is
         Genp.U(Genp.NI) := Temp;
         Genp.NI := Genp.NI - 1;
         if Genp.NI = 0 then
-            Genp.NI := RANGE_3'last;
+            Genp.NI := RANGE_3'Last;
         end if ;
         Genp.NJ := Genp.NJ - 1;
         if Genp.NJ = 0 then
-            Genp.NJ := RANGE_3'last;
+            Genp.NJ := RANGE_3'Last;
         end if ;
         Genp.C := Genp.C - CD;
         if Genp.C < 0.0 then

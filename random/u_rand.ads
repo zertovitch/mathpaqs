@@ -44,11 +44,11 @@ package U_Rand is
 
     type Generator is limited private;
 
-    --------------------------------------------------
-    -- Initialization of the pseudo-random sequence --
-    --------------------------------------------------
+    ----------------------------------------------------
+    --  Initialization of the pseudo-random sequence  --
+    ----------------------------------------------------
 
-    -- Fixed seed initialization
+    --  Fixed seed initialization
     --
     procedure Start(Gen   : out Generator;
                     New_I : SEED_RANGE_1 := Default_I ;
@@ -56,17 +56,21 @@ package U_Rand is
                     New_K : SEED_RANGE_1 := Default_K ;
                     New_L : SEED_RANGE_2 := Default_L
                     ) ;
-    procedure Reset (Gen : out Generator; Initiator : SEED_RANGE_1);
-    -- Ada95
 
-    -- Randomize with real-time clock
+    subtype Seed_range_for_Reset is Integer range 0 .. ((M1-1) ** 3) * (M2-1) - 1;
+    --  NB: concretely, the range is: 0 .. 947'478'337
+
+    --  Generator initialization, compatible with Ada 95+
+    procedure Reset (Gen : out Generator; Initiator : Seed_range_for_Reset);
+
+    --  Randomize with real-time clock
     --
     procedure Randomize (Gen : out Generator);
-    procedure Reset (Gen : out Generator) renames Randomize; -- Ada 95 style
+    procedure Reset (Gen : out Generator) renames Randomize; -- Ada 95+ style
 
-    ---------------------------------------------
-    -- Obtaining the next pseudo-random number --
-    ---------------------------------------------
+    -----------------------------------------------
+    --  Obtaining the next pseudo-random number  --
+    -----------------------------------------------
     --
     function Next(Gen: Generator) return Uniformly_Distributed;
     pragma Inline(Next);
@@ -76,11 +80,11 @@ private
 
     M3 : constant := 97 ;
 
-    subtype RANGE_3 is INTEGER range 1..M3 ;
+    subtype RANGE_3 is Integer range 1..M3 ;
     type U_array is array(RANGE_3) of Real;
 
     type Generator is limited record
-      NI, NJ : INTEGER ;
+      NI, NJ : Integer ;
       C : Real ;
       U : U_array;
     end record;
