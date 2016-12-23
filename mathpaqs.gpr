@@ -37,7 +37,9 @@ project Mathpaqs is
        -- *** Misc
          "fractal.adb", "biomorph.adb",
          "champ_vt.adb", "arenstorf.adb",
-         "cr_demo.adb"
+         "cr_demo.adb", "ppm2func.adb",
+         "arithmetic_compression.adb",
+         "show_floats_limits.adb"
        );
    case Build_Mode is
      when "Debug" | "Style_Checks" =>
