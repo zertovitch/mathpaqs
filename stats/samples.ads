@@ -118,9 +118,9 @@ package Samples is
   --  after a call to Get_measures.
 
   No_occurrence                 : exception;
-  Quantile_level_negative      : exception;
-  Quantile_levels_not_ascending: exception;
-  Unexpected_case              : exception;
+  Quantile_level_negative       : exception;
+  Quantile_levels_not_ascending : exception;
+  Unexpected_case               : exception;
 
 private
 

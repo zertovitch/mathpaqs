@@ -1,4 +1,4 @@
--- !! replace all = 0.0 and x = y by almost_zero tests
+-- !! To do: replace all equality tests = 0.0 and x = y by almost_zero tests
 
 with Ada.Text_IO; use Ada.Text_IO; -- for debug
 -- with INTEGER_ARRAYS_IO;  -- for debug
@@ -12,8 +12,8 @@ package body Generic_Real_Linear_Equations is
     return abs x <= Real'Base'Model_Small;
   end Almost_zero;
 
-  package ELEMENTARY_FUNCTIONS is new
-                       Ada.Numerics.GENERIC_ELEMENTARY_FUNCTIONS ( REAL ) ;
+  package Elementary_Functions is new
+    Ada.Numerics.Generic_Elementary_Functions ( Real ) ;
 
 --  package REAL_IO is new REAL_ARRAYS_IO
 --                            (REAL, Real_Arrays); -- for debug
@@ -600,10 +600,10 @@ package body Generic_Real_Linear_Equations is
     NORM1 : Real := 0.0 ;                      -- 1 NORM OF MATRIX
     SUM : Real ;                               -- TEMP VARIBLE
   begin
-    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+    if A'Length ( 1 ) /= A'Length ( 2 ) then
       raise Constraint_Error with "Matrix A is not square";
     end if ;
-    if A'LENGTH ( 1 ) /= Y'LENGTH then
+    if A'Length ( 1 ) /= Y'Length then
       raise Constraint_Error with "Matrix A row count is different than vector Y's";
     end if ;
     Z(1):= 0.0; -- calm down "may be referenced before it has a value" warning
@@ -612,12 +612,12 @@ package body Generic_Real_Linear_Equations is
     --                        BUILD WORKING DATA STRUCTURE
     for I in 1 .. N loop
       for J in 1 .. N loop
-        B ( I , J ) := A ( I - 1 + A'FIRST( 1 ) , J - 1 + A'FIRST ( 2 )) ;
+        B ( I , J ) := A ( I - 1 + A'First( 1 ) , J - 1 + A'First ( 2 )) ;
         if abs B ( I , J ) > NORM1 then
           NORM1 := abs B ( I , J ) ;
         end if ;
       end loop ;
-      YY ( I ) := Y ( I - 1 + Y'FIRST ) ;
+      YY ( I ) := Y ( I - 1 + Y'First ) ;
     end loop ;
 
     --                        SET UP ROW  INTERCHANGE VECTORS
@@ -641,8 +641,8 @@ package body Generic_Real_Linear_Equations is
       end loop ;
 
       --                                CHECK FOR NEAR SINGULAR
-      if ABS_PIVOT < REAL'EPSILON * NORM1 then -- degeneration
-        raise MATRIX_DATA_ERROR ;
+      if ABS_PIVOT < Real'Epsilon * NORM1 then -- degeneration
+        raise Matrix_Data_Error ;
       end if ;
 
       --                                HAVE PIVOT, INTERCHANGE ROW POINTERS
@@ -667,7 +667,7 @@ package body Generic_Real_Linear_Equations is
         end loop ;
         B(ROW(I),J) := (B(ROW(I),J)-SUM)/B(ROW(J),J) ;
       end loop ;
-      Put_Line("finished col " & integer'image(J));
+      Put_Line("finished col " & Integer'Image(J));
     end loop ;
 
     -- back substitute, first part
@@ -689,10 +689,9 @@ package body Generic_Real_Linear_Equations is
     end loop;
     Put_Line("Finished back sub, part 2");
     return X ;
-  end CROUT_SOLVE ;
+  end Crout_Solve ;
 
-
-  function CHOLESKY_DECOMPOSITION ( A : REAL_MATRIX) return REAL_MATRIX is
+  function Cholesky_Decomposition ( A : Real_Matrix) return Real_Matrix is
 
     --      PURPOSE : COMPUTE THE CHOLESKY DECOMPOSITION OF A SYMMETRIC
     --                POSITIVE DEFINATE MATRIX 'A'
@@ -712,44 +711,45 @@ package body Generic_Real_Linear_Equations is
     --
     --      WRITTEN BY : JON SQUIRE , 11/30/88
 
-    L : REAL_MATRIX ( A'RANGE(1), A'RANGE(2) ) := (others=>(others=>0.0)) ;
-    SUM : REAL;
+    L : Real_Matrix ( A'Range(1), A'Range(2) ) := (others=>(others=>0.0)) ;
+    SUM : Real;
   begin
-    if A'LENGTH(1) /= A'LENGTH(2) then
-      raise MATRIX_DATA_ERROR ;
+    if A'Length(1) /= A'Length(2) then
+      raise Matrix_Data_Error ;
     end if;
-    for I in A'RANGE(1) loop          -- check A for being symmetric
-      for J in A'FIRST(2)-A'FIRST(1)+I+1 .. A'LAST(2) loop
-        if A(I,J) /= A(A'FIRST(1)-A'FIRST(2)+J, A'FIRST(2)-A'FIRST(1)+I) then
-          if abs(A(I,J)-A(A'FIRST(1)-A'FIRST(2)+J, A'FIRST(2)-A'FIRST(1)+I)) >
-             2.0 * REAL'EPSILON * abs(A(I,J)) then
-               raise MATRIX_DATA_ERROR with "Matrix is not symmetric";
+    for I in A'Range(1) loop          -- check A for being symmetric
+      for J in A'First(2)-A'First(1)+I+1 .. A'Last(2) loop
+        if A(I,J) /= A(A'First(1)-A'First(2)+J, A'First(2)-A'First(1)+I) then
+          if abs(A(I,J)-A(A'First(1)-A'First(2)+J, A'First(2)-A'First(1)+I)) >
+             2.0 * Real'Epsilon * abs(A(I,J))
+          then
+               raise Matrix_Data_Error with "Matrix is not symmetric";
           end if;
         end if;
       end loop;
     end loop;
 
-    for J in A'RANGE(2) loop
-      for I in A'FIRST(1)-A'FIRST(2)+J..A'LAST(1) loop
+    for J in A'Range(2) loop
+      for I in A'First(1)-A'First(2)+J..A'Last(1) loop
         SUM := A(I,J);
-        for K in A'FIRST(2)..J-1 loop
-          SUM := SUM - L(I,K) * L(A'FIRST(1)-A'FIRST(2)+J,K);
+        for K in A'First(2)..J-1 loop
+          SUM := SUM - L(I,K) * L(A'First(1)-A'First(2)+J,K);
         end loop;
-        if I = A'FIRST(1)-A'FIRST(2)+J then
+        if I = A'First(1)-A'First(2)+J then
           if SUM <= 0.0 then
-            raise MATRIX_DATA_ERROR with "Matrix is not positive definite";
+            raise Matrix_Data_Error with "Matrix is not positive definite";
           end if;
-          L(I,J) := ELEMENTARY_FUNCTIONS.SQRT(SUM);
+          L(I,J) := Elementary_Functions.Sqrt(SUM);
         else
-          L(I,J) := SUM / L(A'FIRST(1)-A'FIRST(2)+J,J);
+          L(I,J) := SUM / L(A'First(1)-A'First(2)+J,J);
         end if;
       end loop;
     end loop;
     return L;
-  end CHOLESKY_DECOMPOSITION;
+  end Cholesky_Decomposition;
 
-  function CHOLESKY_SOLVE ( L : REAL_MATRIX ;
-                            Y : REAL_VECTOR ) return REAL_VECTOR is
+  function Cholesky_Solve ( L : Real_Matrix ;
+                            Y : Real_Vector ) return Real_Vector is
 
     --      PURPOSE : SOLVE THE LINEAR SYSTEM OF EQUATIONS WITH REAL
     --                COEFFICIENTS   [A] * |X| = |Y| USING CHOLESKY
@@ -770,35 +770,35 @@ package body Generic_Real_Linear_Equations is
     --
     --      WRITTEN BY : JON SQUIRE , 11/30/88
 
-    X : REAL_VECTOR ( Y'RANGE ) ;
-    W : REAL_VECTOR ( Y'RANGE ) ;
-    SUM : REAL;
+    X : Real_Vector ( Y'Range ) ;
+    W : Real_Vector ( Y'Range ) ;
+    SUM : Real;
   begin
     X(X'First):= 0.0; -- calm down "may be referenced before..." warning
     W(W'First):= 0.0; -- calm down "may be referenced before..." warning
     --
-    for I in Y'RANGE loop -- solve  L * w = y
+    for I in Y'Range loop -- solve  L * w = y
       SUM := Y(I);
-      for K in Y'FIRST..I-1 loop
-        SUM := SUM - L(L'FIRST(1)-Y'FIRST+I, L'FIRST(2)-Y'FIRST+K) * W(K);
+      for K in Y'First..I-1 loop
+        SUM := SUM - L(L'First(1)-Y'First+I, L'First(2)-Y'First+K) * W(K);
       end loop;
-      W(I) := SUM / L(L'FIRST(1)-Y'FIRST+I, L'FIRST(2)-Y'FIRST+I);
+      W(I) := SUM / L(L'First(1)-Y'First+I, L'First(2)-Y'First+I);
     end loop;
                                   --         T
-    for I in reverse Y'RANGE loop -- solve  L  * x = w
+    for I in reverse Y'Range loop -- solve  L  * x = w
       SUM := W(I);
-      for K in I+1..Y'LAST loop
-        SUM := SUM - L(L'FIRST(1)-Y'FIRST+K, L'FIRST(2)-Y'FIRST+I) * X(K);
+      for K in I+1..Y'Last loop
+        SUM := SUM - L(L'First(1)-Y'First+K, L'First(2)-Y'First+I) * X(K);
       end loop;
-      X(I) := SUM / L(L'FIRST(1)-Y'FIRST+I, L'FIRST(2)-Y'FIRST+I);
+      X(I) := SUM / L(L'First(1)-Y'First+I, L'First(2)-Y'First+I);
     end loop;
     return X;
-  end CHOLESKY_SOLVE ;
+  end Cholesky_Solve ;
 
-  procedure LU_DECOMPOSITION ( A : REAL_MATRIX ;
-                               L : in out REAL_MATRIX ;
-                               U : in out REAL_MATRIX ;
-                               P : in out INTEGER_VECTOR) is
+  procedure LU_Decomposition ( A : Real_Matrix ;
+                               L : in out Real_Matrix ;
+                               U : in out Real_Matrix ;
+                               P : in out Integer_Vector) is
 
     --      PURPOSE : COMPUTE THE LU DECOMPOSITION OF MATRIX 'A'
     --                LU_SOLVE MAY THEN BE USED TO SOLVE LINEAR EQUATIONS
@@ -818,19 +818,19 @@ package body Generic_Real_Linear_Equations is
     --                  MATRIX_DATA_ERROR  RAISED IF 'A' IS SINGULAR
     --
 
-    AA : REAL_MATRIX(A'RANGE(1),A'RANGE(2)) := A;
-    ITEMP : INTEGER;
-    KK    : INTEGER;
-    TEMP  : REAL;
-    BIG   : REAL;
-    OFAL1 : constant INTEGER := L'FIRST(1) - A'FIRST(1) ;
-    OFAL2 : constant INTEGER := L'FIRST(2) - A'FIRST(2) ;
-    OFAU1 : constant INTEGER := U'FIRST(1) - A'FIRST(1) ;
-    OFAU2 : constant INTEGER := U'FIRST(2) - A'FIRST(2) ;
-    OFAA2 : constant INTEGER := A'FIRST(2) - A'FIRST(1) ;
-    OFAP  : constant INTEGER := P'FIRST - A'FIRST(1) ;
+    AA : Real_Matrix(A'Range(1),A'Range(2)) := A;
+    ITEMP : Integer;
+    KK    : Integer;
+    TEMP  : Real;
+    BIG   : Real;
+    OFAL1 : constant Integer := L'First(1) - A'First(1) ;
+    OFAL2 : constant Integer := L'First(2) - A'First(2) ;
+    OFAU1 : constant Integer := U'First(1) - A'First(1) ;
+    OFAU2 : constant Integer := U'First(2) - A'First(2) ;
+    OFAA2 : constant Integer := A'First(2) - A'First(1) ;
+    OFAP  : constant Integer := P'First - A'First(1) ;
   begin
-    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+    if A'Length ( 1 ) /= A'Length ( 2 ) then
       raise Constraint_Error with "Matrix A is not square";
     end if ;
     if A'Length(1) /= L'Length(1) or
@@ -844,52 +844,52 @@ package body Generic_Real_Linear_Equations is
 
     L := (others=>(others=>0.0));
     U := (others=>(others=>0.0));
-    for I in A'RANGE(1) loop
+    for I in A'Range(1) loop
       P(I+OFAP) := I;
       L(I+OFAL1,I+OFAL2) := 1.0;
     end loop;
-    for K in A'FIRST(1)..A'LAST(1)-1 loop
+    for K in A'First(1)..A'Last(1)-1 loop
       BIG := 0.0;
-      for I in K..A'LAST(1) loop
+      for I in K..A'Last(1) loop
         if abs AA(I,K+OFAA2) > BIG then
           BIG := abs AA(I,K+OFAA2);
           KK := I;
         end if;
       end loop;
       if Almost_zero(BIG) then
-        raise MATRIX_DATA_ERROR with "Matrix is singular";
+        raise Matrix_Data_Error with "Matrix is singular";
       end if;
       ITEMP := P(K+OFAP);
       P(K+OFAP) := P(KK+OFAP);
       P(KK+OFAP) := ITEMP;
-      for I in A'RANGE(1) loop
+      for I in A'Range(1) loop
         TEMP := AA(K,I+OFAA2);
         AA(K,I+OFAA2) := AA(KK,I+OFAA2);
         AA(KK,I+OFAA2) := TEMP;
       end loop;
-      for I in K+1..A'LAST(1) loop
+      for I in K+1..A'Last(1) loop
         AA(I,K+OFAA2) := AA(I,K+OFAA2) / AA(K,K+OFAA2);
-        for J in K+1..A'LAST(1) loop
+        for J in K+1..A'Last(1) loop
           AA(I,J+OFAA2) := AA(I,J+OFAA2) - AA(I,K+OFAA2) * AA(K,J+OFAA2);
         end loop;
       end loop;
     end loop;
-    for I in A'RANGE(1) loop  -- copy from A to U
-      for J in I..A'LAST(1) loop
+    for I in A'Range(1) loop  -- copy from A to U
+      for J in I..A'Last(1) loop
         U(I+OFAU1,J+OFAU2) := AA(I,J+OFAA2);
       end loop;
     end loop;
-    for I in A'FIRST(1)+1..A'LAST(1) loop  -- copy from A to L
+    for I in A'First(1)+1..A'Last(1) loop  -- copy from A to L
       for J in 1..I-1 loop
         L(I+OFAL1,J+OFAL2) := AA(I,J+OFAA2);
       end loop;
     end loop;
-  end LU_DECOMPOSITION;
+  end LU_Decomposition;
 
-  function LU_SOLVE ( L : REAL_MATRIX ;
-                      U : REAL_MATRIX ;
-                      P : INTEGER_VECTOR ;
-                      Y : REAL_VECTOR ) return REAL_VECTOR is
+  function LU_Solve ( L : Real_Matrix ;
+                      U : Real_Matrix ;
+                      P : Integer_Vector ;
+                      Y : Real_Vector ) return Real_Vector is
 
     --      PURPOSE : SOLVE THE LINEAR SYSTEM OF EQUATIONS WITH REAL
     --                COEFFICIENTS   [A] * |X| = |Y| USING LU DECOMPOSITION
@@ -909,19 +909,20 @@ package body Generic_Real_Linear_Equations is
     --                                     Y LENGTH /= ROWS OF 'L'
     --
 
-    X : REAL_VECTOR ( Y'RANGE ) ;
-    B : REAL_VECTOR ( Y'RANGE ) ;
-    SUM : REAL ;
-    OFYL1 : constant INTEGER := L'FIRST(1) - Y'FIRST ;
-    OFYL2 : constant INTEGER := L'FIRST(2) - Y'FIRST ;
-    OFYU1 : constant INTEGER := U'FIRST(1) - Y'FIRST ;
-    OFYU2 : constant INTEGER := U'FIRST(2) - Y'FIRST ;
+    X : Real_Vector ( Y'Range ) ;
+    B : Real_Vector ( Y'Range ) ;
+    SUM : Real ;
+    OFYL1 : constant Integer := L'First(1) - Y'First ;
+    OFYL2 : constant Integer := L'First(2) - Y'First ;
+    OFYU1 : constant Integer := U'First(1) - Y'First ;
+    OFYU2 : constant Integer := U'First(2) - Y'First ;
   begin
     if L'Length(1) /= L'Length(2) or
        L'Length(1) /= U'Length(1) or
        L'Length(1) /= U'Length(2) or
        L'Length(1) /= P'Length or
-       L'Length(1) /= Y'Length then
+       L'Length(1) /= Y'Length
+    then
       raise Constraint_Error with "Dimension error with L, U, P or Y";
     end if;
     B(B'First):= 0.0; -- calm down "may be referenced before..." warning
@@ -943,11 +944,11 @@ package body Generic_Real_Linear_Equations is
       X(I) := ( B(I) - SUM ) / U(I+OFYU1,I+OFYU2) ;
     end loop ;
     return X;
-  end LU_SOLVE ;
+  end LU_Solve ;
 
-  procedure QR_DECOMPOSITION ( A : REAL_MATRIX ;
-                               Q : in out REAL_MATRIX ;
-                               R : in out REAL_MATRIX ) is
+  procedure QR_Decomposition ( A : Real_Matrix ;
+                               Q : in out Real_Matrix ;
+                               R : in out Real_Matrix ) is
 
     --      PURPOSE : COMPUTE THE QR DECOMPOSITION OF MATRIX 'A'
     --                QR_SOLVE MAY THEN BE USED TO SOLVE LINEAR EQUATIONS
@@ -968,21 +969,22 @@ package body Generic_Real_Linear_Equations is
     --                  MATRIX_DATA_ERROR  RAISED IF 'A' IS SINGULAR
     --
 
-    N : constant INTEGER := A'LENGTH(1) ;     -- SIZE OF MATRIX
-    AA : REAL_MATRIX ( 1 .. N , 1 .. N ) ;    -- WORKING MATRIX
-    C  : REAL_VECTOR ( 1 .. N ) ;
-    D  : REAL_VECTOR ( 1 .. N ) ;
-    SCALE, SIGMA, SUM, TAU : REAL ;
-    OFAQ1 : constant INTEGER := Q'FIRST(1) - 1 ;
-    OFAQ2 : constant INTEGER := Q'FIRST(2) - 1 ;
-    OFAR1 : constant INTEGER := R'FIRST(1) - 1 ;
-    OFAR2 : constant INTEGER := R'FIRST(2) - 1 ;
+    N : constant Integer := A'Length(1) ;     -- SIZE OF MATRIX
+    AA : Real_Matrix ( 1 .. N , 1 .. N ) ;    -- WORKING MATRIX
+    C  : Real_Vector ( 1 .. N ) ;
+    D  : Real_Vector ( 1 .. N ) ;
+    SCALE, SIGMA, SUM, TAU : Real ;
+    OFAQ1 : constant Integer := Q'First(1) - 1 ;
+    OFAQ2 : constant Integer := Q'First(2) - 1 ;
+    OFAR1 : constant Integer := R'First(1) - 1 ;
+    OFAR2 : constant Integer := R'First(2) - 1 ;
   begin
-    if A'LENGTH ( 1 ) /= A'LENGTH ( 2 ) then
+    if A'Length ( 1 ) /= A'Length ( 2 ) then
       raise Constraint_Error with "Matrix A is not square";
     end if ;
-    if N /= R'LENGTH(1) or N /= R'LENGTH(2) or
-       N /= Q'LENGTH(1) or N /= Q'LENGTH(2) then
+    if N /= R'Length(1) or N /= R'Length(2) or
+       N /= Q'Length(1) or N /= Q'Length(2)
+    then
       raise Constraint_Error with "Dimension error";
     end if ;
 
@@ -995,7 +997,7 @@ package body Generic_Real_Linear_Equations is
         end if ;
       end loop ;
       if Almost_zero(SCALE) then
-        raise MATRIX_DATA_ERROR with
+        raise Matrix_Data_Error with
           "Matrix is singular (scale = 0 on column" & Integer'Image(K) & ")";
       else
         for I in K .. N loop
@@ -1006,9 +1008,9 @@ package body Generic_Real_Linear_Equations is
           SUM := SUM + AA(I,K) * AA(I,K) ;
         end loop ;
         if AA(K,K) < 0.0 then
-          SIGMA := -ELEMENTARY_FUNCTIONS.SQRT(SUM) ;
+          SIGMA := -Elementary_Functions.Sqrt(SUM) ;
         else
-          SIGMA := ELEMENTARY_FUNCTIONS.SQRT(SUM) ;
+          SIGMA := Elementary_Functions.Sqrt(SUM) ;
         end if ;
         AA(K,K) := AA(K,K) + SIGMA ;
         C(K) := SIGMA * AA(K,K) ;
@@ -1027,7 +1029,7 @@ package body Generic_Real_Linear_Equations is
     end loop ;
     D(N) := AA(N,N) ;
     if Almost_zero(D(N)) then
-      raise MATRIX_DATA_ERROR with
+      raise Matrix_Data_Error with
         "Matrix is singular (diag = 0 on position" & Integer'Image(N) & ")";
     end if ;
 
@@ -1035,13 +1037,13 @@ package body Generic_Real_Linear_Equations is
     for K in 1..N-1 loop
       if not Almost_zero(C(K)) then
         for J in 1..N loop
-          sum:= 0.0;
+          SUM:= 0.0;
           for I in K..N loop
-            sum:= sum + AA(I,K) * Q(J+OFAQ1, I+OFAQ2);
+            SUM:= SUM + AA(I,K) * Q(J+OFAQ1, I+OFAQ2);
           end loop;
-          sum:= sum / C(K);
+          SUM:= SUM / C(K);
           for I in K..N loop
-            Q(J+OFAQ1, I+OFAQ2):= Q(J+OFAQ1, I+OFAQ2) - sum * AA(I,K);
+            Q(J+OFAQ1, I+OFAQ2):= Q(J+OFAQ1, I+OFAQ2) - SUM * AA(I,K);
           end loop;
         end loop;
       end if;
@@ -1070,11 +1072,11 @@ package body Generic_Real_Linear_Equations is
     --          end if ;
     --        end loop ;
     --      end loop ;
-  end QR_DECOMPOSITION;
+  end QR_Decomposition;
 
-  function QR_SOLVE ( Q : REAL_MATRIX ;
-                      R : REAL_MATRIX ;
-                      Y : REAL_VECTOR ) return REAL_VECTOR is
+  function QR_Solve ( Q : Real_Matrix ;
+                      R : Real_Matrix ;
+                      Y : Real_Vector ) return Real_Vector is
 
     --      PURPOSE : SOLVE THE LINEAR SYSTEM OF EQUATIONS WITH REAL
     --                COEFFICIENTS   [A] * |X| = |Y| USING QR DECOMPOSITION
@@ -1093,40 +1095,41 @@ package body Generic_Real_Linear_Equations is
     --                                     Y LENGTH /= ROWS OF 'Q'
     --
 
-    X : REAL_VECTOR ( Y'RANGE ) ;
-    SUM : REAL ;
-    OFYQ1 : constant INTEGER := Q'FIRST(1) - Y'FIRST ;
-    OFYQ2 : constant INTEGER := Q'FIRST(2) - Y'FIRST ;
-    OFYR1 : constant INTEGER := R'FIRST(1) - Y'FIRST ;
-    OFYR2 : constant INTEGER := R'FIRST(2) - Y'FIRST ;
+    X : Real_Vector ( Y'Range ) ;
+    SUM : Real ;
+    OFYQ1 : constant Integer := Q'First(1) - Y'First ;
+    OFYQ2 : constant Integer := Q'First(2) - Y'First ;
+    OFYR1 : constant Integer := R'First(1) - Y'First ;
+    OFYR2 : constant Integer := R'First(2) - Y'First ;
   begin
-    if Y'LENGTH /= R'LENGTH(1) or Y'LENGTH /= R'LENGTH(2) or
-       Y'LENGTH /= Q'LENGTH(1) or Y'LENGTH /= Q'LENGTH(2) then
+    if Y'Length /= R'Length(1) or Y'Length /= R'Length(2) or
+       Y'Length /= Q'Length(1) or Y'Length /= Q'Length(2)
+    then
       raise Constraint_Error with "Dimension error";
     end if ;
     X(X'First):= 0.0; -- calm down "may be referenced before..." warning
 
-    for I in reverse Y'RANGE loop
+    for I in reverse Y'Range loop
       SUM := 0.0 ;
-      for K in Y'RANGE loop
+      for K in Y'Range loop
         SUM := SUM + Q(K+OFYQ1,I+OFYQ2) * Y(K) ; -- TRANSPOSE(Q) * Y
         -- (orig: was Y(I) !)
       end loop ;
       -- sum is (Qt y)_i
-      for J in I+1 .. Y'LAST loop
+      for J in I+1 .. Y'Last loop
         SUM := SUM - X(J) * R(I+OFYR1,J+OFYR2) ;
       end loop ;
       X(I) := SUM / R(I+OFYR1,I+OFYR2) ;
     end loop ;
     return X;
-  end QR_SOLVE ;
+  end QR_Solve ;
 
-  procedure SV_DECOMPOSITION ( A : REAL_MATRIX ;
-                               UU : in out REAL_MATRIX ;
-                               VV : in out REAL_MATRIX ;
-                               WW : in out REAL_VECTOR ) is
-    M: constant Integer := A'length(1);
-    N: constant Integer := A'length(2);
+  procedure SV_Decomposition ( A : Real_Matrix ;
+                               UU : in out Real_Matrix ;
+                               VV : in out Real_Matrix ;
+                               WW : in out Real_Vector ) is
+    M: constant Integer := A'Length(1);
+    N: constant Integer := A'Length(2);
     U:Real_Matrix(1..M,1..N) := A;
     V:Real_Matrix(1..N,1..N);
     W:Real_Vector(1..N);
@@ -1157,9 +1160,10 @@ package body Generic_Real_Linear_Equations is
       return abs (Val);
     end Sign;
   begin
-    if Uu'length(1)/=M or Uu'length(2)/=N or
-       Vv'length(1)/=N or Vv'length(2)/=N or
-       Ww'length/=N then
+    if UU'Length(1)/=M or UU'Length(2)/=N or
+       VV'Length(1)/=N or VV'Length(2)/=N or
+       WW'Length/=N
+    then
       raise Constraint_Error with "Dimension error";
     end if ;
     Machep := 2.0**(-23);
@@ -1431,43 +1435,42 @@ package body Generic_Real_Linear_Equations is
         end loop ;
       end if ;
     end loop ;  -- 700
-    Ww := W;
-    Uu := U;
-    Vv := V;
-  end SV_DECOMPOSITION;
+    WW := W;
+    UU := U;
+    VV := V;
+  end SV_Decomposition;
 
-  function SV_SOLVE ( U : REAL_MATRIX ;
-                      V : REAL_MATRIX ;
-                      W : REAL_VECTOR ;
-                      Y : REAL_VECTOR ) return REAL_VECTOR is
-    M: constant Integer := U'length(1);
-    N: constant Integer := U'length(2);
+  function SV_Solve ( U : Real_Matrix ;
+                      V : Real_Matrix ;
+                      W : Real_Vector ;
+                      Y : Real_Vector ) return Real_Vector is
+    M: constant Integer := U'Length(1);
+    N: constant Integer := U'Length(2);
     S:Real;
     X:Real_Vector(1..N);
     Tmp:Real_Vector(1..N);
   begin
-    if V'length(1)/=N or V'length(2)/=N or W'length/=N or Y'length/=N then
+    if V'Length(1)/=N or V'Length(2)/=N or W'Length/=N or Y'Length/=N then
       raise Constraint_Error with "Dimension error";
     end if ;
     for J in 1..N loop
       S := 0.0;
-      if W(J-1+W'first)/=0.0 then
+      if W(J-1+W'First)/=0.0 then
         for I in 1..M loop
-          S := S+U(I-1+U'first(1),J-1+U'first(2))*Y(I-1+Y'first);
+          S := S+U(I-1+U'First(1),J-1+U'First(2))*Y(I-1+Y'First);
         end loop ;
-        S := S/W(J-1+W'first);
+        S := S/W(J-1+W'First);
       end if ;
       Tmp(J) := S;
     end loop ;
     for J in 1..N loop
       S := 0.0;
       for Jj in 1..N loop
-        S := S+V(J-1+V'first(1),Jj-1+V'first(2))*Tmp(Jj);
+        S := S+V(J-1+V'First(1),Jj-1+V'First(2))*Tmp(Jj);
       end loop ;
       X(J) := S;
     end loop ;
     return X;
-  end SV_SOLVE;
+  end SV_Solve;
 
-
-end GENERIC_REAL_LINEAR_EQUATIONS ;
+end Generic_Real_Linear_Equations ;

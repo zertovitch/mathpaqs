@@ -37,7 +37,7 @@ package body Samples is
     pos: Integer;
   begin
     if not s.initialized then
-      raise sample_not_initialized;
+      raise Sample_not_initialized;
     end if;
     s.sum:= s.sum + value;
     s.sum_sq:= s.sum_sq + value*value;
@@ -53,7 +53,7 @@ package body Samples is
       end if;
     else
       Raise_Exception
-       (value_out_of_sample_range'Identity,
+       (Value_out_of_sample_range'Identity,
         "Value = " & Real'Image(value) &
         "; Sample.min = " & Real'Image(s.min) &
         "; Sample.max = " & Real'Image(s.max) &
@@ -82,7 +82,7 @@ package body Samples is
     sub_histo_idx: Real range 0.0..1.0:= 0.0;
   begin
     if s.total_occurrences = 0 then
-      raise no_occurrence;
+      raise No_occurrence;
     end if;
     n:= Real(s.total_occurrences);
     inv_n  := 1.0 / n;
@@ -129,12 +129,12 @@ package body Samples is
         prob_bigger:= (1.0 - m.level(q_idx));
         if Almost_zero(prob_bigger) then
           -- q = 100%, {X>=VaR(q)} is empty, then TailVaR is undefined
-          m.TailVar(q_idx):= 0.0;
+          m.TailVaR(q_idx):= 0.0;
         else
           if i = s.histogram'First then
-            m.TailVar(q_idx):= truncated_mu(i) / prob_bigger;
+            m.TailVaR(q_idx):= truncated_mu(i) / prob_bigger;
           else -- Extra precision, like for VaR
-            m.TailVar(q_idx):=
+            m.TailVaR(q_idx):=
               (truncated_mu(i-1) * (1.0-sub_histo_idx) +
                truncated_mu(i)   * sub_histo_idx
               )
