@@ -10,7 +10,7 @@ package body Multi_precision_integers.Check is
   -- Don't be afraid by the bug reporting tools,
   -- they are unlikely to pop out of a programme ;-)
 
-  Bug_file: Ada.Text_IO.File_type;
+  Bug_file: Ada.Text_IO.File_Type;
   Bug_file_name: constant String:= "mupreint.bug";
 
   -- The flaw detection (DEBUG mode) could suffer from
@@ -26,7 +26,7 @@ package body Multi_precision_integers.Check is
 
   procedure Open_Bug_Report is
   begin
-    Create( Bug_file, out_file, Bug_file_name );
+    Create( Bug_file, Out_File, Bug_file_name );
     Put_Line( Bug_file, "Bug in Multi_precision_integers");
   end Open_Bug_Report;
 
@@ -39,8 +39,8 @@ package body Multi_precision_integers.Check is
     Put_Line( "For details, read file: " & Bug_file_name);
   end Close_Bug_Report;
 
-  procedure Test( m: multi_int; test_last: Boolean:= True ) is
-    last_nz: index_int:= 0;
+  procedure Test( m: Multi_int; test_last: Boolean:= True ) is
+    last_nz: Index_int:= 0;
     Negative_block,
     Last_index_has_zero,
     Field_last_outside_range, Field_last_is_negative: exception;
@@ -61,7 +61,7 @@ package body Multi_precision_integers.Check is
     end if;
   end Test;
 
-  procedure Check_Multiplication(i1,i2,i3: in multi_int) is
+  procedure Check_Multiplication(i1,i2,i3: in Multi_int) is
     jeu: constant:= 5; -- 0 suffit
     q1: Multi_int( i2.last_used + jeu );
     r1: Multi_int( i1.last_used + i2.last_used + jeu );
@@ -112,7 +112,7 @@ package body Multi_precision_integers.Check is
 
   end Check_Multiplication;
 
-  procedure Check_Div_Rem(i1,i2,q,r: in multi_int) is
+  procedure Check_Div_Rem(i1,i2,q,r: in Multi_int) is
 
     procedure Bug_Report is
     begin

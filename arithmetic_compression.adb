@@ -77,7 +77,7 @@ procedure  Arithmetic_Compression is
     len:= 1.0;
     for i in s'Range loop
       po:= 0;
-      for c in char_set'range loop
+      for c in char_set'Range loop
         if char_set(c)=s(i) then
           po:= c;
           exit;
