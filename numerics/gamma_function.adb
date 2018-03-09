@@ -118,7 +118,7 @@ package body Gamma_function is
     PP :=  2.07448227648435975150E-1 + xv*PP;
     PP :=  4.94214826801497100753E-1 + xv*PP;
     PP :=  9.99999999999999996796E-1 + xv*PP;
-    QQ := -2.31581873324120129819E-5;  
+    QQ := -2.31581873324120129819E-5;
     QQ :=  5.39605580493303397842E-4 + xv*QQ;
     QQ := -4.45641913851797240494E-3 + xv*QQ;
     QQ :=  1.18139785222060435552E-2 + xv*QQ;
@@ -167,7 +167,7 @@ package body Gamma_function is
     LS2PI: constant := 0.91893853320467274178;
   begin
     Sign_Gamma_x := 1.0;
-    if xv < -34.0 then    
+    if xv < -34.0 then
       q := -xv;
       w := Log_Gamma(q);
       p := Real'Floor(q);
@@ -178,7 +178,7 @@ package body Gamma_function is
         Sign_Gamma_x := 1.0;
       end if;
       z := q-p;
-      if z > 0.5 then        
+      if z > 0.5 then
         p := p + 1.0;
         z := p - q;
       end if;
@@ -190,7 +190,7 @@ package body Gamma_function is
       z := 1.0;
       p := 0.0;
       u := xv;
-      while u >= 3.0 loop        
+      while u >= 3.0 loop
         p := p - 1.0;
         u := xv + p;
         z := z * u;
@@ -202,8 +202,8 @@ package body Gamma_function is
       end loop;
       if z < 0.0 then
         Sign_Gamma_x := -1.0;
-        z := -z;        
-      else   
+        z := -z;
+      else
         Sign_Gamma_x := 1.0;
       end if;
       if Almost_zero(u - 2.0) then
@@ -218,7 +218,7 @@ package body Gamma_function is
       B := -1162370.97492762307383 + xv*B;
       B := -1721737.00820839662146 + xv*B;
       B := -853555.664245765465627 + xv*B;
-      C := 1.0;                      
+      C := 1.0;
       C := -351.815701436523470549 + xv*C;
       C := -17064.2106651881159223 + xv*C;
       C := -220528.590553854454839 + xv*C;
@@ -235,11 +235,11 @@ package body Gamma_function is
       return;
     end if;
     p := 1.0 / (xv*xv);
-    if xv >= 1000.0 then    
+    if xv >= 1000.0 then
       q := q +
          (
-           (    7.9365079365079365079365 * 0.0001 * p 
-              - 2.7777777777777777777778 * 0.001 ) * p + 
+           (    7.9365079365079365079365 * 0.0001 * p
+              - 2.7777777777777777777778 * 0.001 ) * p +
            0.0833333333333333333333
          ) / xv;
     else

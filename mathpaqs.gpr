@@ -1,5 +1,5 @@
 -- This is a GNAT, GCC or GNAT Programming Studio (GPS) project file
--- for Mathpaqs ( http://sf.net/projects/mathpaqs/ )
+-- for Mathpaqs ( http://sf.net/projects/mathpaqs/ , mirror: https://github.com/svn2github/mathpaqs )
 -- Build me with "gnatmake -P mathpaqs", or open me with GPS
 --
 project Mathpaqs is
@@ -10,31 +10,50 @@ project Mathpaqs is
    Build_Mode : Build_Mode_Type := external ("Build_Mode", "Debug");
 
    for Main use (
+       --
        -- *** Probabilities
+       --
          "test_copulas.adb",
          "test_pareto.adb",
          "test_normal.adb",
          "test_poisson.adb",
+       --
        -- *** Random generation
+       --
          "test_u_rand.adb",
          "test_random_performance.adb",
+       --
        -- *** Statistics
+       --
          "test_samples.adb", 
          "test_estimators.adb", 
+       --
        -- *** Linear algebra
+       --
          "test_sparse.adb", 
          "test_cholesky.adb",
          "test_qr.adb",
          "test_generic_real_linear_equations.adb",
+       --
        -- *** Algebra
+       --
          "test_ert.adb",
+       --
        -- ** Numerics
+       --
+         "test_beta.adb",
          "test_gamma.adb",
+       --
        -- *** Multiple precision integers
+       --
          "gnat_int.adb", "test_rsa.adb",
+       --
        -- *** Formulas
+       --
          "test_formulas.adb",
+       --
        -- *** Misc
+       --
          "fractal.adb", "biomorph.adb",
          "champ_vt.adb", "arenstorf.adb",
          "cr_demo.adb", "ppm2func.adb",
