@@ -63,22 +63,22 @@ package body Gamma_function is
 
   function Gamma(x : Real) return Real is
     xv: Real:= x;
-    p, PP, q, QQ, z, SgnGam: Real;
+    p, PP, q, QQ, z, Sign_Gamma_x: Real;
     i: Integer_for_Gamma;
   begin
-    SgnGam := 1.0;
+    Sign_Gamma_x := 1.0;
     q := abs(xv);
     if q > 33.0 then
       if xv < 0.0 then
         p := Real'Floor(q);
         i := Integer_for_Gamma(p);
         if i rem 2 = 0 then
-          SgnGam := -1.0;
+          Sign_Gamma_x := -1.0;
         end if;
         z := q - p;
         if z > 0.5 then
           p := p + 1.0;
-          z := q-p;
+          z := q - p;
         end if;
         z := q*Sin(Pi*z);
         z := abs(z);
@@ -86,7 +86,7 @@ package body Gamma_function is
       else
         z := GammaStirF(xv);
       end if;
-      return SgnGam*z;
+      return Sign_Gamma_x*z;
     end if;
     z := 1.0;
     while xv >= 3.0 loop
@@ -157,34 +157,34 @@ package body Gamma_function is
   --  Translated on 10-Nov-2015 by (New) P2Ada v. 28-Oct-2009
   --  ************************************************************************
 
-function Log_Gamma(x : Real) return Real is
-  xv: Real:= x;
-  A, B, C: Real;
-  p, q: Real;
-  u, w, z: Real;
-  -- i: Integer_for_Gamma;
-  LogPi: constant := 1.14472988584940017414;
-  LS2PI: constant := 0.91893853320467274178;
-  -- SgnGam : Real;
+  procedure Log_Gamma(x : Real; Log_Gamma_x, Sign_Gamma_x: out Real) is
+    xv: Real:= x;
+    A, B, C: Real;
+    p, q: Real;
+    u, w, z: Real;
+    i: Integer_for_Gamma;
+    LogPi: constant := 1.14472988584940017414;
+    LS2PI: constant := 0.91893853320467274178;
   begin
-    -- SgnGam := 1.0;
+    Sign_Gamma_x := 1.0;
     if xv < -34.0 then    
       q := -xv;
       w := Log_Gamma(q);
       p := Real'Floor(q);
-      -- i := Integer_for_Gamma(p);
-      -- if i rem  2=0 then
-      --   SgnGam := -1.0;
-      -- else
-      --   SgnGam := 1.0;
-      -- end if;
+      i := Integer_for_Gamma(p);
+      if i rem 2 = 0 then
+        Sign_Gamma_x := -1.0;
+      else
+        Sign_Gamma_x := 1.0;
+      end if;
       z := q-p;
       if z > 0.5 then        
         p := p + 1.0;
         z := p - q;
       end if;
       z := q*Sin(Pi*z);
-      return LogPi-Log(z)-w;
+      Log_Gamma_x := LogPi-Log(z)-w;
+      return;
     end if;
     if xv < 13.0 then
       z := 1.0;
@@ -198,17 +198,17 @@ function Log_Gamma(x : Real) return Real is
       while u < 2.0 loop
         z := z/u;
         p := p + 1.0;
-        u := xv+p;
+        u := xv + p;
       end loop;
       if z < 0.0 then
-        -- sgngam := -1.0;
+        Sign_Gamma_x := -1.0;
         z := -z;        
       else   
-        -- sgngam := 1.0;
-        null;
+        Sign_Gamma_x := 1.0;
       end if;
       if Almost_zero(u - 2.0) then
-        return Log(z);
+        Log_Gamma_x := Log(z);
+        return;
       end if;
       p := p - 2.0;
       xv := xv + p;
@@ -226,11 +226,13 @@ function Log_Gamma(x : Real) return Real is
       C := -2532523.07177582951285 + xv*C;
       C := -2018891.41433532773231 + xv*C;
       p := xv * B/C;
-      return Log(z)+p;
+      Log_Gamma_x := Log(z)+p;
+      return;
     end if;
     q := (xv-0.5)*Log(xv)-xv + LS2PI;
     if xv > 100_000_000.0 then
-      return q;
+      Log_Gamma_x := q;
+      return;
     end if;
     p := 1.0 / (xv*xv);
     if xv >= 1000.0 then    
@@ -248,7 +250,14 @@ function Log_Gamma(x : Real) return Real is
       A :=  8.33333333333331927722 * 0.01   + p*A;
       q := q + A/xv;
     end if;
-    return q;
+    Log_Gamma_x := q;
+  end Log_Gamma;
+
+  function Log_Gamma(x : Real) return Real is
+    lg, dummy_sg: Real;
+  begin
+    Log_Gamma (x, lg, dummy_sg);
+    return lg;
   end Log_Gamma;
 
 end Gamma_function;

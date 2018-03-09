@@ -1,10 +1,11 @@
----------------------------------------------
---  Gamma special function and Log(Gamma)
----------------------------------------------
+------------------------------------------------------
+--  Gamma special function and Log(Gamma) function  --
+--  Test procedure: Test_Gamma                      --
+------------------------------------------------------
 --
 -- Legal licensing note:
 
---  Copyright (c) 2015 Gautier de Montmollin (Ada translation and maintenance)
+--  Copyright (c) 2015 .. 2018 Gautier de Montmollin (Ada translation and maintenance)
 --  Originally created by Stephen L. Moshier (see implementation for details)
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,21 +33,12 @@ generic
   type Real is digits <>;
 
 package Gamma_function is
+  --  History and notes about accuracy can be found in the implementation
 
   function Gamma(x : Real) return Real;
-  --  Gamma function
-  --
-  --  Domain:
-  --   0 < x < 171.6
-  --   -170 < x < 0, x is not an integer.
-  --  History and notes about accuracy in the implementation
 
+  --  Natural logarithm of the gamma function
   function Log_Gamma(x : Real) return Real;
-  --  Natural logarithm of gamma function
-  --
-  --  Domain:
-  --   0 < x < 2.55e305
-  --   -2.55e305 < x < 0, x is not an integer.
-  --  History and notes about accuracy in the implementation
+  procedure Log_Gamma(x : Real; Log_Gamma_x, Sign_Gamma_x: out Real);
 
 end Gamma_function;
