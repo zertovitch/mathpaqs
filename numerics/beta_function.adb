@@ -81,68 +81,68 @@ package body Beta_function is
     n: Integer_for_Beta;
   begin
     k1 := a;
-    k2 := a+b;
+    k2 := a + b;
     k3 := a;
-    k4 := a+ 1.0;
-    k5 :=  1.0;
-    k6 := b- 1.0;
+    k4 := a + 1.0;
+    k5 := 1.0;
+    k6 := b - 1.0;
     k7 := k4;
-    k8 := a+Real(2.0);
-    pkm2 := Real(0.0);
-    qkm2 :=  1.0;
-    pkm1 :=  1.0;
-    qkm1 :=  1.0;
-    ans :=  1.0;
-    r :=  1.0;
+    k8 := a + 2.0;
+    pkm2 := 0.0;
+    qkm2 := 1.0;
+    pkm1 := 1.0;
+    qkm1 := 1.0;
+    ans  := 1.0;
+    r := 1.0;
     n := 0;
-    thresh := Real(3.0) * MachineEpsilon;
+    thresh := 3.0 * MachineEpsilon;
     loop
-        xk := -x*k1*k2/(k3*k4);
-        pk := pkm1+pkm2*xk;
-        qk := qkm1+qkm2*xk;
-        pkm2 := pkm1;
-        pkm1 := pk;
-        qkm2 := qkm1;
-        qkm1 := qk;
-        xk := x*k5*k6/(k7*k8);
-        pk := pkm1+pkm2*xk;
-        qk := qkm1+qkm2*xk;
-        pkm2 := pkm1;
-        pkm1 := pk;
-        qkm2 := qkm1;
-        qkm1 := qk;
-        if not Almost_zero (qk) then
-          r := pk/qk;
-        end if;
-        if not Almost_zero (r) then
-          t := abs((ans-r)/r);
-          ans := r;
-        else
-          t :=  1.0;
-        end if;
-        exit when t < thresh;
-        k1 := k1+ 1.0;
-        k2 := k2+ 1.0;
-        k3 := k3+Real(2.0);
-        k4 := k4+Real(2.0);
-        k5 := k5+ 1.0;
-        k6 := k6- 1.0;
-        k7 := k7+Real(2.0);
-        k8 := k8+Real(2.0);
-        if abs(qk) + abs(pk) > big then
-            pkm2 := pkm2*biginv;
-            pkm1 := pkm1*biginv;
-            qkm2 := qkm2*biginv;
-            qkm1 := qkm1*biginv;
-        end if;
-        if abs(qk) < biginv or abs(pk) < biginv then
-            pkm2 := pkm2*big;
-            pkm1 := pkm1*big;
-            qkm2 := qkm2*big;
-            qkm1 := qkm1*big;
-        end if;
-        n := n + 1;
-        exit when n = 300;
+      xk := -x*k1*k2/(k3*k4);
+      pk := pkm1+pkm2*xk;
+      qk := qkm1+qkm2*xk;
+      pkm2 := pkm1;
+      pkm1 := pk;
+      qkm2 := qkm1;
+      qkm1 := qk;
+      xk := x*k5*k6/(k7*k8);
+      pk := pkm1+pkm2*xk;
+      qk := qkm1+qkm2*xk;
+      pkm2 := pkm1;
+      pkm1 := pk;
+      qkm2 := qkm1;
+      qkm1 := qk;
+      if not Almost_zero (qk) then
+        r := pk/qk;
+      end if;
+      if not Almost_zero (r) then
+        t := abs((ans-r)/r);
+        ans := r;
+      else
+        t :=  1.0;
+      end if;
+      exit when t < thresh;
+      k1 := k1+ 1.0;
+      k2 := k2+ 1.0;
+      k3 := k3+2.0;
+      k4 := k4+2.0;
+      k5 := k5+ 1.0;
+      k6 := k6- 1.0;
+      k7 := k7+2.0;
+      k8 := k8+2.0;
+      if abs(qk) + abs(pk) > big then
+        pkm2 := pkm2*biginv;
+        pkm1 := pkm1*biginv;
+        qkm2 := qkm2*biginv;
+        qkm1 := qkm1*biginv;
+      end if;
+      if abs(qk) < biginv or abs(pk) < biginv then
+        pkm2 := pkm2*big;
+        pkm1 := pkm1*big;
+        qkm2 := qkm2*big;
+        qkm1 := qkm1*big;
+      end if;
+      n := n + 1;
+      exit when n = 300;
     end loop;
     return ans;
   end IncompleteBetaFE;
@@ -166,8 +166,8 @@ package body Beta_function is
     k5 :=  1.0;
     k6 := a+b;
     k7 := a+ 1.0;
-    k8 := a+Real(2.0);
-    pkm2 := Real(0.0);
+    k8 := a+2.0;
+    pkm2 := 0.0;
     qkm2 :=  1.0;
     pkm1 :=  1.0;
     qkm1 :=  1.0;
@@ -175,54 +175,54 @@ package body Beta_function is
     ans :=  1.0;
     r :=  1.0;
     n := 0;
-    thresh := Real(3.0) * MachineEpsilon;
+    thresh := 3.0 * MachineEpsilon;
     loop
-        xk := -z*k1*k2/(k3*k4);
-        pk := pkm1+pkm2*xk;
-        qk := qkm1+qkm2*xk;
-        pkm2 := pkm1;
-        pkm1 := pk;
-        qkm2 := qkm1;
-        qkm1 := qk;
-        xk := z*k5*k6/(k7*k8);
-        pk := pkm1+pkm2*xk;
-        qk := qkm1+qkm2*xk;
-        pkm2 := pkm1;
-        pkm1 := pk;
-        qkm2 := qkm1;
-        qkm1 := qk;
-        if not Almost_zero (qk) then
-          r := pk/qk;
-        end if;
-        if not Almost_zero (r) then
-          t := abs((ans-r)/r);
-          ans := r;
-        else
-          t :=  1.0;
-        end if;
-        exit when t < thresh;
-        k1 := k1+ 1.0;
-        k2 := k2- 1.0;
-        k3 := k3+Real(2.0);
-        k4 := k4+Real(2.0);
-        k5 := k5+ 1.0;
-        k6 := k6+ 1.0;
-        k7 := k7+Real(2.0);
-        k8 := k8+Real(2.0);
-        if abs(qk) + abs(pk) > big then
-            pkm2 := pkm2*biginv;
-            pkm1 := pkm1*biginv;
-            qkm2 := qkm2*biginv;
-            qkm1 := qkm1*biginv;
-        end if;
-        if abs(qk) < biginv or abs(pk) < biginv then
-            pkm2 := pkm2*big;
-            pkm1 := pkm1*big;
-            qkm2 := qkm2*big;
-            qkm1 := qkm1*big;
-        end if;
-        n := n + 1;
-        exit when n = 300;
+      xk := -z*k1*k2/(k3*k4);
+      pk := pkm1+pkm2*xk;
+      qk := qkm1+qkm2*xk;
+      pkm2 := pkm1;
+      pkm1 := pk;
+      qkm2 := qkm1;
+      qkm1 := qk;
+      xk := z*k5*k6/(k7*k8);
+      pk := pkm1+pkm2*xk;
+      qk := qkm1+qkm2*xk;
+      pkm2 := pkm1;
+      pkm1 := pk;
+      qkm2 := qkm1;
+      qkm1 := qk;
+      if not Almost_zero (qk) then
+        r := pk/qk;
+      end if;
+      if not Almost_zero (r) then
+        t := abs((ans-r)/r);
+        ans := r;
+      else
+        t :=  1.0;
+      end if;
+      exit when t < thresh;
+      k1 := k1+ 1.0;
+      k2 := k2- 1.0;
+      k3 := k3+2.0;
+      k4 := k4+2.0;
+      k5 := k5+ 1.0;
+      k6 := k6+ 1.0;
+      k7 := k7+2.0;
+      k8 := k8+2.0;
+      if abs(qk) + abs(pk) > big then
+        pkm2 := pkm2*biginv;
+        pkm1 := pkm1*biginv;
+        qkm2 := qkm2*biginv;
+        qkm1 := qkm1*biginv;
+      end if;
+      if abs(qk) < biginv or abs(pk) < biginv then
+        pkm2 := pkm2*big;
+        pkm1 := pkm1*big;
+        qkm2 := qkm2*big;
+        qkm1 := qkm1*big;
+      end if;
+      n := n + 1;
+      exit when n = 300;
     end loop;
     return ans;
   end IncompleteBetaFE2;
@@ -235,48 +235,37 @@ package body Beta_function is
   --  Copyright 1984, 1995, 2000 by Stephen L. Moshier
   --  ************************************************************************
 
-  function IncompleteBetaPS(a : Real;
-     b : Real;
-     x : Real;
-     MAXGAM : Real) return Real
-  is
-      s:Real;
-      t:Real;
-      u:Real;
-      v:Real;
-      n:Real;
-      t1:Real;
-      z:Real;
-      ai:Real;
+  function IncompleteBetaPS(a, b, x, MAXGAM : Real) return Real is
+    s, t, u, v, n, t1, z, ai:Real;
   begin
-    ai :=  1.0/a;
-    u := ( 1.0-b)*x;
-    v := u/(a+ 1.0);
+    ai := 1.0 / a;
+    u := (1.0 - b) * x;
+    v := u / (a + 1.0);
     t1 := v;
     t := u;
-    n := Real(2.0);
-    s := Real(0.0);
-    z := MachineEpsilon*ai;
+    n := 2.0;
+    s := 0.0;
+    z := MachineEpsilon * ai;
     while abs(v) > z loop
-        u := (n-b) * x/n;
-        t := t * u;
-        v := t / (a + n);
-        s := s + v;
-        n := n + 1.0;
+      u := (n-b) * x/n;
+      t := t * u;
+      v := t / (a + n);
+      s := s + v;
+      n := n + 1.0;
     end loop;
     s := s + t1;
     s := s + ai;
     u := a * Log(x);
     if  a+b < MAXGAM and u < Log(MaxRealNumber) then
-        t := Gamma(a+b)/(Gamma(a)*Gamma(b));
-        s := s*t* (x ** a);
+      t := Gamma(a+b)/(Gamma(a)*Gamma(b));
+      s := s*t* (x ** a);
     else
-        t := Log_Gamma(a+b)-Log_Gamma(a)-Log_Gamma(b)+u+Log(s);
-        if t < Log(MinRealNumber) then
-            s := Real(0.0);
-        else
-            s := Exp(t);
-        end if;
+      t := Log_Gamma(a+b)-Log_Gamma(a)-Log_Gamma(b)+u+Log(s);
+      if t < Log(MinRealNumber) then
+        s := 0.0;
+      else
+        s := Exp(t);
+      end if;
     end if;
     return s;
   end IncompleteBetaPS;
@@ -287,13 +276,13 @@ package body Beta_function is
   --  Returns incomplete beta integral of the arguments, evaluated
   --  from zero to x.  The function is defined as
   --
-  --                  x
-  --     -            -
-  --    | (a+b)      | |  a-1     b-1
-  --  -----------    |   t   (1-t)   dt.
-  --   -     -     | |
-  --  | (a) | (b)   -
-  --                0
+  --       x
+  --       -
+  --      | |  a-1     b-1
+  --      |   t   (1-t)   dt.
+  --    | |
+  --     -
+  --     0
   --
   --  The domain of definition is 0 <= x <= 1.  In this
   --  implementation a and b are restricted to positive values.
@@ -330,10 +319,7 @@ package body Beta_function is
 
   function Regularized_Beta(x, a, b: Real) return Real is
     aa, bb, xx : Real;
-    t:Real;
-    xc:Real;
-    w:Real;
-    y:Real;
+    t, xc, w, y:Real;
     flag : Integer_for_Beta := 0;
     big    : constant := 4.503599627370496e15;
     biginv : constant := 2.22044604925031308085e-16;
@@ -369,12 +355,12 @@ package body Beta_function is
     if flag = 1 and bb*xx <= 1.0 and xx <= 0.95 then
       t := IncompleteBetaPS(aa, bb, xx, MAXGAM);
       if  t <= MachineEpsilon then
-        return  1.0 - MachineEpsilon;
+        return 1.0 - MachineEpsilon;
       else
-        return  1.0 - t;
+        return 1.0 - t;
       end if;
     end if;
-    y := xx * (aa+bb-Real(2.0)) - (aa - 1.0);
+    y := xx * (aa+bb - 2.0) - (aa - 1.0);
     if y < 0.0 then
       w := IncompleteBetaFE(aa, bb, xx, big, biginv);
     else
@@ -390,9 +376,9 @@ package body Beta_function is
         t := t * (Gamma(aa+bb) / (Gamma(aa) * Gamma(bb)));
         if flag = 1 then
           if t <= MachineEpsilon then
-            return  1.0 - MachineEpsilon;
+            return 1.0 - MachineEpsilon;
           else
-            return  1.0 - t;
+            return 1.0 - t;
           end if;
         else
           return t;
@@ -480,8 +466,8 @@ package body Beta_function is
   --    if Almost_zero(y - 1.0) then
   --      return 1.0;
   --    end if;
-  --    x0 := Real(0.0);
-  --    yl := Real(0.0);
+  --    x0 := 0.0;
+  --    yl := 0.0;
   --    x1 :=  1.0;
   --    yh :=  1.0;
   --    nflg := 0;
@@ -523,11 +509,11 @@ package body Beta_function is
   --                bbb := b;
   --                y0 := y;
   --            end if;
-  --            lgm := (yp*yp-Real(3.0))/Real(6.0);
-  --            x := Real(2.0)/( 1.0/(Real(2.0)*aaa- 1.0)+ 1.0/(Real(2.0)*bbb- 1.0));
-  --            d := yp*sqrt(x+lgm)/x-( 1.0/(Real(2.0)*bbb- 1.0)- 1.0/(Real(2.0)*aaa- 1.0))*
-  --                   (lgm+Real(5.0)/Real(6.0)-Real(2.0)/(Real(3.0)*x));
-  --            d := Real(2.0)*d;
+  --            lgm := (yp*yp-3.0)/Real(6.0);
+  --            x := 2.0/( 1.0/(2.0*aaa- 1.0)+ 1.0/(2.0*bbb- 1.0));
+  --            d := yp*sqrt(x+lgm)/x-( 1.0/(2.0*bbb- 1.0)- 1.0/(2.0*aaa- 1.0))*
+  --                   (lgm+Real(5.0)/Real(6.0)-2.0/(3.0*x));
+  --            d := 2.0*d;
   --            if  (d < Log(MinRealNumber)) then
   --                x := 0.0;
   --                exit;
@@ -562,10 +548,10 @@ package body Beta_function is
   --                    if  AP_FP_Eq(x, 1.0) then
   --                        x :=  1.0-MachineEpsilon;
   --                    end if;
-  --                    if  AP_FP_Eq(x,Real(0.0)) then
+  --                    if  AP_FP_Eq(x,0.0) then
   --                        di := Real(0.5);
   --                        x := x0+di*(x1-x0);
-  --                        if  AP_FP_Eq(x,Real(0.0)) then
+  --                        if  AP_FP_Eq(x,0.0) then
   --                            exit;
   --                        end if;
   --                    end if;
@@ -613,8 +599,8 @@ package body Beta_function is
   --                        end if;
   --                        x :=  1.0-x;
   --                        yyy := IncompleteBeta(aaa, bbb, x);
-  --                        x0 := Real(0.0);
-  --                        yl := Real(0.0);
+  --                        x0 := 0.0;
+  --                        yl := 0.0;
   --                        x1 :=  1.0;
   --                        yh :=  1.0;
   --                        MainLoopPos := ihalve;
@@ -623,7 +609,7 @@ package body Beta_function is
   --                else
   --                    x1 := x;
   --                    if  (rflg=1)  and (x1 < MachineEpsilon) then
-  --                        x := Real(0.0);
+  --                        x := 0.0;
   --                        exit;
   --                    end if;
   --                    yh := yyy;
@@ -659,8 +645,8 @@ package body Beta_function is
   --                x :=  1.0 - MachineEpsilon;
   --                exit;
   --            end if;
-  --            if (x <= Real(0.0)) then
-  --                x := Real(0.0);
+  --            if (x <= 0.0) then
+  --                x := 0.0;
   --                exit;
   --            end if;
   --            MainLoopPos := newt;
@@ -706,7 +692,7 @@ package body Beta_function is
   --                        end if;
   --                    end if;
   --                end if;
-  --                if  AP_FP_Eq(x, 1.0)  or  AP_FP_Eq(x,Real(0.0)) then
+  --                if  AP_FP_Eq(x, 1.0)  or  AP_FP_Eq(x,0.0) then
   --                    MainLoopPos := breaknewtcycle;
   --                    Continue;
   --                end if;
@@ -724,7 +710,7 @@ package body Beta_function is
   --                if (xt <= x0) then
   --                    yyy := (x-x0)/(x1-x0);
   --                    xt := x0+Real(0.5)*yyy*(x-x0);
-  --                    if  (xt <= Real(0.0)) then
+  --                    if  (xt <= 0.0) then
   --                        MainLoopPos := breaknewtcycle;
   --                        Continue;
   --                    end if;

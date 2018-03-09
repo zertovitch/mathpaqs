@@ -59,7 +59,8 @@ package Beta_function is
 
   --  Regularized Beta function, sometimes written as I_x(a,b).
   --  It is defined as: I_x(a,b) = Beta(x,a,b) / Beta(a,b).
-  --  It is also the cumulative distribution function of the Beta law.
+  --
+  --  It is also the cumulative distribution function of the Beta probability law.
   --  Excel: BETA.DIST(x,a,b,TRUE)
   --
   function Regularized_Beta(x, a, b: Real) return Real;
