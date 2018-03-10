@@ -65,4 +65,9 @@ package Beta_function is
   --
   function Regularized_Beta(x, a, b: Real) return Real;
 
+  --  Find x such as y = Regularized_Beta(x, a, b).
+  --
+  --  Excel: BETA.INV(y,a,b)
+  function Inverse_Regularized_Beta (y, a, b : Real) return Real;
+
 end Beta_function;

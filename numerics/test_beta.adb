@@ -2,14 +2,14 @@
 
 -- ** TO DO **:
 --
---   - test randomized with incomplete and inverse incomplete
+--   - list pathological cases of inverse incomplete inaccuracy
 --   - try gcov to see if all branches are covered
 --
 
 with Beta_function;
 
 with Ada.Numerics.Generic_Elementary_Functions;
-with Ada.Numerics; use Ada.Numerics;
+with Ada.Numerics.Float_Random;
 
 with Ada.Text_IO;                       use Ada.Text_IO;
 
@@ -25,18 +25,19 @@ procedure Test_Beta is
   package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
   use RB, REF;
 
-  function Very_Close (x, y: Real) return Boolean is
+  function Very_Close (x, y, tol: Real) return Boolean is
   begin
     if abs y <= Real'Base'Model_Small then
       return abs x <= Real'Base'Model_Small;
     else
-      return abs (x / y - 1.0) <= 1.0E-13;
+      return abs (x / y - 1.0) <= tol;
     end if;
   end Very_Close;
 
   Different_Beta_values: exception;
   Different_Incomplete_Beta_values: exception;
   Different_Regularized_Beta_values: exception;
+  Different_Inverse_Regularized_Beta_values: exception;
 
   procedure Test_complete(a, b, pbab: Real; comment: String:= "") is
     -- pbab is precomputed Beta(a,b), using another tool.
@@ -47,7 +48,7 @@ procedure Test_Beta is
       Real'Image(b) & "; " &
       Real'Image(bab) & "; " & Real'Image(pbab) & "; " & comment
     );
-    if not Very_Close(bab, pbab) then
+    if not Very_Close(bab, pbab, 1.0E-13) then
       raise Different_Beta_values;
     end if;
   end Test_complete;
@@ -63,7 +64,7 @@ procedure Test_Beta is
       Real'Image(bxab) & "; " &
       Real'Image(pbxab) & "; " & comment
     );
-    if not Very_Close(bxab, pbxab) then
+    if not Very_Close(bxab, pbxab, 1.0E-13) then
       raise Different_Incomplete_Beta_values;
     end if;
   end Test_incomplete;
@@ -79,10 +80,60 @@ procedure Test_Beta is
       Real'Image(bxab) & "; " &
       Real'Image(pbxab) & "; " & comment
     );
-    if not Very_Close(bxab, pbxab) then
+    if not Very_Close(bxab, pbxab, 1.0E-13) then
       raise Different_Regularized_Beta_values;
     end if;
   end Test_regularized;
+
+  procedure Test_inverse(y, a, b, pbiyab: Real; comment: String:= "") is
+    -- pbiyab is precomputed Regularized_Beta(a,b,x), using another tool.
+    biyab: constant Real:= Inverse_Regularized_Beta(y, a, b);
+    diff: constant Real := abs(biyab - pbiyab);
+  begin
+    Put_Line(
+      Real'Image(y) & "; " &
+      Real'Image(a) & "; " &
+      Real'Image(b) & "; " &
+      Real'Image(biyab)  & "; " &
+      Real'Image(pbiyab) & "; " &
+      Real'Image(diff)   & "; " & comment
+    );
+    --  !!  The inverse function seems much less acurate...
+    --      We search the tolerance with the number below.
+    if not Very_Close(biyab, pbiyab, 1.0E-5) then
+      raise Different_Inverse_Regularized_Beta_values;
+    end if;
+  end Test_inverse;
+
+  procedure Test_regularized_and_inverse is
+    use Ada.Numerics.Float_Random;
+    gen: Generator;
+    x, y, x2, y2, a, b, diff_x, diff_y, max_diff_x, max_diff_y: Real;
+    iter : constant := 100_000;
+  begin
+    Put_Line("Random test, #iterations:" & Integer'Image(iter));
+    Reset (gen, 1);
+    max_diff_x := 0.0;
+    max_diff_y := 0.0;
+    for i in 1 .. iter loop
+      x := Real (Random (gen));  --  Must be in [0;1], the domain of the Beta function
+      a := Real (Random (gen)) * 5.0;
+      b := Real (Random (gen)) * 5.0;
+      y := Regularized_Beta (x, a, b);
+      x2 := Inverse_Regularized_Beta (y, a, b);
+      diff_x := abs(x-x2);
+      --  Put_Line (Real'Image(abs(x-x2)));
+      max_diff_x := Real'Max (max_diff_x, diff_x);
+      --  Now the other way round
+      y := Real (Random (gen));  --  Must be in [0;1] (possible values of Regularized_Beta)
+      x := Inverse_Regularized_Beta (y, a, b);
+      y2 := Regularized_Beta (x, a, b);
+      diff_y := abs(y-y2);
+      max_diff_y := Real'Max (max_diff_y, diff_y);
+    end loop;
+    Put_Line ("Maximum difference between x and IRB(RB(x)): " & Real'Image(max_diff_x));
+    Put_Line ("Maximum difference between y and RB(IRB(y)): " & Real'Image(max_diff_y));
+  end Test_regularized_and_inverse;
 
 begin
   Put_Line("Digits:" & Integer'Image(Real'Digits));
@@ -136,13 +187,27 @@ begin
   --
   Put_Line(" x;                        a;                        b;                       " &
            " Regularized_Beta(x,a,b);  Precomp. Reg.Beta(x,a,b);");
-  Test_regularized( 0.1, 5.0, 4.0,  0.00043165);  --  Excel
-  Test_regularized( 0.2, 5.0, 4.0,  0.01040640);  --  Excel
-  Test_regularized( 0.3, 5.0, 4.0,  0.05796765);  --  Excel
-  Test_regularized( 0.4, 5.0, 4.0,  0.17367040);  --  Excel
-  Test_regularized( 0.5, 5.0, 4.0,  0.36328125);  --  Excel
-  Test_regularized( 0.6, 5.0, 4.0,  0.59408640);  --  Excel
-  Test_regularized( 0.7, 5.0, 4.0,  0.80589565);  --  Excel
-  Test_regularized( 0.8, 5.0, 4.0,  0.94371840);  --  Excel
-  Test_regularized( 0.9, 5.0, 4.0,  0.99497565);  --  Excel
+  Test_regularized( 0.1, 5.0, 4.0,  0.00043165,"Excel 2013");
+  Test_regularized( 0.2, 5.0, 4.0,  0.01040640,"Excel 2013");
+  Test_regularized( 0.3, 5.0, 4.0,  0.05796765,"Excel 2013");
+  Test_regularized( 0.4, 5.0, 4.0,  0.17367040,"Excel 2013");
+  Test_regularized( 0.5, 5.0, 4.0,  0.36328125,"Excel 2013");
+  Test_regularized( 0.6, 5.0, 4.0,  0.59408640,"Excel 2013");
+  Test_regularized( 0.7, 5.0, 4.0,  0.80589565,"Excel 2013");
+  Test_regularized( 0.8, 5.0, 4.0,  0.94371840,"Excel 2013");
+  Test_regularized( 0.9, 5.0, 4.0,  0.99497565,"Excel 2013");
+  --
+  Put_Line(" y;                        a;                        b;                       " &
+           " Inv.Reg.Beta(y,a,b);      Precomp. I.R.Beta(y,a,b); difference;");
+  Test_inverse( 0.01, 5.0, 4.0,  0.198202133178711, "Excel 2002");
+  Test_inverse( 0.1 , 5.0, 4.0,  0.344623088836670, "Excel 2002");
+  Test_inverse( 0.9 , 5.0, 4.0,  0.760338306427001, "Excel 2002");
+  Test_inverse( 0.99, 5.0, 4.0,  0.879049301147460, "Excel 2002");
+  --
+  Test_inverse( 0.01, 2.0, 5.0,  0.026762962341309, "Excel 2002");
+  Test_inverse( 0.1 , 2.0, 5.0,  0.092595100402832, "Excel 2002");
+  Test_inverse( 0.9 , 2.0, 5.0,  0.510316371917724, "Excel 2002");
+  Test_inverse( 0.99, 2.0, 5.0,  0.705684661865234, "Excel 2002");
+  --
+  Test_regularized_and_inverse;
 end Test_Beta;

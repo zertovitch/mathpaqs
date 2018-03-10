@@ -3,7 +3,6 @@
 with Gamma_function;
 
 with Ada.Numerics.Generic_Elementary_Functions;
-with Ada.Numerics; use Ada.Numerics;
 
 with Ada.Text_IO;                       use Ada.Text_IO;
 
@@ -11,7 +10,7 @@ with System;
 
 procedure Test_Gamma is
 
-  type Real is digits System.Max_Digits; 
+  type Real is digits System.Max_Digits;
   -- 15 for Long_Float (double);
   -- 18 max. for GNAT on x86
 
@@ -43,8 +42,8 @@ procedure Test_Gamma is
       lpgx:= Log(pgx);
     end if;
     Put_Line(
-      Real'Image(x) & "; " & 
-      Real'Image(gx) & "; " & Real'Image(pgx) & "; " & 
+      Real'Image(x) & "; " &
+      Real'Image(gx) & "; " & Real'Image(pgx) & "; " &
       Real'Image(lgx) & "; " & Real'Image(lpgx) & "; " & comment
     );
     if not Very_Close(gx, pgx) then
@@ -55,9 +54,11 @@ procedure Test_Gamma is
     end if;
   end Test;
 
+  use Ada.Numerics;  --  for Pi.
+
 begin
   Put_Line("Digits:" & Integer'Image(Real'Digits));
-  Put_Line(" x;                        Gamma(x);                " & 
+  Put_Line(" x;                        Gamma(x);                " &
            " Precalculated Gamma(x);   Log_Gamma(x);             Log(Precalculated Gamma(x))");
   -- Obvious (Integers), or computed by Excel 2013:
   Test( 1.0, 1.0   );
