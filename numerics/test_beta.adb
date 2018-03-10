@@ -2,7 +2,7 @@
 
 -- ** TO DO **:
 --
---   - list pathological cases of inverse incomplete inaccuracy
+--   - list pathological cases of inverse incomplete inaccuracy (could be a wrong epsilon...)
 --   - try gcov to see if all branches are covered
 --
 
@@ -25,6 +25,8 @@ procedure Test_Beta is
   package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
   use RB, REF;
 
+  --  Check relative quasi-equality
+  --
   function Very_Close (x, y, tol: Real) return Boolean is
   begin
     if abs y <= Real'Base'Model_Small then
@@ -36,7 +38,10 @@ procedure Test_Beta is
 
   Different_Beta_values: exception;
   Different_Incomplete_Beta_values: exception;
+  Different_Inverse_Beta_values_1: exception;
+  Different_Inverse_Beta_values_2: exception;
   Different_Regularized_Beta_values: exception;
+  Different_Symmetric_Regularized_Beta_values: exception;
   Different_Inverse_Regularized_Beta_values: exception;
 
   procedure Test_complete(a, b, pbab: Real; comment: String:= "") is
@@ -53,40 +58,57 @@ procedure Test_Beta is
     end if;
   end Test_complete;
 
-  procedure Test_incomplete(x, a, b, pbxab: Real; comment: String:= "") is
-    -- pbabx is precomputed Beta(a,b,x), using another tool.
-    bxab: constant Real:= Beta(x, a, b);
+  procedure Test_incomplete_and_inverse(x, a, b, pBxab: Real; comment: String:= "") is
+    -- pBabx is precomputed Beta(x,a,b), using another tool.
+    Bxab: constant Real:= Beta(x, a, b);
+    x_again: constant Real:= Inverse_Beta (Bxab, a, b);
+    x_again_from_precomp: constant Real:= Inverse_Beta (pBxab, a, b);
   begin
     Put_Line(
       Real'Image(x) & "; " &
       Real'Image(a) & "; " &
       Real'Image(b) & "; " &
-      Real'Image(bxab) & "; " &
-      Real'Image(pbxab) & "; " & comment
+      Real'Image(Bxab) & "; " &
+      Real'Image(pBxab) & "; " & comment
     );
-    if not Very_Close(bxab, pbxab, 1.0E-13) then
+    if not Very_Close(Bxab, pBxab, 1.0E-13) then
       raise Different_Incomplete_Beta_values;
     end if;
-  end Test_incomplete;
+    if not Very_Close(x, x_again, 1.0E-13) then
+      raise Different_Inverse_Beta_values_1;
+    end if;
+    if not Very_Close(x, x_again_from_precomp, 1.0E-12) then
+      raise Different_Inverse_Beta_values_2;
+    end if;
+  end Test_incomplete_and_inverse;
 
-  procedure Test_regularized(x, a, b, pbxab: Real; comment: String:= "") is
-    -- pbabx is precomputed Regularized_Beta(a,b,x), using another tool.
-    bxab: constant Real:= Regularized_Beta(x, a, b);
+  --  Specific test when the "precomputed" value is I_x(a, b)
+  --  Typically, Excel, or som exact values
+  --
+  procedure Test_regularized(x, a, b, pBxab: Real; comment: String:= "") is
+    -- pBxab is precomputed Regularized_Beta(x,a,b), using another tool.
+    Bxab: constant Real:= Regularized_Beta(x, a, b);
+    y_sym: constant Real:= 1.0 - Regularized_Beta(1.0 - x, b, a);
   begin
     Put_Line(
       Real'Image(x) & "; " &
       Real'Image(a) & "; " &
       Real'Image(b) & "; " &
-      Real'Image(bxab) & "; " &
-      Real'Image(pbxab) & "; " & comment
+      Real'Image(Bxab) & "; " &
+      Real'Image(pBxab) & "; " & comment
     );
-    if not Very_Close(bxab, pbxab, 1.0E-13) then
+    if not Very_Close(Bxab, pBxab, 1.0E-13) then
       raise Different_Regularized_Beta_values;
+    end if;
+    --  Check accuracy using symmetry property
+    --
+    if not Very_Close(Bxab, y_sym, 1.0E-13) then
+      raise Different_Symmetric_Regularized_Beta_values;
     end if;
   end Test_regularized;
 
-  procedure Test_inverse(y, a, b, pbiyab: Real; comment: String:= "") is
-    -- pbiyab is precomputed Regularized_Beta(a,b,x), using another tool.
+  procedure Test_inverse_regularized(y, a, b, pbiyab: Real; comment: String:= "") is
+    -- pbiyab is precomputed Inverse_Regularized_Beta(y,a,b), using another tool.
     biyab: constant Real:= Inverse_Regularized_Beta(y, a, b);
     diff: constant Real := abs(biyab - pbiyab);
   begin
@@ -103,15 +125,18 @@ procedure Test_Beta is
     if not Very_Close(biyab, pbiyab, 1.0E-5) then
       raise Different_Inverse_Regularized_Beta_values;
     end if;
-  end Test_inverse;
+  end Test_inverse_regularized;
 
-  procedure Test_regularized_and_inverse is
+  procedure Test_regularized_and_inverse_regularized is
     use Ada.Numerics.Float_Random;
     gen: Generator;
     x, y, x2, y2, a, b, diff_x, diff_y, max_diff_x, max_diff_y: Real;
     iter : constant := 100_000;
   begin
-    Put_Line("Random test, #iterations:" & Integer'Image(iter));
+    Put_Line(
+      "Random test with Regularized then Inverse_Regularized, or vice versa, #iterations:" &
+      Integer'Image(iter)
+    );
     Reset (gen, 1);
     max_diff_x := 0.0;
     max_diff_y := 0.0;
@@ -133,7 +158,7 @@ procedure Test_Beta is
     end loop;
     Put_Line ("Maximum difference between x and IRB(RB(x)): " & Real'Image(max_diff_x));
     Put_Line ("Maximum difference between y and RB(IRB(y)): " & Real'Image(max_diff_y));
-  end Test_regularized_and_inverse;
+  end Test_regularized_and_inverse_regularized;
 
 begin
   Put_Line("Digits:" & Integer'Image(Real'Digits));
@@ -149,41 +174,41 @@ begin
   Put_Line(" x;                        a;                        b;                       " &
            " Beta(x,a,b);              Precomputed Beta(x,a,b);");
   --  Wolfram
-  Test_incomplete( 0.01, 5.0, 4.0,  1.95042732142857142857142857142857142857E-11,  "a=5, b=4");
-  Test_incomplete( 0.1 , 5.0, 4.0,  1.541607142857142857142857142857142857E-6,     "a=5, b=4");
-  Test_incomplete( 0.5 , 5.0, 4.0,  0.0012974330357142857142857142857142857142857, "a=5, b=4");
-  Test_incomplete( 0.9 , 5.0, 4.0,  0.0035534844642857142857142857142857142857,    "a=5, b=4");
-  Test_incomplete( 0.99, 5.0, 4.0,  0.0035714261504342732142857142857142857142857, "a=5, b=4");
+  Test_incomplete_and_inverse( 0.01, 5.0, 4.0,  1.95042732142857142857142857E-11,  "a=5, b=4");
+  Test_incomplete_and_inverse( 0.1 , 5.0, 4.0,  1.541607142857142857142857E-6,     "a=5, b=4");
+  Test_incomplete_and_inverse( 0.5 , 5.0, 4.0,  0.0012974330357142857142857142857, "a=5, b=4");
+  Test_incomplete_and_inverse( 0.9 , 5.0, 4.0,  0.0035534844642857142857142857,    "a=5, b=4");
+  Test_incomplete_and_inverse( 0.99, 5.0, 4.0,  0.0035714261504342732142857142857, "a=5, b=4");
   --
-  Test_incomplete( 0.01, 0.5, 0.5,  0.2003348423231195926910463589053866371373519, "a=0.5, b=0.5");
-  Test_incomplete( 0.1 , 0.5, 0.5,  0.6435011087932843868028092287173226380415105, "a=0.5, b=0.5");
-  Test_incomplete( 0.5 , 0.5, 0.5,  1.5707963267948966192313216916397514420985846, "a=0.5, b=0.5");
-  Test_incomplete( 0.9 , 0.5, 0.5,  2.4980915447965088516598341545621802461556588, "a=0.5, b=0.5");
-  Test_incomplete( 0.99, 0.5, 0.5,  2.9412578112666736457715970243741162470598174, "a=0.5, b=0.5");
+  Test_incomplete_and_inverse( 0.01, 0.5, 0.5,  0.2003348423231195926910463589053, "a=0.5, b=0.5");
+  Test_incomplete_and_inverse( 0.1 , 0.5, 0.5,  0.6435011087932843868028092287173, "a=0.5, b=0.5");
+  Test_incomplete_and_inverse( 0.5 , 0.5, 0.5,  1.5707963267948966192313216916397, "a=0.5, b=0.5");
+  Test_incomplete_and_inverse( 0.9 , 0.5, 0.5,  2.4980915447965088516598341545621, "a=0.5, b=0.5");
+  Test_incomplete_and_inverse( 0.99, 0.5, 0.5,  2.9412578112666736457715970243741, "a=0.5, b=0.5");
   --
-  Test_incomplete( 0.01, 5.0, 1.0,  2.0E-11,       "a=5, b=1");
-  Test_incomplete( 0.1 , 5.0, 1.0,  2.0E-06,       "a=5, b=1");
-  Test_incomplete( 0.5 , 5.0, 1.0,  0.00625,       "a=5, b=1");
-  Test_incomplete( 0.9 , 5.0, 1.0,  0.118098,      "a=5, b=1");
-  Test_incomplete( 0.99, 5.0, 1.0,  0.19019800998, "a=5, b=1");
+  Test_incomplete_and_inverse( 0.01, 5.0, 1.0,  2.0E-11,       "a=5, b=1");
+  Test_incomplete_and_inverse( 0.1 , 5.0, 1.0,  2.0E-06,       "a=5, b=1");
+  Test_incomplete_and_inverse( 0.5 , 5.0, 1.0,  0.00625,       "a=5, b=1");
+  Test_incomplete_and_inverse( 0.9 , 5.0, 1.0,  0.118098,      "a=5, b=1");
+  Test_incomplete_and_inverse( 0.99, 5.0, 1.0,  0.19019800998, "a=5, b=1");
   --
-  Test_incomplete( 0.01, 1.0, 3.0,  0.0099003333333333333333333333333333333333333, "a=1, b=3");
-  Test_incomplete( 0.1 , 1.0, 3.0,  0.0903333333333333333333333333333333333333333, "a=1, b=3");
-  Test_incomplete( 0.5 , 1.0, 3.0,  0.2916666666666666666666666666666666666666666, "a=1, b=3");
-  Test_incomplete( 0.9 , 1.0, 3.0,  0.333,                                         "a=1, b=3");
-  Test_incomplete( 0.99, 1.0, 3.0,  0.333333,                                      "a=1, b=3");
+  Test_incomplete_and_inverse( 0.01, 1.0, 3.0,  0.00990033333333333333333333333333333, "a=1, b=3");
+  Test_incomplete_and_inverse( 0.1 , 1.0, 3.0,  0.09033333333333333333333333333333333, "a=1, b=3");
+  Test_incomplete_and_inverse( 0.5 , 1.0, 3.0,  0.29166666666666666666666666666666666, "a=1, b=3");
+  Test_incomplete_and_inverse( 0.9 , 1.0, 3.0,  0.333,                                 "a=1, b=3");
+  Test_incomplete_and_inverse( 0.99, 1.0, 3.0,  0.333333,                              "a=1, b=3");
   --
-  Test_incomplete( 0.01, 2.0, 2.0,  0.0000496666666666666666666666666666666666666, "a=2, a=2");
-  Test_incomplete( 0.1 , 2.0, 2.0,  0.0046666666666666666666666666666666666666666, "a=2, a=2");
-  Test_incomplete( 0.5 , 2.0, 2.0,  0.0833333333333333333333333333333333333333333, "a=2, a=2");
-  Test_incomplete( 0.9 , 2.0, 2.0,  0.162,                                         "a=2, a=2");
-  Test_incomplete( 0.99, 2.0, 2.0,  0.166617,                                      "a=2, a=2");
+  Test_incomplete_and_inverse( 0.01, 2.0, 2.0,  0.00004966666666666666666666666666666, "a=2, a=2");
+  Test_incomplete_and_inverse( 0.1 , 2.0, 2.0,  0.00466666666666666666666666666666666, "a=2, a=2");
+  Test_incomplete_and_inverse( 0.5 , 2.0, 2.0,  0.08333333333333333333333333333333333, "a=2, a=2");
+  Test_incomplete_and_inverse( 0.9 , 2.0, 2.0,  0.162,                                 "a=2, a=2");
+  Test_incomplete_and_inverse( 0.99, 2.0, 2.0,  0.166617,                              "a=2, a=2");
   --
-  Test_incomplete( 0.01, 2.0, 5.0,  0.0000486815868333333333333333333333333333333, "a=2, a=5");
-  Test_incomplete( 0.1 , 2.0, 5.0,  0.0038088333333333333333333333333333333333333, "a=2, a=5");
-  Test_incomplete( 0.5 , 2.0, 5.0,  0.0296875,                                     "a=2, a=5");
-  Test_incomplete( 0.9 , 2.0, 5.0,  0.0333315,                                     "a=2, a=5");
-  Test_incomplete( 0.99, 2.0, 5.0,  0.0333333333135,                               "a=2, a=5");
+  Test_incomplete_and_inverse( 0.01, 2.0, 5.0,  0.00004868158683333333333333333333333, "a=2, a=5");
+  Test_incomplete_and_inverse( 0.1 , 2.0, 5.0,  0.00380883333333333333333333333333333, "a=2, a=5");
+  Test_incomplete_and_inverse( 0.5 , 2.0, 5.0,  0.0296875,                             "a=2, a=5");
+  Test_incomplete_and_inverse( 0.9 , 2.0, 5.0,  0.0333315,                             "a=2, a=5");
+  Test_incomplete_and_inverse( 0.99, 2.0, 5.0,  0.0333333333135,                       "a=2, a=5");
   --
   Put_Line(" x;                        a;                        b;                       " &
            " Regularized_Beta(x,a,b);  Precomp. Reg.Beta(x,a,b);");
@@ -196,18 +221,23 @@ begin
   Test_regularized( 0.7, 5.0, 4.0,  0.80589565,"Excel 2013");
   Test_regularized( 0.8, 5.0, 4.0,  0.94371840,"Excel 2013");
   Test_regularized( 0.9, 5.0, 4.0,  0.99497565,"Excel 2013");
+  Test_regularized( 0.9, 5.0, 4.0,  0.99497565,"Excel 2013");
+  --
+  --  !! Exact values - we could randomize this kind of tests...
+  Test_regularized( 0.1234, 6.54321, 1.0,  0.1234 ** 6.54321, "I_x(a,1) = x^a");
+  Test_regularized( 0.7531, 1.0, 1.246,  1.0 - (1.0 - 0.7531) ** 1.246, "I_x(1,b) = 1 - (1-x)^b");
   --
   Put_Line(" y;                        a;                        b;                       " &
            " Inv.Reg.Beta(y,a,b);      Precomp. I.R.Beta(y,a,b); difference;");
-  Test_inverse( 0.01, 5.0, 4.0,  0.198202133178711, "Excel 2002");
-  Test_inverse( 0.1 , 5.0, 4.0,  0.344623088836670, "Excel 2002");
-  Test_inverse( 0.9 , 5.0, 4.0,  0.760338306427001, "Excel 2002");
-  Test_inverse( 0.99, 5.0, 4.0,  0.879049301147460, "Excel 2002");
+  Test_inverse_regularized( 0.01, 5.0, 4.0,  0.198202133178711, "Excel 2002");
+  Test_inverse_regularized( 0.1 , 5.0, 4.0,  0.344623088836670, "Excel 2002");
+  Test_inverse_regularized( 0.9 , 5.0, 4.0,  0.760338306427001, "Excel 2002");
+  Test_inverse_regularized( 0.99, 5.0, 4.0,  0.879049301147460, "Excel 2002");
   --
-  Test_inverse( 0.01, 2.0, 5.0,  0.026762962341309, "Excel 2002");
-  Test_inverse( 0.1 , 2.0, 5.0,  0.092595100402832, "Excel 2002");
-  Test_inverse( 0.9 , 2.0, 5.0,  0.510316371917724, "Excel 2002");
-  Test_inverse( 0.99, 2.0, 5.0,  0.705684661865234, "Excel 2002");
+  Test_inverse_regularized( 0.01, 2.0, 5.0,  0.026762962341309, "Excel 2002");
+  Test_inverse_regularized( 0.1 , 2.0, 5.0,  0.092595100402832, "Excel 2002");
+  Test_inverse_regularized( 0.9 , 2.0, 5.0,  0.510316371917724, "Excel 2002");
+  Test_inverse_regularized( 0.99, 2.0, 5.0,  0.705684661865234, "Excel 2002");
   --
-  Test_regularized_and_inverse;
+  Test_regularized_and_inverse_regularized;
 end Test_Beta;

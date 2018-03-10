@@ -271,6 +271,16 @@ package body Beta_function is
     return s;
   end IncompleteBetaPS;
 
+  function Beta (x, a, b: Real) return Real is
+  begin
+    return Regularized_Beta (x, a, b) * Beta (a, b);
+  end Beta;
+
+  function Inverse_Beta (y, a, b : Real) return Real is
+  begin
+    return Inverse_Regularized_Beta (y / Beta (a, b), a, b);
+  end Inverse_Beta;
+
   --  ************************************************************************
   --  Incomplete beta integral
   --
@@ -312,11 +322,6 @@ package body Beta_function is
   --  Cephes Math Library, Release 2.8:  June, 2000
   --  Copyright 1984, 1995, 2000 by Stephen L. Moshier
   --  ************************************************************************
-
-  function Beta(x, a, b: Real) return Real is
-  begin
-    return Regularized_Beta(x,a,b) * Beta(a,b);
-  end Beta;
 
   function Regularized_Beta(x, a, b: Real) return Real is
     aa, bb, xx : Real;
@@ -438,26 +443,26 @@ package body Beta_function is
       d:Real;
       yyy:Real;
       x:Real;
-      x0:Real;
-      x1:Real;
+      x0:Real := 0.0;
+      x1:Real := 1.0;
       lgm:Real;
       yp:Real;
       di:Real;
       dithresh:Real;
-      yl:Real;
-      yh:Real;
+      yl:Real := 0.0;
+      yh:Real := 1.0;
       xt:Real;
       i:Integer_for_Beta;
       rflg:Integer_for_Beta;
       dir:Integer_for_Beta;
-      nflg:Integer_for_Beta;
-      MainLoopPos:Integer_for_Beta;
-      ihalve:Integer_for_Beta;
-      ihalvecycle:Integer_for_Beta;
-      newt:Integer_for_Beta;
-      newtcycle:Integer_for_Beta;
-      breaknewtcycle:Integer_for_Beta;
-      breakihalvecycle:Integer_for_Beta;
+      nflg:Integer_for_Beta := 0;
+      MainLoopPos:Integer_for_Beta := 0;
+      ihalve: constant := 1;
+      ihalvecycle: constant := 2;
+      newt: constant := 3;
+      newtcycle: constant := 4;
+      breaknewtcycle: constant := 5;
+      breakihalvecycle: constant := 6;
   begin
     i := 0;
     if Almost_zero(y) then
@@ -466,18 +471,6 @@ package body Beta_function is
     if Almost_zero(y - 1.0) then
       return 1.0;
     end if;
-    x0 := 0.0;
-    yl := 0.0;
-    x1 :=  1.0;
-    yh :=  1.0;
-    nflg := 0;
-    MainLoopPos := 0;
-    ihalve := 1;
-    ihalvecycle := 2;
-    newt := 3;
-    newtcycle := 4;
-    breaknewtcycle := 5;
-    breakihalvecycle := 6;
     Main_Loop:
     loop
       --
@@ -490,19 +483,19 @@ package body Beta_function is
                 aaa := a;
                 bbb := b;
                 y0 := y;
-                x := aaa/(aaa+bbb);
-                yyy := Regularized_Beta(x, aaa, bbb);
+                x := aaa / (aaa+bbb);
+                yyy := Regularized_Beta (x, aaa, bbb);
                 MainLoopPos := ihalve;
                 goto Continue;
             else
-                dithresh := Real(1.0e-4);
+                dithresh := 1.0e-4;
             end if;
-            yp := -Normal_inverse_CDF(y);  --  ALGLIB: InvNormalDistribution
+            yp := - Normal_inverse_CDF(y);  --  ALGLIB: InvNormalDistribution
             if y > 0.5 then
                 rflg := 1;
                 aaa := b;
                 bbb := a;
-                y0 :=  1.0-y;
+                y0 := 1.0 - y;
                 yp := -yp;
             else
                 rflg := 0;
@@ -510,18 +503,18 @@ package body Beta_function is
                 bbb := b;
                 y0 := y;
             end if;
-            lgm := (yp*yp-3.0)/Real(6.0);
-            x := 2.0/( 1.0/(2.0*aaa- 1.0)+ 1.0/(2.0*bbb- 1.0));
-            d := yp*Sqrt(x+lgm)/x-( 1.0/(2.0*bbb- 1.0)- 1.0/(2.0*aaa- 1.0))*
-                   (lgm+Real(5.0)/Real(6.0)-2.0/(3.0*x));
+            lgm := (yp*yp-3.0) / 6.0;
+            x := 2.0 / ( 1.0 / (2.0*aaa - 1.0)+ 1.0 / (2.0*bbb - 1.0));
+            d := yp * Sqrt(x+lgm) / x - ( 1.0/(2.0*bbb- 1.0) - 1.0/(2.0*aaa- 1.0))*
+                   (lgm + 5.0/6.0 - 2.0/(3.0*x));
             d := 2.0*d;
             if  d < Log(MinRealNumber) then
                 x := 0.0;
                 exit Main_Loop;
             end if;
-            x := aaa/(aaa+bbb*Exp(d));
-            yyy := Regularized_Beta(x, aaa, bbb);
-            yp := (yyy-y0)/y0;
+            x := aaa / (aaa+bbb*Exp(d));
+            yyy := Regularized_Beta (x, aaa, bbb);
+            yp := (yyy-y0) / y0;
             if abs(yp) < Real(0.2) then
                 MainLoopPos := newt;
                 goto Continue;
@@ -543,7 +536,7 @@ package body Beta_function is
         --  ihalvecycle
         --
         if MainLoopPos = ihalvecycle then
-            if  i<=99 then
+            if i <= 99 then
                 if  i/=0 then
                     x := x0+di*(x1-x0);
                     if Almost_zero(x - 1.0) then
@@ -555,12 +548,12 @@ package body Beta_function is
                         exit Main_Loop when Almost_zero(x);
                     end if;
                     yyy := Regularized_Beta(x, aaa, bbb);
-                    yp := (x1-x0)/(x1+x0);
+                    yp := (x1-x0) / (x1+x0);
                     if abs(yp) < dithresh then
                         MainLoopPos := newt;
                         goto Continue;
                     end if;
-                    yp := (yyy-y0)/y0;
+                    yp := (yyy-y0) / y0;
                     if abs(yp) < dithresh then
                         MainLoopPos := newt;
                         goto Continue;
@@ -574,17 +567,17 @@ package body Beta_function is
                         di := 0.5;
                     else
                         if dir > 3 then
-                            di :=  1.0-( 1.0-di)*( 1.0-di);
+                            di :=  1.0 - (1.0-di) * ( 1.0-di);
                         else
                             if dir > 1 then
-                                di := 0.5*di+0.5;
+                                di := 0.5 * di + 0.5;
                             else
-                                di := (y0-yyy)/(yh-yl);
+                                di := (y0-yyy) / (yh-yl);
                             end if;
                         end if;
                     end if;
                     dir := dir + 1;
-                    if x0 > Real(0.75) then
+                    if x0 > 0.75 then
                         if  rflg = 1 then
                             rflg := 0;
                             aaa := a;
@@ -596,7 +589,7 @@ package body Beta_function is
                             bbb := a;
                             y0 :=  1.0-y;
                         end if;
-                        x :=  1.0-x;
+                        x :=  1.0 - x;
                         yyy := Regularized_Beta(x, aaa, bbb);
                         x0 := 0.0;
                         yl := 0.0;
@@ -620,9 +613,9 @@ package body Beta_function is
                             di := di*di;
                         else
                             if  dir < -1 then
-                                di := 0.5*di;
+                                di := 0.5 * di;
                             else
-                                di := (yyy-y0)/(yh-yl);
+                                di := (yyy-y0) / (yh-yl);
                             end if;
                         end if;
                     end if;
@@ -668,7 +661,7 @@ package body Beta_function is
         if  MainLoopPos = newtcycle then
             if  i <= 7 then
                 if  i /= 0 then
-                    yyy := Regularized_Beta(x, aaa, bbb);
+                    yyy := Regularized_Beta (x, aaa, bbb);
                 end if;
                 if  yyy < yl then
                     x := x0;
@@ -678,7 +671,7 @@ package body Beta_function is
                         x := x1;
                         yyy := yh;
                     else
-                        if  yyy < y0 then
+                        if yyy < y0 then
                             x0 := x;
                             yl := yyy;
                         else
@@ -691,7 +684,7 @@ package body Beta_function is
                     MainLoopPos := breaknewtcycle;
                     goto Continue;
                 end if;
-                d := (aaa- 1.0) * Log(x)+(bbb- 1.0)*Log( 1.0-x)+lgm;
+                d := (aaa - 1.0) * Log(x) + (bbb - 1.0) * Log(1.0 - x) + lgm;
                 exit Main_Loop when d < Log(MinRealNumber);
                 if  d > Log(MaxRealNumber) then
                     MainLoopPos := breaknewtcycle;
@@ -701,16 +694,16 @@ package body Beta_function is
                 d := (yyy-y0)/d;
                 xt := x-d;
                 if xt <= x0 then
-                    yyy := (x-x0)/(x1-x0);
-                    xt := x0+0.5*yyy*(x-x0);
-                    if  xt <= 0.0 then
+                    yyy := (x-x0) / (x1-x0);
+                    xt := x0 + 0.5 * yyy * (x-x0);
+                    if xt <= 0.0 then
                         MainLoopPos := breaknewtcycle;
                         goto Continue;
                     end if;
                 end if;
                 if xt >= x1 then
                     yyy := (x1-x) / (x1-x0);
-                    xt := x1-0.5 * yyy * (x1-x);
+                    xt := x1 - 0.5 * yyy * (x1-x);
                     if xt >= 1.0 then
                         MainLoopPos := breaknewtcycle;
                         goto Continue;
