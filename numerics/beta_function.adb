@@ -1,18 +1,16 @@
 -- Translated on 9-Mar-2018 by (New) P2Ada v. 28-Oct-2009
 
 with Ada.Numerics.Generic_Elementary_Functions;
-with Ada.Numerics; use Ada.Numerics;
 
-with Gamma_function;
-with Generic_Random_Functions;
+with Gamma_function, Phi_function;
 
 package body Beta_function is
 
   package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
-  package RRF is new Generic_Random_Functions (Real);
+  package RPhF is new Phi_function (Real);
   package Real_Gamma is new Gamma_function(Real);
 
-  use REF, RRF, Real_Gamma;
+  use REF, Real_Gamma;
 
   --  ************************************************************************
   --  Beta function
@@ -490,7 +488,7 @@ package body Beta_function is
             else
                 dithresh := 1.0e-4;
             end if;
-            yp := - Normal_inverse_CDF(y);  --  ALGLIB: InvNormalDistribution
+            yp := - RPhF.Inverse_Phi (y);  --  ALGLIB: InvNormalDistribution
             if y > 0.5 then
                 rflg := 1;
                 aaa := b;

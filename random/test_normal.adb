@@ -23,12 +23,13 @@ procedure Test_Normal is
   x, y, z, diff, max_diff, sum_diff, avg_diff : Real;
 
 begin
-  Put_Line("Real'Digits =" & Integer'Image(Real'Digits));
-  Put("Real'First ="); Put(Real'First); New_Line;
-  Put("Real'Last ="); Put(Real'Last);  New_Line;
+  Put_Line ("Real'Digits =" & Integer'Image (Real'Digits));
+  Put ("Real'First ="); Put (Real'First); New_Line;
+  Put ("Real'Last ="); Put (Real'Last);  New_Line;
+  Put_Line ("Total steps =" & Integer'Image (max*2));
   max_diff:= 0.0;
   sum_diff:= 0.0;
-  for i in -max..max loop
+  for i in -max .. max loop
     x:= Real(i) * bound / Real(max);
     y:= Normal_CDF(x);
     z:= Normal_inverse_CDF(y);
