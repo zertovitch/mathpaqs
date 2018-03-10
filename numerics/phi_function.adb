@@ -1,4 +1,3 @@
-with Ada.Numerics;                      use Ada.Numerics;
 with Ada.Numerics.Generic_Elementary_Functions;
 
 package body Phi_function is
@@ -212,27 +211,27 @@ package body Phi_function is
   --  Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
   --  ************************************************************************
 
-  function Inverse_Phi (y0 : Real) return Real is
+  function Inverse_Phi (y : Real) return Real is
     Expm2: constant:= 0.13533528323661269189;
     S2Pi : constant:= 2.50662827463100050242;
-    x, y, z, y2, x0, x1:Real;
+    x, y_var, z, y2, x0, x1:Real;
     code: Integer:= 1;
     P0, Q0, P1, Q1, P2, Q2:Real;
   begin
-    if y0 <= 0.0 then  --  was < in the Pascal code -> Log(0.0) later...
+    if y <= 0.0 then  --  was < in the Pascal code -> causes a Log(0.0) later...
       return Real'First;
     end if;
-    if y0 >= 1.0 then
+    if y >= 1.0 then
       return Real'Last;
     end if;
-    y := y0;
-    if y > 1.0 - Expm2 then
-      y := 1.0 - y;
+    y_var := y;
+    if y_var > 1.0 - Expm2 then
+      y_var := 1.0 - y_var;
       code := 0;
     end if;
-    if y > Expm2 then
-        y := y - 0.5;
-        y2 := y*y;
+    if y_var > Expm2 then
+        y_var := y_var - 0.5;
+        y2 := y_var*y_var;
         P0 := -59.9633501014107895267;
         P0 :=  98.0010754185999661536+y2*P0;
         P0 := -56.6762857469070293439+y2*P0;
@@ -247,10 +246,10 @@ package body Phi_function is
         Q0 := -82.0372256168333339912+y2*Q0;
         Q0 :=  15.9056225126211695515+y2*Q0;
         Q0 := -1.18331621121330003142+y2*Q0;
-        x := y+y*y2*P0/Q0;
+        x := y_var + y_var*y2*P0/Q0;
         return x*S2Pi;
     end if;
-    x := Sqrt(-2.0*Log(y));
+    x := Sqrt(-2.0*Log(y_var));
     x0 := x - Log(x)/x;
     z := 1.0/x;
     if x < 8.0 then

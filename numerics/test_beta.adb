@@ -18,7 +18,7 @@ with System;
 procedure Test_Beta is
 
   type Real is digits System.Max_Digits;
-  -- 15 for Long_Float (double);
+  -- 15 for Long_Float (IEEE double);
   -- 18 max. for GNAT on x86
 
   package RB is new Beta_function(Real);
@@ -191,7 +191,10 @@ procedure Test_Beta is
   end Test_regularized_and_inverse_regularized;
 
 begin
-  Put_Line("Digits:" & Integer'Image(Real'Digits));
+  Put_Line ("Real'Digits =" & Integer'Image (Real'Digits));
+  Put_Line ("Real'First  =" & Real'Image(Real'First));
+  Put_Line ("Real'Last   =" & Real'Image(Real'Last));
+  Put_Line("----");
   Put_Line(" a;                        b;                       " &
            " Beta(a,b);                Precomputed Beta(a,b);");
   --

@@ -24,8 +24,8 @@ procedure Test_Normal is
 
 begin
   Put_Line ("Real'Digits =" & Integer'Image (Real'Digits));
-  Put ("Real'First ="); Put (Real'First); New_Line;
-  Put ("Real'Last ="); Put (Real'Last);  New_Line;
+  Put ("Real'First  ="); Put (Real'First); New_Line;
+  Put ("Real'Last   ="); Put (Real'Last);  New_Line;
   Put_Line ("Total steps =" & Integer'Image (max*2));
   max_diff:= 0.0;
   sum_diff:= 0.0;

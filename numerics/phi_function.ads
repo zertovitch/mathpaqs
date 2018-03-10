@@ -37,6 +37,6 @@ package Phi_function is
 
   function Phi (x: Real) return Real;
 
-  function Inverse_Phi (y0 : Real) return Real;
+  function Inverse_Phi (y : Real) return Real;
 
 end Phi_function;
