@@ -161,7 +161,7 @@ procedure Test_Beta is
     use Ada.Numerics.Float_Random;
     gen: Generator;
     x, y, x2, y2, a, b, diff_x, diff_y, max_diff_x, max_diff_y: Real;
-    iter : constant := 100_000;
+    iter : constant := 10_000;
   begin
     Put_Line(
       "Random test with Regularized then Inverse_Regularized, or vice versa; #iterations:" &
@@ -172,8 +172,8 @@ procedure Test_Beta is
     max_diff_y := 0.0;
     for i in 1 .. iter loop
       x := Real (Random (gen));  --  Must be in [0;1], the domain of Regularized_Beta
-      a := Real (Random (gen)) * 5.0;
-      b := Real (Random (gen)) * 5.0;
+      a := Real (Random (gen)) * 10.0;
+      b := Real (Random (gen)) * 10.0;
       y := Regularized_Beta (x, a, b);
       x2 := Inverse_Regularized_Beta (y, a, b);
       diff_x := abs(x-x2);
@@ -185,6 +185,19 @@ procedure Test_Beta is
       y2 := Regularized_Beta (x, a, b);
       diff_y := abs(y-y2);
       max_diff_y := Real'Max (max_diff_y, diff_y);
+      if diff_y > 1.0e-4 then
+        Put_Line ("Bork case!");
+        Put_Line(" y;                        a;                        b;                       " &
+                 " Inv.Reg.Beta(y,a,b);      R.Beta(I.R.Beta(y,a,b));  difference;");
+        Put_Line(
+          Real'Image(y) & "; " &
+          Real'Image(a) & "; " &
+          Real'Image(b) & "; " &
+          Real'Image(x)  & "; " &
+          Real'Image(y2) & "; " &
+          Real'Image(diff_y)
+        );
+      end if;
     end loop;
     Put_Line ("Maximum difference between x and IRB(RB(x)): " & Real'Image(max_diff_x));
     Put_Line ("Maximum difference between y and RB(IRB(y)): " & Real'Image(max_diff_y));
@@ -273,6 +286,16 @@ begin
   Test_inverse_regularized( 0.1 , 2.0, 5.0,  0.092595100402832, "Excel 2002");
   Test_inverse_regularized( 0.9 , 2.0, 5.0,  0.510316371917724, "Excel 2002");
   Test_inverse_regularized( 0.99, 2.0, 5.0,  0.705684661865234, "Excel 2002");
+  --
+  --  Test_inverse_regularized(
+  --    6.24895215034484863E-01,
+  --    3.34854155778884888E+00,
+  --    1.50668609421700239E-02,
+  --    0.9999999999999999999999999999892137  ,  -- Wolfram [Note the 28 x '9' !...]
+  --    "Bork case with our ALGLIB version; error with Excel 2002"
+  --  );
+  --
+  --  x found by our ALGLIB version: 9.99999999999999500E-01
   --
   Test_regularized_and_inverse_regularized;
 end Test_Beta;
