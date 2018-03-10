@@ -83,7 +83,7 @@ procedure Test_Beta is
   end Test_incomplete_and_inverse;
 
   --  Specific test when the "precomputed" value is I_x(a, b)
-  --  Typically, Excel, or som exact values
+  --  Typically, Excel, or some exact values
   --
   procedure Test_regularized(x, a, b, pBxab: Real; comment: String:= "") is
     -- pBxab is precomputed Regularized_Beta(x,a,b), using another tool.
@@ -106,6 +106,36 @@ procedure Test_Beta is
       raise Different_Symmetric_Regularized_Beta_values;
     end if;
   end Test_regularized;
+
+  procedure Test_regularized_on_analytic_values is
+    use Ada.Numerics.Float_Random;
+    gen: Generator;
+    x, y, a, b, diff_yb1, diff_ya1, max_diff_yb1, max_diff_ya1: Real;
+    iter : constant := 1_000_000;
+  begin
+    Put_Line(
+      "Random test with Regularized on cases with an analytic value; #iterations:" &
+      Integer'Image(iter)
+    );
+    max_diff_ya1 := 0.0;
+    max_diff_yb1 := 0.0;
+    for i in 1 .. iter loop
+      --  I_x(a,1) = x^a
+      x := Real (Random (gen));
+      a := Real (Random (gen)) * 20.0;
+      y := Regularized_Beta (x, a, 1.0);
+      diff_yb1 := abs(y - x ** a);
+      max_diff_yb1 := Real'Max (max_diff_yb1, diff_yb1);
+      --  I_x(1,b) = 1 - (1-x)^b
+      x := Real (Random (gen));
+      b := Real (Random (gen)) * 20.0;
+      y := Regularized_Beta (x, 1.0, b);
+      diff_ya1 := abs(y-(1.0-(1.0-x)**b));
+      max_diff_ya1 := Real'Max (max_diff_ya1, diff_ya1);
+    end loop;
+    Put_Line ("Maximum difference for cases where a=1: " & Real'Image(max_diff_ya1));
+    Put_Line ("Maximum difference for cases where b=1: " & Real'Image(max_diff_yb1));
+  end Test_regularized_on_analytic_values;
 
   procedure Test_inverse_regularized(y, a, b, pbiyab: Real; comment: String:= "") is
     -- pbiyab is precomputed Inverse_Regularized_Beta(y,a,b), using another tool.
@@ -134,14 +164,14 @@ procedure Test_Beta is
     iter : constant := 100_000;
   begin
     Put_Line(
-      "Random test with Regularized then Inverse_Regularized, or vice versa, #iterations:" &
+      "Random test with Regularized then Inverse_Regularized, or vice versa; #iterations:" &
       Integer'Image(iter)
     );
     Reset (gen, 1);
     max_diff_x := 0.0;
     max_diff_y := 0.0;
     for i in 1 .. iter loop
-      x := Real (Random (gen));  --  Must be in [0;1], the domain of the Beta function
+      x := Real (Random (gen));  --  Must be in [0;1], the domain of Regularized_Beta
       a := Real (Random (gen)) * 5.0;
       b := Real (Random (gen)) * 5.0;
       y := Regularized_Beta (x, a, b);
@@ -223,9 +253,11 @@ begin
   Test_regularized( 0.9, 5.0, 4.0,  0.99497565,"Excel 2013");
   Test_regularized( 0.9, 5.0, 4.0,  0.99497565,"Excel 2013");
   --
-  --  !! Exact values - we could randomize this kind of tests...
+  --  Exact values
   Test_regularized( 0.1234, 6.54321, 1.0,  0.1234 ** 6.54321, "I_x(a,1) = x^a");
   Test_regularized( 0.7531, 1.0, 1.246,  1.0 - (1.0 - 0.7531) ** 1.246, "I_x(1,b) = 1 - (1-x)^b");
+  --  We do the same, randomized.
+  Test_regularized_on_analytic_values;
   --
   Put_Line(" y;                        a;                        b;                       " &
            " Inv.Reg.Beta(y,a,b);      Precomp. I.R.Beta(y,a,b); difference;");

@@ -1,6 +1,7 @@
 with Ada.Numerics;                      use Ada.Numerics;
-
 with Ada.Numerics.Generic_Elementary_Functions;
+
+--  with Beta_function;
 
 package body Generic_Random_Functions is
 
@@ -323,7 +324,8 @@ package body Generic_Random_Functions is
     k: Integer;
   begin
     -- Algo found in:
-    -- http://en.wikipedia.org/wiki/Poisson_distribution#Generating_Poisson-distributed_random_variables
+    -- http://en.wikipedia.org/wiki/Poisson_distribution
+    --   #Generating_Poisson-distributed_random_variables
     -- referring to:
     -- Knuth (whom else ?!), The Art of Computer Programming,
     -- Volume 2, Seminumerical algorithms, 3.4.1. Numerical Distributions,
@@ -351,5 +353,13 @@ package body Generic_Random_Functions is
   begin
     return 1.0 - (threshold / x) ** alpha;
   end Pareto_CDF;
+
+  --  !! Need to solve circular instanciation
+
+  --  function Beta_CDF (x, a, b: Real) return Real is
+  --    package RBF is new Beta_function (Real);
+  --  begin
+  --    return RBF.Regularized_Beta (x,a,b);
+  --  end Beta_CDF;
 
 end Generic_Random_Functions;
