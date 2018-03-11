@@ -108,7 +108,7 @@ procedure Test_Beta is
     use Ada.Numerics.Float_Random;
     gen: Generator;
     x, y, a, b, diff_yb1, diff_ya1, max_diff_yb1, max_diff_ya1: Real;
-    iter : constant := 100_000;
+    iter : constant := 1_000_000;
   begin
     Put_Line(
       "Random test with Regularized on cases with an analytic value; #iterations:" &
@@ -157,7 +157,7 @@ procedure Test_Beta is
     use Ada.Numerics.Float_Random;
     gen: Generator;
     x, y, x2, y2, a, b, diff_x, diff_y, max_diff_x, max_diff_y: Real;
-    iter : constant := 100_000;
+    iter : constant := 10_000_000;
     bork_level: constant := 1.0e-4;
   begin
     Put_Line(
@@ -172,8 +172,8 @@ procedure Test_Beta is
       --  We avoid cases of (a,b) where any approximation of Beta
       --  or its inverse *must* become inaccurate
       --  - discussed in Beta_function package spec.
-      a := 0.2 + Real (Random (gen)) * 4.0;
-      b := 0.2 + Real (Random (gen)) * 4.0;
+      a := 0.3 + Real (Random (gen)) * 3.0;
+      b := 0.3 + Real (Random (gen)) * 3.0;
       y := Regularized_Beta (x, a, b);
       x2 := Inverse_Regularized_Beta (y, a, b);
       diff_x := abs(x-x2);

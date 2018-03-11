@@ -435,32 +435,32 @@ package body Beta_function is
   --  ************************************************************************
 
   function Inverse_Regularized_Beta (y, a, b: Real) return Real is
-      aaa:Real;
-      bbb:Real;
-      y0:Real;
-      d:Real;
-      yyy:Real;
-      x:Real;
-      x0:Real := 0.0;
-      x1:Real := 1.0;
-      lgm:Real;
-      yp:Real;
-      di:Real;
-      dithresh:Real;
-      yl:Real := 0.0;
-      yh:Real := 1.0;
-      xt:Real;
-      i:Integer_for_Beta;
-      rflg:Integer_for_Beta;
-      dir:Integer_for_Beta;
-      nflg:Integer_for_Beta := 0;
-      MainLoopPos:Integer_for_Beta := 0;
-      ihalve: constant := 1;
-      ihalvecycle: constant := 2;
-      newt: constant := 3;
-      newtcycle: constant := 4;
-      breaknewtcycle: constant := 5;
-      breakihalvecycle: constant := 6;
+    aaa:Real;
+    bbb:Real;
+    y0:Real;
+    d:Real;
+    yyy:Real;
+    x:Real;
+    x0:Real := 0.0;
+    x1:Real := 1.0;
+    lgm:Real;
+    yp:Real;
+    di:Real;
+    dithresh:Real;
+    yl:Real := 0.0;
+    yh:Real := 1.0;
+    xt:Real;
+    i:Integer_for_Beta;
+    rflg:Integer_for_Beta;
+    dir:Integer_for_Beta;
+    nflg:Integer_for_Beta := 0;
+    MainLoopPos:Integer_for_Beta := 0;
+    ihalve: constant := 1;
+    ihalvecycle: constant := 2;
+    newt: constant := 3;
+    newtcycle: constant := 4;
+    breaknewtcycle: constant := 5;
+    breakihalvecycle: constant := 6;
   begin
     i := 0;
     if Almost_zero(y) then
@@ -475,267 +475,267 @@ package body Beta_function is
       --  start
       --
       if MainLoopPos = 0 then
-            if a <=  1.0 or b <=  1.0 then
-                dithresh := 1.0e-6;
+        if a <=  1.0 or b <=  1.0 then
+          dithresh := 1.0e-6;
+          rflg := 0;
+          aaa := a;
+          bbb := b;
+          y0 := y;
+          x := aaa / (aaa+bbb);
+          yyy := Regularized_Beta (x, aaa, bbb);
+          MainLoopPos := ihalve;
+          goto Continue;
+        else
+          dithresh := 1.0e-4;
+        end if;
+        yp := - RPhF.Inverse_Phi (y);  --  ALGLIB: InvNormalDistribution
+        if y > 0.5 then
+          rflg := 1;
+          aaa := b;
+          bbb := a;
+          y0 := 1.0 - y;
+          yp := -yp;
+        else
+          rflg := 0;
+          aaa := a;
+          bbb := b;
+          y0 := y;
+        end if;
+        lgm := (yp*yp-3.0) / 6.0;
+        x := 2.0 / ( 1.0 / (2.0*aaa - 1.0)+ 1.0 / (2.0*bbb - 1.0));
+        d := yp * Sqrt(x+lgm) / x - ( 1.0/(2.0*bbb- 1.0) - 1.0/(2.0*aaa- 1.0))*
+               (lgm + 5.0/6.0 - 2.0/(3.0*x));
+        d := 2.0*d;
+        if  d < Log(MinRealNumber) then
+          x := 0.0;
+          exit Main_Loop;
+        end if;
+        x := aaa / (aaa+bbb*Exp(d));
+        yyy := Regularized_Beta (x, aaa, bbb);
+        yp := (yyy-y0) / y0;
+        if abs(yp) < Real(0.2) then
+          MainLoopPos := newt;
+          goto Continue;
+        end if;
+        MainLoopPos := ihalve;
+        goto Continue;
+      end if;
+      --
+      --  ihalve
+      --
+      if MainLoopPos = ihalve then
+        dir := 0;
+        di := 0.5;
+        i := 0;
+        MainLoopPos := ihalvecycle;
+        goto Continue;
+      end if;
+      --
+      --  ihalvecycle
+      --
+      if MainLoopPos = ihalvecycle then
+        if i <= 99 then
+          if i/=0 then
+            x := x0+di*(x1-x0);
+            if Almost_zero(x - 1.0) then
+              x :=  1.0 - MachineEpsilon;
+            end if;
+            if Almost_zero(x) then
+              di := 0.5;
+              x := x0+di * (x1-x0);
+              exit Main_Loop when Almost_zero(x);
+            end if;
+            yyy := Regularized_Beta(x, aaa, bbb);
+            yp := (x1-x0) / (x1+x0);
+            if abs(yp) < dithresh then
+              MainLoopPos := newt;
+              goto Continue;
+            end if;
+            yp := (yyy-y0) / y0;
+            if abs(yp) < dithresh then
+              MainLoopPos := newt;
+              goto Continue;
+            end if;
+          end if;
+          if yyy < y0 then
+            x0 := x;
+            yl := yyy;
+            if dir < 0 then
+              dir := 0;
+              di := 0.5;
+            else
+              if dir > 3 then
+                di :=  1.0 - (1.0-di) * ( 1.0-di);
+              else
+                if dir > 1 then
+                  di := 0.5 * di + 0.5;
+                else
+                  di := (y0-yyy) / (yh-yl);
+                end if;
+              end if;
+            end if;
+            dir := dir + 1;
+            if x0 > 0.75 then
+              if  rflg = 1 then
                 rflg := 0;
                 aaa := a;
                 bbb := b;
                 y0 := y;
-                x := aaa / (aaa+bbb);
-                yyy := Regularized_Beta (x, aaa, bbb);
-                MainLoopPos := ihalve;
-                goto Continue;
-            else
-                dithresh := 1.0e-4;
-            end if;
-            yp := - RPhF.Inverse_Phi (y);  --  ALGLIB: InvNormalDistribution
-            if y > 0.5 then
+              else
                 rflg := 1;
                 aaa := b;
                 bbb := a;
-                y0 := 1.0 - y;
-                yp := -yp;
+                y0 :=  1.0-y;
+              end if;
+              x :=  1.0 - x;
+              yyy := Regularized_Beta(x, aaa, bbb);
+              x0 := 0.0;
+              yl := 0.0;
+              x1 :=  1.0;
+              yh :=  1.0;
+              MainLoopPos := ihalve;
+              goto Continue;
+            end if;
+          else
+            x1 := x;
+            if rflg = 1 and x1 < MachineEpsilon then
+              x := 0.0;
+              exit Main_Loop;
+            end if;
+            yh := yyy;
+            if dir > 0 then
+              dir := 0;
+              di := 0.5;
             else
-                rflg := 0;
-                aaa := a;
-                bbb := b;
-                y0 := y;
+              if dir < -3 then
+                di := di*di;
+              else
+                if  dir < -1 then
+                  di := 0.5 * di;
+                else
+                  di := (yyy-y0) / (yh-yl);
+                end if;
+              end if;
             end if;
-            lgm := (yp*yp-3.0) / 6.0;
-            x := 2.0 / ( 1.0 / (2.0*aaa - 1.0)+ 1.0 / (2.0*bbb - 1.0));
-            d := yp * Sqrt(x+lgm) / x - ( 1.0/(2.0*bbb- 1.0) - 1.0/(2.0*aaa- 1.0))*
-                   (lgm + 5.0/6.0 - 2.0/(3.0*x));
-            d := 2.0*d;
-            if  d < Log(MinRealNumber) then
-                x := 0.0;
-                exit Main_Loop;
-            end if;
-            x := aaa / (aaa+bbb*Exp(d));
+            dir := dir - 1;
+          end if;
+          i := i + 1;
+          MainLoopPos := ihalvecycle;
+          goto Continue;
+        else
+          MainLoopPos := breakihalvecycle;
+          goto Continue;
+        end if;
+      end if;
+      --
+      --  breakihalvecycle
+      --
+      if MainLoopPos = breakihalvecycle then
+        if x0 >= 1.0 then
+          x :=  1.0 - MachineEpsilon;
+          exit Main_Loop;
+        end if;
+        if x <= 0.0 then
+          x := 0.0;
+          exit Main_Loop;
+        end if;
+        MainLoopPos := newt;
+        goto Continue;
+      end if;
+      --
+      --  newt
+      --
+      if MainLoopPos = newt then
+        exit Main_Loop when nflg /= 0;
+        nflg := 1;
+        lgm := Log_Gamma(aaa+bbb) - Log_Gamma(aaa) - Log_Gamma(bbb);
+        i := 0;
+        MainLoopPos := newtcycle;
+        goto Continue;
+      end if;
+      --
+      --  newtcycle
+      --
+      if MainLoopPos = newtcycle then
+        if i <= 7 then
+          if  i /= 0 then
             yyy := Regularized_Beta (x, aaa, bbb);
-            yp := (yyy-y0) / y0;
-            if abs(yp) < Real(0.2) then
-                MainLoopPos := newt;
-                goto Continue;
-            end if;
-            MainLoopPos := ihalve;
-            goto Continue;
-        end if;
-        --
-        --  ihalve
-        --
-        if MainLoopPos = ihalve then
-            dir := 0;
-            di := 0.5;
-            i := 0;
-            MainLoopPos := ihalvecycle;
-            goto Continue;
-        end if;
-        --
-        --  ihalvecycle
-        --
-        if MainLoopPos = ihalvecycle then
-            if i <= 99 then
-                if  i/=0 then
-                    x := x0+di*(x1-x0);
-                    if Almost_zero(x - 1.0) then
-                        x :=  1.0 - MachineEpsilon;
-                    end if;
-                    if Almost_zero(x) then
-                        di := 0.5;
-                        x := x0+di * (x1-x0);
-                        exit Main_Loop when Almost_zero(x);
-                    end if;
-                    yyy := Regularized_Beta(x, aaa, bbb);
-                    yp := (x1-x0) / (x1+x0);
-                    if abs(yp) < dithresh then
-                        MainLoopPos := newt;
-                        goto Continue;
-                    end if;
-                    yp := (yyy-y0) / y0;
-                    if abs(yp) < dithresh then
-                        MainLoopPos := newt;
-                        goto Continue;
-                    end if;
-                end if;
-                if yyy < y0 then
-                    x0 := x;
-                    yl := yyy;
-                    if dir < 0 then
-                        dir := 0;
-                        di := 0.5;
-                    else
-                        if dir > 3 then
-                            di :=  1.0 - (1.0-di) * ( 1.0-di);
-                        else
-                            if dir > 1 then
-                                di := 0.5 * di + 0.5;
-                            else
-                                di := (y0-yyy) / (yh-yl);
-                            end if;
-                        end if;
-                    end if;
-                    dir := dir + 1;
-                    if x0 > 0.75 then
-                        if  rflg = 1 then
-                            rflg := 0;
-                            aaa := a;
-                            bbb := b;
-                            y0 := y;
-                        else
-                            rflg := 1;
-                            aaa := b;
-                            bbb := a;
-                            y0 :=  1.0-y;
-                        end if;
-                        x :=  1.0 - x;
-                        yyy := Regularized_Beta(x, aaa, bbb);
-                        x0 := 0.0;
-                        yl := 0.0;
-                        x1 :=  1.0;
-                        yh :=  1.0;
-                        MainLoopPos := ihalve;
-                        goto Continue;
-                    end if;
-                else
-                    x1 := x;
-                    if rflg = 1 and x1 < MachineEpsilon then
-                        x := 0.0;
-                        exit Main_Loop;
-                    end if;
-                    yh := yyy;
-                    if dir > 0 then
-                        dir := 0;
-                        di := 0.5;
-                    else
-                        if dir < -3 then
-                            di := di*di;
-                        else
-                            if  dir < -1 then
-                                di := 0.5 * di;
-                            else
-                                di := (yyy-y0) / (yh-yl);
-                            end if;
-                        end if;
-                    end if;
-                    dir := dir - 1;
-                end if;
-                i := i + 1;
-                MainLoopPos := ihalvecycle;
-                goto Continue;
+          end if;
+          if  yyy < yl then
+            x := x0;
+            yyy := yl;
+          else
+            if yyy > yh then
+              x := x1;
+              yyy := yh;
             else
-                MainLoopPos := breakihalvecycle;
-                goto Continue;
+              if yyy < y0 then
+                x0 := x;
+                yl := yyy;
+              else
+                x1 := x;
+                yh := yyy;
+              end if;
             end if;
-        end if;
-        --
-        --  breakihalvecycle
-        --
-        if MainLoopPos = breakihalvecycle then
-            if x0 >= 1.0 then
-                x :=  1.0 - MachineEpsilon;
-                exit Main_Loop;
-            end if;
-            if x <= 0.0 then
-                x := 0.0;
-                exit Main_Loop;
-            end if;
-            MainLoopPos := newt;
+          end if;
+          if Almost_zero(x - 1.0) or Almost_zero(x) then
+            MainLoopPos := breaknewtcycle;
             goto Continue;
-        end if;
-        --
-        --  newt
-        --
-        if MainLoopPos = newt then
-            exit Main_Loop when nflg /= 0;
-            nflg := 1;
-            lgm := Log_Gamma(aaa+bbb) - Log_Gamma(aaa) - Log_Gamma(bbb);
-            i := 0;
-            MainLoopPos := newtcycle;
+          end if;
+          d := (aaa - 1.0) * Log(x) + (bbb - 1.0) * Log(1.0 - x) + lgm;
+          exit Main_Loop when d < Log(MinRealNumber);
+          if  d > Log(MaxRealNumber) then
+            MainLoopPos := breaknewtcycle;
             goto Continue;
-        end if;
-        --
-        --  newtcycle
-        --
-        if  MainLoopPos = newtcycle then
-            if  i <= 7 then
-                if  i /= 0 then
-                    yyy := Regularized_Beta (x, aaa, bbb);
-                end if;
-                if  yyy < yl then
-                    x := x0;
-                    yyy := yl;
-                else
-                    if yyy > yh then
-                        x := x1;
-                        yyy := yh;
-                    else
-                        if yyy < y0 then
-                            x0 := x;
-                            yl := yyy;
-                        else
-                            x1 := x;
-                            yh := yyy;
-                        end if;
-                    end if;
-                end if;
-                if Almost_zero(x - 1.0) or Almost_zero(x) then
-                    MainLoopPos := breaknewtcycle;
-                    goto Continue;
-                end if;
-                d := (aaa - 1.0) * Log(x) + (bbb - 1.0) * Log(1.0 - x) + lgm;
-                exit Main_Loop when d < Log(MinRealNumber);
-                if  d > Log(MaxRealNumber) then
-                    MainLoopPos := breaknewtcycle;
-                    goto Continue;
-                end if;
-                d := Exp(d);
-                d := (yyy-y0)/d;
-                xt := x-d;
-                if xt <= x0 then
-                    yyy := (x-x0) / (x1-x0);
-                    xt := x0 + 0.5 * yyy * (x-x0);
-                    if xt <= 0.0 then
-                        MainLoopPos := breaknewtcycle;
-                        goto Continue;
-                    end if;
-                end if;
-                if xt >= x1 then
-                    yyy := (x1-x) / (x1-x0);
-                    xt := x1 - 0.5 * yyy * (x1-x);
-                    if xt >= 1.0 then
-                        MainLoopPos := breaknewtcycle;
-                        goto Continue;
-                    end if;
-                end if;
-                x := xt;
-                exit Main_Loop when abs(d/x) < 128.0 * MachineEpsilon;
-                i := i + 1;
-                MainLoopPos := newtcycle;
-                goto Continue;
-            else
-                MainLoopPos := breaknewtcycle;
-                goto Continue;
+          end if;
+          d := Exp(d);
+          d := (yyy-y0)/d;
+          xt := x-d;
+          if xt <= x0 then
+            yyy := (x-x0) / (x1-x0);
+            xt := x0 + 0.5 * yyy * (x-x0);
+            if xt <= 0.0 then
+              MainLoopPos := breaknewtcycle;
+              goto Continue;
             end if;
+          end if;
+          if xt >= x1 then
+            yyy := (x1-x) / (x1-x0);
+            xt := x1 - 0.5 * yyy * (x1-x);
+            if xt >= 1.0 then
+              MainLoopPos := breaknewtcycle;
+              goto Continue;
+            end if;
+          end if;
+          x := xt;
+          exit Main_Loop when abs(d/x) < 128.0 * MachineEpsilon;
+          i := i + 1;
+          MainLoopPos := newtcycle;
+          goto Continue;
+        else
+          MainLoopPos := breaknewtcycle;
+          goto Continue;
         end if;
-        --
-        --  breaknewtcycle
-        --
-        if  MainLoopPos = breaknewtcycle then
-            dithresh := 256.0 * MachineEpsilon;
-            MainLoopPos := ihalve;
-            goto Continue;
-        end if;
-        <<Continue>> null;
+      end if;
+      --
+      --  breaknewtcycle
+      --
+      if MainLoopPos = breaknewtcycle then
+        dithresh := 256.0 * MachineEpsilon;
+        MainLoopPos := ihalve;
+        goto Continue;
+      end if;
+      <<Continue>> null;
     end loop Main_Loop;
     --
     --  done
     --
     if rflg /= 0 then
-        if  x <= MachineEpsilon then
-            x :=  1.0 - MachineEpsilon;
-        else
-            x :=  1.0 - x;
-        end if;
+      if x <= MachineEpsilon then
+        x :=  1.0 - MachineEpsilon;
+      else
+        x :=  1.0 - x;
+      end if;
     end if;
     return x;
   end Inverse_Regularized_Beta;
