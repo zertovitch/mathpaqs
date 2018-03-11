@@ -29,11 +29,32 @@
 -- NB: this is the MIT License, as found 9-Feb-2011 on the site
 -- http://www.opensource.org/licenses/mit-license.php
 
+---------------------------------------------------------------------
+--  Extreme cases of the Beta function x |-> B(x,a,b):
+--
+--    - B is at some places very steep and the numerical
+--        approximation is inaccurate
+--    - B is at some places almost flat and the numerical
+--        approximation of the inverse, B^{-1}, is inaccurate
+--
+--  This occurs on those different combinations of (a,b):
+--
+--   - B' is  U-shaped (a < 1 and b < 1) with a, b _small_
+--   - B' is /\-shaped (a > 1 and b > 1) with a, b large
+--   - B' is \_-shaped (a < 1 and b > 1) with b large
+--   - B' is _/-shaped (a > 1 and b < 1) with a large
+--
+--  B' and B can be plotted online on many sites
+--  (search "plot beta distribution online"), e.g.:
+--    Beta distribution (chart) Calculator
+--    http://keisan.casio.com/exec/system/1180573226
+--
+--  History and further notes about accuracy can be found in the implementation
+
 generic
   type Real is digits <>;
 
 package Beta_function is
-  --  History and notes about accuracy can be found in the implementation
 
   --  Complete Beta integral
   --                  1
@@ -64,10 +85,6 @@ package Beta_function is
   --  Excel: BETA.DIST(x,a,b,TRUE)
   --
   function Regularized_Beta (x, a, b: Real) return Real;
-
-  -----------------------------------------------------------------------------------------------
-  --  !! Inverse beta functions have some suspicious borderline cases (to be investigated) !!  --
-  -----------------------------------------------------------------------------------------------
 
   --  Find x such as y = Beta(x, a, b).
   --

@@ -25,7 +25,11 @@ package body Generic_Random_Functions is
 
   package RPhF is new Phi_function (Real);
   function Normal_CDF (x: Real) return Real renames RPhF.Phi;
-  function Normal_inverse_CDF (y0 : Real) return Real renames RPhF.Inverse_Phi;
+  function Normal_inverse_CDF (y : Real) return Real renames RPhF.Inverse_Phi;
+
+  package RBF is new Beta_function (Real);
+  function Beta_CDF (x, a, b: Real) return Real renames RBF.Regularized_Beta;
+  function Beta_inverse_CDF (x, a, b: Real) return Real renames RBF.Inverse_Regularized_Beta;
 
   package GEF is new Ada.Numerics.Generic_Elementary_Functions(Real);
   use GEF;
@@ -75,8 +79,5 @@ package body Generic_Random_Functions is
   begin
     return 1.0 - (threshold / x) ** alpha;
   end Pareto_CDF;
-
-  package RBF is new Beta_function (Real);
-  function Beta_CDF (x, a, b: Real) return Real renames RBF.Regularized_Beta;
 
 end Generic_Random_Functions;

@@ -8,9 +8,9 @@ package body Beta_function is
 
   package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
   package RPhF is new Phi_function (Real);
-  package Real_Gamma is new Gamma_function(Real);
+  package RGF is new Gamma_function(Real);
 
-  use REF, Real_Gamma;
+  use REF, RGF;
 
   --  ************************************************************************
   --  Beta function

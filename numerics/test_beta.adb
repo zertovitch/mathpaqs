@@ -1,10 +1,7 @@
 -- Testing the Beta special function
 
 -- ** TO DO **:
---
---   - list pathological cases of inverse incomplete inaccuracy (could be a wrong epsilon...)
 --   - try gcov to see if all branches are covered
---
 
 with Beta_function;
 
@@ -111,12 +108,13 @@ procedure Test_Beta is
     use Ada.Numerics.Float_Random;
     gen: Generator;
     x, y, a, b, diff_yb1, diff_ya1, max_diff_yb1, max_diff_ya1: Real;
-    iter : constant := 1_000_000;
+    iter : constant := 100_000;
   begin
     Put_Line(
       "Random test with Regularized on cases with an analytic value; #iterations:" &
       Integer'Image(iter)
     );
+    Reset (gen, 1);
     max_diff_ya1 := 0.0;
     max_diff_yb1 := 0.0;
     for i in 1 .. iter loop
@@ -150,8 +148,6 @@ procedure Test_Beta is
       Real'Image(pbiyab) & "; " &
       Real'Image(diff)   & "; " & comment
     );
-    --  !!  The inverse function seems much less acurate...
-    --      We search the tolerance with the number below.
     if not Very_Close(biyab, pbiyab, 1.0E-5) then
       raise Different_Inverse_Regularized_Beta_values;
     end if;
@@ -161,7 +157,8 @@ procedure Test_Beta is
     use Ada.Numerics.Float_Random;
     gen: Generator;
     x, y, x2, y2, a, b, diff_x, diff_y, max_diff_x, max_diff_y: Real;
-    iter : constant := 10_000;
+    iter : constant := 100_000;
+    bork_level: constant := 1.0e-4;
   begin
     Put_Line(
       "Random test with Regularized then Inverse_Regularized, or vice versa; #iterations:" &
@@ -172,20 +169,36 @@ procedure Test_Beta is
     max_diff_y := 0.0;
     for i in 1 .. iter loop
       x := Real (Random (gen));  --  Must be in [0;1], the domain of Regularized_Beta
-      a := Real (Random (gen)) * 10.0;
-      b := Real (Random (gen)) * 10.0;
+      --  We avoid cases of (a,b) where any approximation of Beta
+      --  or its inverse *must* become inaccurate
+      --  - discussed in Beta_function package spec.
+      a := 0.2 + Real (Random (gen)) * 4.0;
+      b := 0.2 + Real (Random (gen)) * 4.0;
       y := Regularized_Beta (x, a, b);
       x2 := Inverse_Regularized_Beta (y, a, b);
       diff_x := abs(x-x2);
       --  Put_Line (Real'Image(abs(x-x2)));
       max_diff_x := Real'Max (max_diff_x, diff_x);
+      if diff_x > bork_level then
+        Put_Line ("Bork case!");
+        Put_Line(" x;                        a;                        b;                       " &
+                 " Reg.Beta(x,a,b);          I.R.Beta(R.Beta(x,a,b));  difference;");
+        Put_Line(
+          Real'Image(x) & "; " &
+          Real'Image(a) & "; " &
+          Real'Image(b) & "; " &
+          Real'Image(y)  & "; " &
+          Real'Image(x2) & "; " &
+          Real'Image(diff_x)
+        );
+      end if;
       --  Now the other way round
       y := Real (Random (gen));  --  Must be in [0;1] (possible values of Regularized_Beta)
       x := Inverse_Regularized_Beta (y, a, b);
       y2 := Regularized_Beta (x, a, b);
       diff_y := abs(y-y2);
       max_diff_y := Real'Max (max_diff_y, diff_y);
-      if diff_y > 1.0e-4 then
+      if diff_y > bork_level then
         Put_Line ("Bork case!");
         Put_Line(" y;                        a;                        b;                       " &
                  " Inv.Reg.Beta(y,a,b);      R.Beta(I.R.Beta(y,a,b));  difference;");
@@ -292,7 +305,7 @@ begin
   --    3.34854155778884888E+00,
   --    1.50668609421700239E-02,
   --    0.9999999999999999999999999999892137  ,  -- Wolfram [Note the 28 x '9' !...]
-  --    "Bork case with our ALGLIB version; error with Excel 2002"
+  --    "Error with Excel 2002; would need floating-points with more than 28 digits"
   --  );
   --
   --  x found by our ALGLIB version: 9.99999999999999500E-01
