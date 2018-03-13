@@ -16,14 +16,14 @@ package body Sparse is
   function Defined_symmetric( A: CRS_matrix ) return Boolean is
   begin
     return A.symmetric;
-  end;
+  end Defined_symmetric;
 
   function Rows( A: CRS_matrix ) return Index is
   begin
     return A.rows;
-  end;
+  end Rows;
 
-  procedure Mult( A: in CRS_matrix; u: vector; w: in out vector ) is
+  procedure Mult( A: in CRS_matrix; u: Vector; w: in out Vector ) is
 
 --     calcule w=a*u
 
@@ -58,12 +58,12 @@ package body Sparse is
 --            A.col_ind(*)   =   [1, 4, 5, 2, 3, 4, 5, 5]
 --            A.row_ptr(*)   =   [1, 4, 5, 6, 8, 9]
 
-   deb, fin, jaj: index;
-   ui, wi, wi_sum: real;
-   rows: constant index:= A.rows;
-   val: vector renames A.val;
-   col_ind: index_array renames A.col_ind;
-   row_ptr: index_array renames A.row_ptr;
+   deb, fin, jaj: Index;
+   ui, wi, wi_sum: Real;
+   rows: constant Index:= A.rows;
+   val: Vector renames A.val;
+   col_ind: Index_array renames A.col_ind;
+   row_ptr: Index_array renames A.row_ptr;
 
    begin
 
@@ -111,8 +111,8 @@ package body Sparse is
 
    --- GdM 29.III.1999
 
-   procedure Put( A: in out CRS_matrix; i,j: index; value: real ) is
-     row_begin, row_end, ci: index;
+   procedure Put( A: in out CRS_matrix; i,j: Index; value: Real ) is
+     row_begin, row_end, ci: Index;
    begin
      row_begin := A.row_ptr(i);
      row_end   := A.row_ptr(i+1)-1;
@@ -125,15 +125,15 @@ package body Sparse is
        end if;
      end loop;
 
-     raise_exception(
+     Raise_Exception(
        position_not_found_in_sparse_matrix'Identity,
        " i=" & Index'Image(i) & ", j=" & Index'Image(j)
      );
 
    end Put;
 
-   procedure Add( A: in out CRS_matrix; i,j: index; value: real ) is
-     row_begin, row_end, ci: index;
+   procedure Add( A: in out CRS_matrix; i,j: Index; value: Real ) is
+     row_begin, row_end, ci: Index;
    begin
      row_begin := A.row_ptr(i);
      row_end   := A.row_ptr(i+1)-1;
@@ -146,15 +146,15 @@ package body Sparse is
        end if;
      end loop;
 
-     raise_exception(
+     Raise_Exception(
        position_not_found_in_sparse_matrix'Identity,
        " i=" & Index'Image(i) & ", j=" & Index'Image(j)
      );
 
    end Add;
 
-   function  Get( A: in    CRS_matrix; i,j: index ) return real is
-     row_begin, row_end, ci: index;
+   function  Get( A: in    CRS_matrix; i,j: Index ) return Real is
+     row_begin, row_end, ci: Index;
    begin
      row_begin := A.row_ptr(i);
      row_end   := A.row_ptr(i+1)-1;
@@ -166,23 +166,23 @@ package body Sparse is
        end if;
      end loop;
 
-     raise_exception(
+     Raise_Exception(
        position_not_found_in_sparse_matrix'Identity,
        " i=" & Index'Image(i) & ", j=" & Index'Image(j)
      );
 
-   end Get;
+  end Get;
 
-  procedure Copy( u: in vector; v: out vector )
+  procedure Copy( u: in Vector; v: out Vector )
     renames Sparse_BLA.Copy;
 
-  function "*"(u,v: vector) return real
+  function "*"(u,v: Vector) return Real
     renames Sparse_BLA."*";
 
-  procedure Add_scaled( factor: real; u: in vector; v: in out vector )
-    renames Sparse_BLA.Add_Scaled;
+  procedure Add_scaled( factor: Real; u: in Vector; v: in out Vector )
+    renames Sparse_BLA.Add_scaled;
 
-  procedure Scale( factor: real; u: in out vector )
+  procedure Scale( factor: Real; u: in out Vector )
     renames Sparse_BLA.Scale;
 
 end Sparse;

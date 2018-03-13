@@ -20,7 +20,7 @@ package body SparseB is
 
     -- (A) >>>> STILS_TMQ1 : 5394 sec. =~  89 min.
     -- (B) >>>> STILS_TMQ1 : 2000 sec. =~  33 min.  --> 37%
-  end;
+  end Copy;
 
   function "*"(u,v: vector) return real is
     uv: real:= 0.0;
@@ -29,21 +29,21 @@ package body SparseB is
       uv:= uv + u(i)*v(i);
     end loop;
     return uv;
-  end;
+  end "*";
 
   procedure Add_scaled( factor: real; u: in vector; v: in out vector ) is
   begin
     for i in u'Range loop
       v(i):= v(i) + factor * u(i);
     end loop;
-  end;
+  end Add_scaled;
 
   procedure Scale( factor: real; u: in out vector ) is
   begin
     for i in u'Range loop
       u(i):= factor * u(i);
     end loop;
-  end;
+  end Scale;
 
   pragma Inline("*", Add_scaled, Scale);
 

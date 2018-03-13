@@ -34,8 +34,8 @@ package Sparse is
 
   type CRS_matrix( rows_max_p1, nnz_max: Index ) is record
     val       : Vector(1..nnz_max);
-    col_ind   : index_array(1..nnz_max);
-    row_ptr   : index_array(1..rows_max_p1); -- p1 means +1 -> extra row ptr
+    col_ind   : Index_array(1..nnz_max);
+    row_ptr   : Index_array(1..rows_max_p1); -- p1 means +1 -> extra row ptr
     symmetric : Boolean;
     -- rows and nnz are effective upper bounds for matrix re-use
     rows      : Index:= rows_max_p1-1; -- must be in [ 1..rows_max_p1-1 ]
@@ -58,13 +58,12 @@ package Sparse is
   -- Matrix-vector multiplication --
   ----------------------------------
 
-   -- w:= A*u
+  -- w:= A*u
 
-   procedure Mult( A: in CRS_matrix; u: Vector; w: in out Vector );
+  procedure Mult( A: in CRS_matrix; u: Vector; w: in out Vector );
 
   -- operator version - warning: uses stack, not for large/fast usage !
   --   function "*"( A: CRS_matrix; u: vector ) return vector;
-
 
   ------------------------------------------
   -- Put/Add/Get data into/in/from matrix --
@@ -74,7 +73,7 @@ package Sparse is
   procedure Add( A: in out CRS_matrix; i,j: Index; value: Real );
   function  Get( A: in     CRS_matrix; i,j: Index ) return Real;
 
-   -- pragma Inline(Put, Add);
+  -- pragma Inline(Put, Add);
 
   position_not_found_in_sparse_matrix: exception;
 

@@ -20,7 +20,7 @@ with Ada.Float_Text_IO;                 use Ada.Float_Text_IO;
 
 procedure PPM2Func is
 
-  i,o: File_type;
+  i,o: File_Type;
   mx,my, R,G,B: Integer;
   v: Float;
 
@@ -44,7 +44,7 @@ begin
     New_Line;
     Put_Line( "Syntax: ppm2func input_file function_name" );
   else
-    Open(i,in_file,Argument(1));
+    Open(i,In_File,Argument(1));
     Get_Line(i,s,l);
 
     if l /= 2 or else s(1) /= 'P' then
@@ -64,7 +64,7 @@ begin
     else
       -- We ate a line too much
       Close(i);
-      Open(i,in_file,Argument(1));
+      Open(i,In_File,Argument(1));
       Skip_Line(i);
     end if;
 
@@ -72,7 +72,7 @@ begin
     Get(i,my);
     Get(i,Maxval);
 
-    Create(o,out_file, Argument(2) & ".adb" );
+    Create(o,Out_File, Argument(2) & ".adb" );
 
     Put_Line(o,"function " & Argument(2) &
                "( x, y: Float ) return Float is");

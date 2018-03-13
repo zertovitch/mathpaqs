@@ -6,12 +6,12 @@
 ------------------------------------------------------------------------------
 
 generic                              -- to provide:
-          type ring_elt is private;                  -- ring element type 
+          type ring_elt is private;                  -- ring element type
           zero, one: ring_elt;                       -- 0 and 1 elements
 
           with function "-" (a,b:ring_elt) return ring_elt;  -- binary oper.
           with function "*" (a,b:ring_elt) return ring_elt;
-          with function "/" (a,b:ring_elt) return ring_elt; 
+          with function "/" (a,b:ring_elt) return ring_elt;
                         -- returns the quotient:  a= b*q + r
                         -- q:quotient, r:rest
 

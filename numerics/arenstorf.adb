@@ -10,7 +10,7 @@
 ------------------------------------------------------------------------------
 with Ada.Text_IO;                       use Ada.Text_IO;
 with Ada.Numerics;                      use Ada.Numerics;
-with Ada.Numerics.Generic_Elementary_functions;
+with Ada.Numerics.Generic_Elementary_Functions;
 
 with Dormand_Prince_8, G_Matrices;
 with Graph;                             use Graph;
@@ -40,7 +40,6 @@ procedure Arenstorf is
 
   package PFIO is new Float_IO(prec_float); use PFIO;
 
-
 -- Restricted three body problem
 
   mu:  constant:= 0.012277471;   -- moon
@@ -50,7 +49,7 @@ procedure Arenstorf is
 
   h, t, t_end: prec_float;
 
-  subtype vector4 is vector(1..4);
+  subtype vector4 is Vector(1..4);
 
   x: vector4;  -- = (x1,x2,x1',x2')
   x0: constant vector4:=
@@ -76,9 +75,9 @@ procedure Arenstorf is
   function f(x:vector4) return vector4 is
     x1p: constant prec_float:= x(1)+mu;
     x1m: constant prec_float:= x(1)-mup;
-    D1: constant prec_float:= sqrt(( x1p**2 + x(2)**2  )**3);
+    D1: constant prec_float:= Sqrt(( x1p**2 + x(2)**2  )**3);
     mup_sur_D1: constant prec_float:= mup/D1;
-    D2: constant prec_float:= sqrt(( x1m**2 + x(2)**2  )**3);
+    D2: constant prec_float:= Sqrt(( x1m**2 + x(2)**2  )**3);
     mu_sur_D2:  constant prec_float:= mu /D2;
   begin
     return
@@ -145,7 +144,7 @@ procedure Arenstorf is
                      bu_b(4) * k4 + bu_b(5) * k5 + bu_b(6) * k6+
                      bu_b(7) * k7);
         t:= t+h;
-      when DopriF7 | DopriF8 | DoPriV8 =>
+      when DoPriF7 | DoPriF8 | DoPriV8 =>
         k1:=  f(x);
         k2:=  f(x + h *  a21 * k1);
         k3:=  f(x + h * (a31 * k1 + a32 * k2) );
@@ -195,7 +194,7 @@ procedure Arenstorf is
                   );
                 err:= err + ((xp8(i)-xp7(i)) / denom) ** 2;
               end loop;
-              err:= sqrt(err / prec_float(vector4'Length));
+              err:= Sqrt(err / prec_float(vector4'Length));
               fac:= prec_float'Max(
                 1.0/6.0,
                 prec_float'Min(3.0, ((err/eps)**(1.0/8.0)) / 0.9)
@@ -208,9 +207,9 @@ procedure Arenstorf is
                  if not accepted and then h < hnew then
                    hnew:= h;
                  end if;
-                 accepted:= true;
+                 accepted:= True;
               else
-                 accepted:= false;
+                 accepted:= False;
               end if;
               h:= hnew;
             end if;
@@ -235,7 +234,7 @@ procedure Arenstorf is
       SetRGBPalette(c, Integer(p*63.0), Integer(q*63.0), 63-Integer(p*63.0));
     end loop;
    end loop;
-  end;
+  end Degrade;
 
   dessine: constant array(t_meth) of Boolean:=
     (Euler1 => true,
@@ -303,9 +302,9 @@ begin
 
   CloseGraph;
 
-  put("hprem= "); put(hprem);    new_line;
-  put("hmin=  "); put(hmin);     new_line;
-  put("hmax=  "); put(hmax);     new_line;
-  put("hdern= "); put(hdern);    new_line;
+  Put("hprem= "); Put(hprem);    New_Line;
+  Put("hmin=  "); Put(hmin);     New_Line;
+  Put("hmax=  "); Put(hmax);     New_Line;
+  Put("hdern= "); Put(hdern);    New_Line;
 
-end;
+end Arenstorf;

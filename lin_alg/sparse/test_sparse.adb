@@ -154,14 +154,14 @@ procedure Test_Sparse is
     for i in x'Range loop
       tmp:= tmp + abs(x(i)-1.0);
     end loop;
-    Put(tmp); new_line;
+    Put(tmp); New_Line;
 --      for i in 1..neq loop
 --         Put(i); Put(x(i), exp=> 0); new_line;
 --      end loop;
     Put("# iterations"); Put(nite); New_Line;
 
-    Put("Temps structure et remplissage"); DurIO.Put(T1 - T0, aft=> 2);
+    Put("Temps structure et remplissage"); DurIO.Put(T1 - T0, Aft => 2);
     New_Line;
-    Put("Temps resolution              "); DurIO.Put(T2 - T1, aft=> 2);
+    Put("Temps resolution              "); DurIO.Put(T2 - T1, Aft => 2);
     New_Line;
-end;
+end Test_Sparse;
