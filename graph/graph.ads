@@ -28,7 +28,7 @@
 --       this file generated from Graph.prs by "gnatprep", see prep_src.bat
 --
 --  Date/version:    16-Feb-2007
---  Author:          Gautier de Montmollin - gdm@mydiax.ch
+--  Author:          Gautier de Montmollin
 --
 --  Copyright (c) Gautier de Montmollin 1999-2007
 --  CH-8810 Horgen

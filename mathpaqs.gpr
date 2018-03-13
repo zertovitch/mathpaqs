@@ -3,6 +3,7 @@
 --      home page:     http://mathpaqs.sf.net/
 --      project page:  http://sf.net/projects/mathpaqs/
 --      mirror:        https://github.com/svn2github/mathpaqs
+--
 --  Build me with "gnatmake -P mathpaqs", or open me with GPS
 --
 project Mathpaqs is
@@ -71,8 +72,15 @@ project Mathpaqs is
    end case;
 
    Common_Options := ("-gnat05", "-gnatwa");
-   Debug_Options  := ("-gnatVa", "-gnato", "-g", "-fno-inline", "-fstack-check", "-gnatec../debug.pra", "-gnatq", "-gnatQ");
-   Fast_Options   := ("-O2", "-gnatpn", "-fipa-cp-clone", "-fgcse-after-reload", "-funroll-loops", "-fpeel-loops", "-funswitch-loops", "-ftracer", "-ftree-vectorize", "-g");
+   Debug_Options  := (
+	   "-gnatVa", "-gnato", "-g", 
+		 "-fno-inline", "-fstack-check",
+		 "-gnatec=" & project'Project_Dir & "debug.pra", "-gnatq", "-gnatQ");
+   Fast_Options   := (
+	   "-O2", "-gnatpn", 
+		 "-fipa-cp-clone", "-fgcse-after-reload", 
+		 "-funroll-loops", "-fpeel-loops", "-funswitch-loops", 
+		 "-ftracer", "-ftree-vectorize", "-g");
    
    package Compiler is
       case Build_Mode is
@@ -106,7 +114,9 @@ project Mathpaqs is
    end Binder;
 
    package Builder is
-      for Default_Switches ("ada") use ("-j7", "-C");
+      --   "If -j0 is used, then the maximum number of simultaneous compilation
+      --    jobs is the number of core processors on the platform."
+      for Default_Switches ("ada") use ("-j0");
    end Builder;
 
    package Ide is

@@ -14,7 +14,7 @@ with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 
 with Graph.PostScript_driver;           use Graph.PostScript_driver;
 
-with Time_Log;
+with Time_display;
 
 -- Now reference all devices made by Jerry van Dijk:
 
@@ -967,9 +967,9 @@ package body Graph is
         PiAC(999);
         PlAC("     AutoCAD-DXF output from Graph Ada package  v. 18-Mar-2001");
         PiAC(999);
-        PlAC("     by Gautier de Montmollin  http://www.diax.ch/users/gdm/");
+        PlAC("     by Gautier de Montmollin - https://sf.net/u/gdemont");
         PiAC(999);
-        PlAC("     Current time at start:" & Time_log );
+        PlAC("     Current time at start:" & Time_display );
         PiAC(2); PlAC("ENTITIES");
 
 

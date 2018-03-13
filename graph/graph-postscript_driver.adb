@@ -1,6 +1,6 @@
 with Ada.Text_IO;         use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Time_Log;
+with Time_display;
 
 package body Graph.PostScript_driver is
 
@@ -97,9 +97,9 @@ package body Graph.PostScript_driver is
     end if;
     PlPS("% ------------------------------------------------------------");
     PlPS("% PostScript prolog for Graph Ada package       v.  8-Dec-2001");
-    PlPS("% G. de Montmollin http://www.mysunrise.ch/users/gdm/graph.htm");
+    PlPS("% by Gautier de Montmollin - https://sf.net/u/gdemont         ");
     PlPS("% ------------------------------------------------------------");
-    PlPS("% Current time at start of output:" & Time_log );
+    PlPS("% Current time at start of output:" & Time_display );
     PlPS("save");
     PlPS("2.0 setlinewidth");
     -- Ajout 8-Dec-2001 a cause du chainage (nouveau) et des
