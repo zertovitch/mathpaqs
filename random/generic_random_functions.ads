@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------
 --  GENERIC RANDOM FUNCTIONS
--- 
+--
 --  Functions facilitating computations with various standard random distributions.
 --  These functions can be called by more elaborate object-oriented
 --  random distribution classes with CDF, Inverse_CDF, or Simulate methods.

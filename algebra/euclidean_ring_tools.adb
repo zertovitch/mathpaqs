@@ -39,6 +39,6 @@ package body Euclidean_Ring_Tools is
       t:=       ta(2);
       the_gcd:= ta(3);
 
-    end GCD_and_Bezout;  
+    end GCD_and_Bezout;
 
 end Euclidean_Ring_Tools;

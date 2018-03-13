@@ -40,54 +40,54 @@ generic
   with procedure Add_scaled( factor: Real; u: in Vector; v: in out Vector );
   with procedure Scale( factor: Real; u: in out Vector );
 
-  ----------------------------------
-  -- Matrix-vector multiplication --
-  ----------------------------------
+  ------------------------------------
+  --  Matrix-vector multiplication  --
+  ------------------------------------
 
   with procedure Mult( A: in Any_matrix; u: Vector; w: in out Vector );
 
 package ConjGrad is
 
-  -- Kind of preconditioner for iterative methods
+  --  Kind of preconditioner for iterative methods
 
   type t_precond is ( none, diag, tridiag );
 
-  -----------------------------------------------------------------------------
-  -- Iterative solving of Ax=b symmetric system by conjugate gradient method --
-  -----------------------------------------------------------------------------
+  -----------------------------------------------------------------------------------
+  --  Iterative solving of Ax=b symmetric system by the conjugate gradient method  --
+  -----------------------------------------------------------------------------------
 
-   procedure CG ( A : in Any_matrix;
-                  b : Vector;
-                  x : in out Vector;    -- * input:  1st approx;
-                                        -- * output: solution of Ax=b
-                  tol: Real;            -- tolerance
-                  precond: t_precond;   -- kind of preconditioning
-                  itmax: Index;         -- maximum number of iterations
-                  ite: out Index        -- last iteration
-                );
+  procedure CG ( A : in Any_matrix;
+                 b : Vector;
+                 x : in out Vector;    -- * input:  1st approx;
+                                       -- * output: solution of Ax=b
+                 tol: Real;            -- tolerance
+                 precond: t_precond;   -- kind of preconditioning
+                 itmax: Index;         -- maximum number of iterations
+                 ite: out Index        -- last iteration
+               );
 
-  --------------------------------------------------------------
-  -- Stabilized biconjugate gradient method (A non symmetric) --
-  --------------------------------------------------------------
+  ----------------------------------------------------------------
+  --  Stabilized biconjugate gradient method (A non symmetric)  --
+  ----------------------------------------------------------------
 
-   procedure BiCGStab ( A : in Any_matrix;
-                        b : Vector;
-                        x : in out Vector;    -- * input:  1st approx;
-                                              -- * output: solution of Ax=b
-                        eps_rho  : Real;      -- minimal step allowed
-                        tol_omega: Real;      -- tolerance
-                        tol      : Real;      -- tolerance
-                        precond: t_precond;   -- kind of preconditioning
-                        itmax: Index;         -- maximum number of iterations
-                        ite: out Index        -- last iteration
-                      );
+  procedure BiCGStab ( A : in Any_matrix;
+                       b : Vector;
+                       x : in out Vector;    -- * input:  1st approx;
+                                             -- * output: solution of Ax=b
+                       eps_rho  : Real;      -- minimal step allowed
+                       tol_omega: Real;      -- tolerance
+                       tol      : Real;      -- tolerance
+                       precond: t_precond;   -- kind of preconditioning
+                       itmax: Index;         -- maximum number of iterations
+                       ite: out Index        -- last iteration
+                     );
 
-   -- Exceptions raised by CG / BiCG
-   non_symmetric, not_converging, dot_prod_rho_too_small: exception;
+  --  Exceptions raised by CG / BiCG
+  non_symmetric, not_converging, dot_prod_rho_too_small: exception;
 
-   iteration_at_failure: Index; -- information on iteration at last failure
+  iteration_at_failure: Index;  --  Information on iteration at last failure
 
-   -- Preconditionning exceptions
-   tridiagonal_singularity: exception;
+  --  Preconditionning exceptions
+  tridiagonal_singularity: exception;
 
 end ConjGrad;
