@@ -31,7 +31,7 @@ procedure CR_Demo is
         -- SetColor( integer(float(palaz)*(z-zmin)/(zmax-zmin)) + pala );  -- indexed colors
         SetColor(zz,0.0,1.0-zz);
         Line(x1, y1, x2, y2);
-      end;
+      end col_vecout;
 
       package CRG is new Contours(Float, col_vecout); use CRG;
 
@@ -50,7 +50,7 @@ procedure CR_Demo is
       zmax := -1.0e30;
       for i in 0..nx loop
          for j in 0..ny loop
-            d(i,j) := float((i-nx/2) * (j-ny/2));
+            d(i,j) := Float((i-nx/2) * (j-ny/2));
             zmin := Float'Min(zmin, d(i, j));
             zmax := Float'Max(zmax, d(i, j));
          end loop;
@@ -60,20 +60,20 @@ procedure CR_Demo is
 --     automatic plotting on the graphics screen
 --
       for j in 0..ny loop
-         y(j) := float(j * (pymax - pymin)) / float(ny) + float(pymin);
+         y(j) := Float(j * (pymax - pymin)) / Float(ny) + Float(pymin);
       end loop;
 --
 --     Set coordinates in X array suitable for
 --     automatic plotting on the graphics screen
 --
       for i in 0..nx loop
-         x(i) := float(i * (pxmax - pxmin)) / float(nx) + float(pxmin);
+         x(i) := Float(i * (pxmax - pxmin)) / Float(nx) + Float(pxmin);
       end loop;
 --
 --     Set a full contingent of contour levels
 --
       for i in 1..nc loop
-         z(i) := float(i) * (zmax - zmin) / float(nc + 1);
+         z(i) := Float(i) * (zmax - zmin) / Float(nc + 1);
       end loop;
 
 --     Init. graphics
@@ -90,10 +90,10 @@ procedure CR_Demo is
 --
 --     Draw a border around the contour plot
 --
-      x1 := float(pxmin);
-      y1 := float(pymin);
-      x2 := float(pxmax);
-      y2 := float(pymax);
+      x1 := Float(pxmin);
+      y1 := Float(pymin);
+      x2 := Float(pxmax);
+      y2 := Float(pymax);
 
       Set_math_plane(x1,y1,x2,y2);
 

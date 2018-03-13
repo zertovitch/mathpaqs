@@ -1,12 +1,18 @@
--------------
--- SAMPLES --
--------------
+---------------
+--  SAMPLES  --
+---------------
 -- Package for building samples of random values, then computing
 -- statistics from these samples (see Get_measures)
 -------------
--- Author: G. de Montmollin, August 2007 and later
 --
--- Legal licensing note:
+--  This is part of the Mathpaqs collection of mathematical packages.
+--  Latest version may be available at:
+--      home page:     http://mathpaqs.sf.net/
+--      project page:  http://sf.net/projects/mathpaqs/
+--      mirror:        https://github.com/svn2github/mathpaqs
+--
+-------------------------
+--  Legal licensing note:
 
 --  Copyright (c) 2007..2015 Gautier de Montmollin
 
@@ -28,8 +34,8 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 
--- NB: this is the MIT License, as found 12-Sep-2007 on the site
--- http://www.opensource.org/licenses/mit-license.php
+--  NB: this is the MIT License, as found 12-Sep-2007 on the site
+--  http://www.opensource.org/licenses/mit-license.php
 
 generic
 

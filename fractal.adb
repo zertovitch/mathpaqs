@@ -26,31 +26,31 @@ procedure Fractal is
 
   type Matrix22 is array(1..2,1..2) of Real;
 
-  function "+"(p: Pt; v: Vector) return Pt is
+  function "+" (p: Pt; v: Vector) return Pt is
   begin
     return (p.x+v.x, p.y+v.y);
-  end;
+  end "+";
 
-  function "*"(M: Matrix22; p: Pt) return Pt is
+  function "*" (M: Matrix22; p: Pt) return Pt is
   begin
     return
       (M(1,1) * p.x + M(1,2) * p.y,
        M(2,1) * p.x + M(2,2) * p.y);
-  end;
+  end "*";
 
-  function "*"(f: Real; p: Pt) return Pt is
+  function "*" (f: Real; p: Pt) return Pt is
   begin
     return (f * p.x, f*p.y);
-  end;
+  end "*";
 
-  function "*"(f: Real; fig: Figure) return Figure is
+  function "*" (f: Real; fig: Figure) return Figure is
     res: Figure:= fig;
   begin
     for i in res'Range loop
       res(i):= f * res(i);
     end loop;
     return res;
-  end;
+  end "*";
 
   type Affine is record
     M: Matrix22;
@@ -59,7 +59,7 @@ procedure Fractal is
 
   type Affine_array is array(Positive range <>) of Affine;
 
-  function Morph(f: Figure; a: Affine) return Figure is
+  function Morph (f: Figure; a: Affine) return Figure is
     mod_f: Figure(f'Range);
   begin
     for i in f'Range loop
@@ -83,7 +83,7 @@ procedure Fractal is
 
   end Draw;
 
-  procedure Plot(f: Figure; a: Affine_array; d:device_type; n:string) is
+  procedure Plot(f: Figure; a: Affine_array; d:device_type; n:String) is
   begin
     InitGraph(d, file_name=>n);
     Set_math_plane(0.0,0.0, 1.0,1.0, d);
@@ -96,7 +96,7 @@ procedure Fractal is
 
   -- Napperons
 
-  procedure Plot_Sierpinski(d:device_type; n:string) is
+  procedure Plot_Sierpinski (d: device_type; n: String) is
     triangle: constant Figure:= ((0.0,0.0), (0.5, Sqrt(3.0)/2.0), (1.0,0.0));
     M: constant Matrix22:= ((0.5,0.0),(0.0,0.5));
     v1: constant Vector:= (0.0,0.0);
@@ -106,11 +106,11 @@ procedure Fractal is
       ( (M,v1), (M,v2), (M,v3) );
   begin
     Plot( triangle, transformation, d, n);
-  end Plot_sierpinski;
+  end Plot_Sierpinski;
 
   -- Fougère
 
-  procedure Plot_Barnsley(d:device_type; n:string) is
+  procedure Plot_Barnsley (d: device_type; n: String) is
     triangle: constant Figure:= 0.1 * ((0.0,0.0), (0.5, Sqrt(3.0)/2.0), (1.0,0.0));
     M1: constant Matrix22:= ((0.849, 0.037),
                             (-0.037, 0.849));
@@ -131,6 +131,6 @@ procedure Fractal is
   end Plot_Barnsley;
 
 begin
-  Plot_sierpinski(PostScript, "sierpinski.ps");
-  Plot_barnsley(PostScript, "barnsley.ps");
-end;
+  Plot_Sierpinski(PostScript, "sierpinski.ps");
+  Plot_Barnsley(PostScript, "barnsley.ps");
+end Fractal;

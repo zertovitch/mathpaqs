@@ -1,13 +1,16 @@
--- This is a GNAT, GCC or GNAT Programming Studio (GPS) project file
--- for Mathpaqs ( http://sf.net/projects/mathpaqs/ , mirror: https://github.com/svn2github/mathpaqs )
--- Build me with "gnatmake -P mathpaqs", or open me with GPS
+--  This is a GNAT, GCC or GNAT Programming Studio (GPS) project file
+--  for the Mathpaqs collection of mathematical packages:
+--      home page:     http://mathpaqs.sf.net/
+--      project page:  http://sf.net/projects/mathpaqs/
+--      mirror:        https://github.com/svn2github/mathpaqs
+--  Build me with "gnatmake -P mathpaqs", or open me with GPS
 --
 project Mathpaqs is
 
    for Source_Dirs use (".", "algebra", "edp", "eds", "lin_alg", "multi", "numerics", "probas", "random", "lin_alg/sparse", "stats", "graph");
    for Exec_Dir use ".";
    type Build_Mode_Type is ("Debug", "Style_Checks", "Fast");
-   Build_Mode : Build_Mode_Type := external ("Build_Mode", "Debug");
+   Build_Mode : Build_Mode_Type := external ("Build_Mode", "Fast");
 
    for Main use (
        --

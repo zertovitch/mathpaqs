@@ -67,7 +67,7 @@ package body Samples is
   function Occurrences(s: Sample) return Natural is
   begin
     return s.total_occurrences;
-  end;
+  end Occurrences;
 
   procedure Get_measures(
     s: in     Sample;

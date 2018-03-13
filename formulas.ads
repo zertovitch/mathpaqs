@@ -10,8 +10,11 @@
 --  automatic memory management, automatic deep copy & delete,
 --  improved formula simplification, etc.
 --
+--  This is part of the Mathpaqs collection of mathematical packages.
 --  Latest version may be available at:
---  http://mathpaqs.sf.net/ or http://sf.net/projects/mathpaqs/
+--      home page:     http://mathpaqs.sf.net/
+--      project page:  http://sf.net/projects/mathpaqs/
+--      mirror:        https://github.com/svn2github/mathpaqs
 
 -- Copyright (c) Gautier de Montmollin 2015 .. 2016
 --

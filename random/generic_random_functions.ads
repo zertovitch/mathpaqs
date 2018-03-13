@@ -1,13 +1,20 @@
---------------------------------
--- Generic_Random_Functions
+---------------------------------------------------------------------------
+--  GENERIC RANDOM FUNCTIONS
+-- 
+--  Functions facilitating computations with various standard random distributions.
+--  These functions can be called by more elaborate object-oriented
+--  random distribution classes with CDF, Inverse_CDF, or Simulate methods.
+--  The purpose here is a direct, "ad-hoc" utility.
+---------------------------------------------------------------------------
 --
--- Functions facilitating computations with various random distributions.
--- These functions can be called by more elaborate object-oriented
--- random distribution classes with CDF, Inverse_CDF, or Simulate methods.
--- The purpose here is a direct, "ad-hoc" utility.
---------------------------------
+--  This is part of the Mathpaqs collection of mathematical packages.
+--  Latest version may be available at:
+--      home page:     http://mathpaqs.sf.net/
+--      project page:  http://sf.net/projects/mathpaqs/
+--      mirror:        https://github.com/svn2github/mathpaqs
 --
--- Legal licensing note:
+-------------------------
+--  Legal licensing note:
 
 --  Copyright (c) 2010 .. 2018 Gautier de Montmollin
 --  Parts originally created by Stephen L. Moshier (see implementation for details)
@@ -30,8 +37,8 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 
--- NB: this is the MIT License, as found 9-Feb-2011 on the site
--- http://www.opensource.org/licenses/mit-license.php
+--  NB: this is the MIT License, as found 9-Feb-2011 on the site
+--  http://www.opensource.org/licenses/mit-license.php
 
 ----------------
 -- To do list --

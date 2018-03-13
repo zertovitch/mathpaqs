@@ -1,16 +1,21 @@
---
--- COPULAS
---
---   A copula is a multivariate uniform distribution function.
+---------------
+--  COPULAS  --
+---------------
+--   A copula is a multivariate *uniform* distribution function.
 --   Thanks to Sklar's theorem, any multivariate random distribution
---   can be decomposed in a unique copula and marginal distributions.
---   Thus, a copula contains all depedency information and can be used
+--   can be decomposed as a unique copula, and a set of marginal distributions.
+--   Thus, a copula contains all dependency information and can be used
 --   separately from the random distributions themselves.
+--------------------------------------------------------------------------
 --
--- Author: G. de Montmollin, January 2009 and later
---         http://gautiersblog.blogspot.ch/search/label/Ada
+--  This is part of the Mathpaqs collection of mathematical packages.
+--  Latest version may be available at:
+--      home page:     http://mathpaqs.sf.net/
+--      project page:  http://sf.net/projects/mathpaqs/
+--      mirror:        https://github.com/svn2github/mathpaqs
 --
--- Legal licensing note:
+-------------------------
+--  Legal licensing note:
 --
 --  Copyright (c) 2009 .. 2016 Gautier de Montmollin
 --
@@ -32,17 +37,17 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 --
--- NB: this is the MIT License, as found 12-Sep-2007 on the site
--- http://www.opensource.org/licenses/mit-license.php
+--  NB: this is the MIT License, as found 12-Sep-2007 on the site
+--  http://www.opensource.org/licenses/mit-license.php
 
 ------------
--- Changes
+--  Changes
 --
--- 09-Nov-2010: Fixed a bug in Gaussian copula (the last element of an odd
---                number of dependent variables was wrongly simulated)
--- 17-Jul-2009: U(0,1) Random generator is provided by the user
--- 16-Apr-2009: Evolutive object hierachy implemented
---    Jan-2009: Copula type as rigid record type
+--  09-Nov-2010: Fixed a bug in Gaussian copula (the last element of an odd
+--                 number of dependent variables was wrongly simulated)
+--  17-Jul-2009: U(0,1) Random generator is provided by the user
+--  16-Apr-2009: Evolutive object hierachy implemented
+--     Jan-2009: Copula type as rigid record type
 
 with Ada.Numerics.Generic_Real_Arrays;
 

@@ -1,4 +1,13 @@
--- Random generation for enumrated types
+----------------------------------------------
+--  Random generation for enumerated types  --
+----------------------------------------------
+--
+--  This is part of the Mathpaqs collection of mathematical packages.
+--  Latest version may be available at:
+--      home page:     http://mathpaqs.sf.net/
+--      project page:  http://sf.net/projects/mathpaqs/
+--      mirror:        https://github.com/svn2github/mathpaqs
+--
 
 -- 17-Feb-2011: moved Uniform_random from generic function
 -- to a parameter of Finite_distributed_random in order to

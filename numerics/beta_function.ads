@@ -1,9 +1,16 @@
 ---------------------------------
---  Beta special function      --
+--  BETA SPECIAL FUNCTION      --
 --  Test procedure: Test_Beta  --
 ---------------------------------
 --
--- Legal licensing note:
+--  This is part of the Mathpaqs collection of mathematical packages.
+--  Latest version may be available at:
+--      home page:     http://mathpaqs.sf.net/
+--      project page:  http://sf.net/projects/mathpaqs/
+--      mirror:        https://github.com/svn2github/mathpaqs
+--
+-------------------------
+--  Legal licensing note:
 
 --  Copyright (c) 2018 Gautier de Montmollin (Ada translation and maintenance)
 --  Originally created by Stephen L. Moshier (see implementation for details)
@@ -26,8 +33,8 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 
--- NB: this is the MIT License, as found 9-Feb-2011 on the site
--- http://www.opensource.org/licenses/mit-license.php
+--  NB: this is the MIT License, as found 9-Feb-2011 on the site
+--  http://www.opensource.org/licenses/mit-license.php
 
 ---------------------------------------------------------------------
 --  Extreme cases of the Beta function x |-> B(x,a,b):

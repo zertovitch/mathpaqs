@@ -1,12 +1,17 @@
 ----------------------------------
 --  DISCRETE RANDOM SIMULATION  --
 ----------------------------------
---  Package for simulating discrete random variables, using a standard
---  generator with uniform floating-point values in the [0;1] interval
--------------
+--  Package for simulating empiric discrete random variables, using a standard
+--  pseudo-random generator with uniform floating-point values in the [0;1] interval.
+----------------------------------
 --
---  Author: G. de Montmollin, February 2011 and later
+--  This is part of the Mathpaqs collection of mathematical packages.
+--  Latest version may be available at:
+--      home page:     http://mathpaqs.sf.net/
+--      project page:  http://sf.net/projects/mathpaqs/
+--      mirror:        https://github.com/svn2github/mathpaqs
 --
+-------------------------
 --  Legal licensing note:
 
 --  Copyright (c) 2011 .. 2017 Gautier de Montmollin
