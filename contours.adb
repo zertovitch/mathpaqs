@@ -27,23 +27,23 @@ package body Contours is
       m1, m2, m3, cas : Integer;
       x1, y1, x2, y2 : Real;
 
-      function xsect(p1,p2: natural) return Real is
-        begin return (h(p2) * xh(p1) - h(p1) * xh(p2)) / (h(p2) - h(p1)); end;
+      function xsect(p1,p2: Natural) return Real is
+        begin return (h(p2) * xh(p1) - h(p1) * xh(p2)) / (h(p2) - h(p1)); end xsect;
 
-      function ysect(p1,p2: natural) return Real is
-        begin return (h(p2) * yh(p1) - h(p1) * yh(p2)) / (h(p2) - h(p1)); end;
+      function ysect(p1,p2: Natural) return Real is
+        begin return (h(p2) * yh(p1) - h(p1) * yh(p2)) / (h(p2) - h(p1)); end ysect;
 
    begin
 --
 --     Scan the arrays, top down, left to right within rows
 --
-      for j in reverse d'first(2)..d'last(2)-1 loop
+      for j in reverse d'First(2)..d'last(2)-1 loop
          for i in d'first(1)..d'last(1)-1 loop
 
             dmin := Real'Min(Real'Min(d(i, j), d(i, j + 1)), Real'Min(d(i + 1, j), d(i + 1, j + 1)));
             dmax := Real'Max(Real'Max(d(i, j), d(i, j + 1)), Real'Max(d(i + 1, j), d(i + 1, j + 1)));
 
-            if  dmax >= z ( z'first ) and dmin <= z ( z'last )  then
+            if  dmax >= z ( z'First ) and dmin <= z ( z'Last )  then
                for k in z'range loop
                   if  z ( k ) in dmin..dmax  then
 
@@ -179,11 +179,11 @@ package body Contours is
                            y1 := ysect(m3, m1);
                            x2 := xsect(m1, m2);
                            y2 := ysect(m1, m2);
-                           
-                         when others => raise constraint_error;
+
+                         when others => raise Constraint_Error;
 
                         end case;
-                        vecout(x1,y1,x2,y2,z(k));
+                        Vecout (x1,y1,x2,y2,z(k));
                       end if;
 
                      end loop;
@@ -196,6 +196,6 @@ package body Contours is
 
       end loop;
 
-   end conrec;
+   end ConRec;
 
 end Contours;

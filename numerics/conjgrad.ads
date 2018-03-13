@@ -27,7 +27,7 @@ generic
   -- [Ada 95+] type Any_matrix (<>) is private;
   -- [Ada 83]  type Any_matrix is private;
 
-  with function  Get( A: Any_matrix; i,j: index ) return real;
+  with function  Get( A: Any_matrix; i,j: Index ) return Real;
   with function Rows( A: Any_matrix ) return Index;
   with function Defined_symmetric( A: Any_matrix ) return Boolean;
 
@@ -35,16 +35,16 @@ generic
   -- Vector operations --
   -----------------------
 
-  with procedure Copy( u: in vector; v: out vector );
-  with function "*"(u,v: vector) return real;
-  with procedure Add_scaled( factor: real; u: in vector; v: in out vector );
-  with procedure Scale( factor: real; u: in out vector );
+  with procedure Copy( u: in Vector; v: out Vector );
+  with function "*"(u,v: Vector) return Real;
+  with procedure Add_scaled( factor: Real; u: in Vector; v: in out Vector );
+  with procedure Scale( factor: Real; u: in out Vector );
 
   ----------------------------------
   -- Matrix-vector multiplication --
   ----------------------------------
 
-  with procedure Mult( A: in Any_matrix; u: vector; w: in out vector );
+  with procedure Mult( A: in Any_matrix; u: Vector; w: in out Vector );
 
 package ConjGrad is
 
@@ -57,13 +57,13 @@ package ConjGrad is
   -----------------------------------------------------------------------------
 
    procedure CG ( A : in Any_matrix;
-                  b : vector;
-                  x : in out vector;    -- * input:  1st approx;
+                  b : Vector;
+                  x : in out Vector;    -- * input:  1st approx;
                                         -- * output: solution of Ax=b
-                  tol: real;            -- tolerance
+                  tol: Real;            -- tolerance
                   precond: t_precond;   -- kind of preconditioning
-                  itmax: index;         -- maximum number of iterations
-                  ite: out index        -- last iteration
+                  itmax: Index;         -- maximum number of iterations
+                  ite: out Index        -- last iteration
                 );
 
   --------------------------------------------------------------
@@ -71,15 +71,15 @@ package ConjGrad is
   --------------------------------------------------------------
 
    procedure BiCGStab ( A : in Any_matrix;
-                        b : vector;
-                        x : in out vector;    -- * input:  1st approx;
+                        b : Vector;
+                        x : in out Vector;    -- * input:  1st approx;
                                               -- * output: solution of Ax=b
-                        eps_rho  : real;      -- minimal step allowed
-                        tol_omega: real;      -- tolerance
-                        tol      : real;      -- tolerance
+                        eps_rho  : Real;      -- minimal step allowed
+                        tol_omega: Real;      -- tolerance
+                        tol      : Real;      -- tolerance
                         precond: t_precond;   -- kind of preconditioning
-                        itmax: index;         -- maximum number of iterations
-                        ite: out index        -- last iteration
+                        itmax: Index;         -- maximum number of iterations
+                        ite: out Index        -- last iteration
                       );
 
    -- Exceptions raised by CG / BiCG

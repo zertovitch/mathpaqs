@@ -15,7 +15,7 @@ procedure Champ_vt is
   begin
     return (a*((r-1.0)*(r-1.0)/r)*x-y,a*((r-1.0)*(r-1.0)/r)*y+x);
     -- return (x,0);
-  end;
+  end F;
 
   procedure Dessine_Champ(xa,ya,xb,yb: Float; points_x, points_y: Positive) is
     xab: constant Float:= xb-xa;

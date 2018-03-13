@@ -31,14 +31,17 @@
 --     Author: Paul D. Bourke
 --     Ada version: 23.I.1999, Gautier de Montmollin
 --
---       Latest version may be available at:
---       http://mathpaqs.sf.net/ or http://sf.net/projects/mathpaqs/
+--     This is part of the Mathpaqs collection of mathematical packages.
+--     Latest version may be available at:
+--         home page:     http://mathpaqs.sf.net/
+--         project page:  http://sf.net/projects/mathpaqs/
+--         mirror:        https://github.com/svn2github/mathpaqs
 --======================================================================
 
 generic
 
   type Real is digits <>;
-  with procedure Vecout (x1, y1, x2, y2, z: Real ); 
+  with procedure Vecout (x1, y1, x2, y2, z: Real );
   --  User-defined line drawing procedure
 
 package Contours is
@@ -51,4 +54,4 @@ package Contours is
                     x, y : contour_pos;
                     z    : contour_level);
 
-end;
+end Contours;
