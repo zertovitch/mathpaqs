@@ -39,10 +39,13 @@
 
 generic
 
-  type Real is digits <>;
+  --  Probability_value is any floating-point type; can be restricted to the 0.0 .. 1.0 range.
+  --
+  type Probability_value is digits <>;
+
   --  The following array type represents an empiric random variable
   --  with integer values, like 0,1,2,...n and cumulative probabilities
-  --  p0, p0+p1, p0+p1+p2, p0+p1+...+pn = 1
+  --  p0, p0+p1, p0+p1+p2, ... , p0+p1+...+pn = 1
   --
   --  Caution:
   --
@@ -60,8 +63,8 @@ generic
   --     Dice: (0.0, 1.0/6.0, 2.0/6.0, 3.0/6.0, 4.0/6.0, 5.0/6.0)
   --
   --  See Test_Discrete_Random_Simulation for more.
-
-  type Cumulative_distribution_function is array(Integer range <>) of Real;
+  --
+  type Probability_array is array(Integer range <>) of Probability_value;
 
 package Discrete_Random_Simulation is
 
@@ -87,11 +90,19 @@ package Discrete_Random_Simulation is
     --    (and you don't want to use more than one method, do you ?) :
     discrete_random_mode: Discrete_random_simulation_mode;
   function Index(
-    U01 : Real;  --  Probability value, assumed to be uniform in [0,1]
-    Fx  : Cumulative_distribution_function  --  CDF
+    U01 : Probability_value;  --  Probability value, assumed to be uniform in [0,1]
+    Fx  : Probability_array   --  Cumulative distribution function (CDF)
   )
   return Integer;
 
   pragma Inline(Index);  --  For performance
+
+  --------------------------------------------------------------------------
+  --  Utility: conversion of an array with single probability             --
+  --  values to a CDF array.                                              --
+  --  Note that p(p'Last) is not used in the CDF (it is used implicitly)  --
+  --------------------------------------------------------------------------
+
+  function To_cumulative (p: Probability_array; check: Boolean:= False) return Probability_array;
 
 end Discrete_Random_Simulation;
