@@ -14,7 +14,7 @@
 -------------------------
 --  Legal licensing note:
 
---  Copyright (c) 2011 .. 2017 Gautier de Montmollin
+--  Copyright (c) 2011 .. 2018 Gautier de Montmollin
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -40,8 +40,28 @@
 generic
 
   type Real is digits <>;
+  --  The following array type represents an empiric random variable
+  --  with integer values, like 0,1,2,...n and cumulative probabilities
+  --  p0, p0+p1, p0+p1+p2, p0+p1+...+pn = 1
+  --
+  --  Caution:
+  --
+  --    1) The first probability value in the array must be 0.0 since the array
+  --           represents the function F(x) = P(X<x) (variant with strict "<").
+  --
+  --    2) It is advised to avoid an 1.0 as final value for
+  --           the "x=infinite case" even if it looks fine, since
+  --           it will be drawn sometimes due to random U01 values
+  --           very close to 1 that satisify, numerically, 1.0 <= U01
+  --
+  --  Examples with correct data:
+  --
+  --     Flip-or-coin: (0.0, 0.5)
+  --     Dice: (0.0, 1.0/6.0, 2.0/6.0, 3.0/6.0, 4.0/6.0, 5.0/6.0)
+  --
+  --  See Test_Discrete_Random_Simulation for more.
+
   type Cumulative_distribution_function is array(Integer range <>) of Real;
-  --  CDF for a random variable with integer values, like 0,1,2,3,...
 
 package Discrete_Random_Simulation is
 
@@ -70,7 +90,7 @@ package Discrete_Random_Simulation is
     U01 : Real;  --  Probability value, assumed to be uniform in [0,1]
     Fx  : Cumulative_distribution_function  --  CDF
   )
-  return Natural;
+  return Integer;
 
   pragma Inline(Index);  --  For performance
 

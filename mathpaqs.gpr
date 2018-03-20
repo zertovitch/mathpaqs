@@ -18,14 +18,15 @@ project Mathpaqs is
        -- *** Probabilities
        --
          "test_copulas.adb",
-         "test_pareto.adb",
-         "test_normal.adb",
-         "test_poisson.adb",
        --
-       -- *** Random generation
+       -- *** Random generation & simulation
        --
          "test_u_rand.adb",
          "test_random_performance.adb",
+         "test_discrete_random_simulation.adb",
+         "test_pareto.adb",
+         "test_normal.adb",
+         "test_poisson.adb",
        --
        -- *** Statistics
        --

@@ -10,7 +10,7 @@ package body Discrete_Random_Simulation is
     U01 : Real; -- Probability value, assumed to be unform in [0,1]
     Fx  : Cumulative_distribution_function
   )
-  return Natural
+  return Integer
   is
     l, r, i: Integer;
   begin
