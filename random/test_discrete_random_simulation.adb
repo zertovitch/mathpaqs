@@ -83,7 +83,7 @@ procedure Test_Discrete_Random_Simulation is
 
   flip_coin: constant CDF := (0.0, 0.5);
   dice_1: constant CDF (1..6) := (0.0, 1.0/6.0, 2.0/6.0, 3.0/6.0, 4.0/6.0, 5.0/6.0);
-  dice_other : constant CDF:= To_cumulative((1.0/6.0,1.0/6.0,1.0/6.0,1.0/6.0,1.0/6.0,1.0/6.0));
+  dice_other : constant CDF:= To_cumulative((1..6 => 1.0/6.0));
 
   empiric_a: constant CDF := To_cumulative(
     (0.01, 0.02, 0.04, 0.08, 0.16,  --  Sums to 0.31

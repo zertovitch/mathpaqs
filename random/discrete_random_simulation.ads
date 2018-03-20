@@ -1,5 +1,8 @@
-----------------------------------
---  DISCRETE RANDOM SIMULATION  --
+-------------------------------------------------------
+--  DISCRETE RANDOM SIMULATION                       --
+--  Test procedure: Test_Discrete_Random_Simulation  --
+-------------------------------------------------------
+
 ----------------------------------
 --  Package for simulating empiric discrete random variables, using a standard
 --  pseudo-random generator with uniform floating-point values in the [0;1] interval.
@@ -42,28 +45,6 @@ generic
   --  Probability_value is any floating-point type; can be restricted to the 0.0 .. 1.0 range.
   --
   type Probability_value is digits <>;
-
-  --  The following array type represents an empiric random variable
-  --  with integer values, like 0,1,2,...n and cumulative probabilities
-  --  p0, p0+p1, p0+p1+p2, ... , p0+p1+...+pn = 1
-  --
-  --  Caution:
-  --
-  --    1) The first probability value in the array must be 0.0 since the array
-  --           represents the function F(x) = P(X<x) (variant with strict "<").
-  --
-  --    2) It is advised to avoid an 1.0 as final value for
-  --           the "x=infinite case" even if it looks fine, since
-  --           it will be drawn sometimes due to random U01 values
-  --           very close to 1 that satisify, numerically, 1.0 <= U01
-  --
-  --  Examples with correct data:
-  --
-  --     Flip-or-coin: (0.0, 0.5)
-  --     Dice: (0.0, 1.0/6.0, 2.0/6.0, 3.0/6.0, 4.0/6.0, 5.0/6.0)
-  --
-  --  See Test_Discrete_Random_Simulation for more.
-  --
   type Probability_array is array(Integer range <>) of Probability_value;
 
 package Discrete_Random_Simulation is
@@ -90,19 +71,42 @@ package Discrete_Random_Simulation is
     --    (and you don't want to use more than one method, do you ?) :
     discrete_random_mode: Discrete_random_simulation_mode;
   function Index(
-    U01 : Probability_value;  --  Probability value, assumed to be uniform in [0,1]
-    Fx  : Probability_array   --  Cumulative distribution function (CDF)
+    U01 : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
+    Fx  : Probability_array   --  Fx is the Cumulative distribution function (CDF), F(x).
+                              --  Read note below for correct usage!
   )
   return Integer;
 
   pragma Inline(Index);  --  For performance
 
+  --  The Fx array type represents an empiric random variable
+  --  with integer values, like 0,1,2,...n and cumulative probabilities
+  --  p0, p0+p1, p0+p1+p2, ... , p0+p1+...+pn = 1
+  --
+  --  Caution:
+  ------------
+  --
+  --    1) The first probability value in the array must be 0.0 since the array
+  --           represents the function F(x) = P(X<x) (variant with strict "<").
+  --
+  --    2) It is advised to avoid an 1.0 as final value for
+  --           the "x=infinite case" even if it looks fine, since
+  --           it will be drawn sometimes due to random U01 values
+  --           very close to 1 that satisfy, numerically, 1.0 <= U01
+  --
+  --  Examples with correct data (more in Test_Discrete_Random_Simulation):
+  --
+  --     Flip-or-coin: (0.0, 0.5)
+  --     Dice: (0.0, 1.0/6.0, 2.0/6.0, 3.0/6.0, 4.0/6.0, 5.0/6.0)
+
   --------------------------------------------------------------------------
-  --  Utility: conversion of an array with single probability             --
-  --  values to a CDF array.                                              --
+  --  Utility: To_cumulative: conversion of an array with                 --
+  --  single probability values to a CDF array.                           --
   --  Note that p(p'Last) is not used in the CDF (it is used implicitly)  --
   --------------------------------------------------------------------------
-
+  --
+  --  Example: Dice: To_cumulative((1..6 => 1.0/6.0));
+  --
   function To_cumulative (p: Probability_array; check: Boolean:= False) return Probability_array;
 
 end Discrete_Random_Simulation;

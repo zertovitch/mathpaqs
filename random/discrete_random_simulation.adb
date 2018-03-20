@@ -7,8 +7,8 @@ package body Discrete_Random_Simulation is
   -- num: Natural:= 0;
 
   function Index(
-    U01 : Probability_value;  --  Probability value, assumed to be unform in [0,1]
-    Fx  : Probability_array   --  Cumulative distribution function (CDF)
+    U01 : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
+    Fx  : Probability_array   --  Fx is the Cumulative distribution function (CDF), F(x)
   )
   return Integer
   is
