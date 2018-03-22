@@ -1,14 +1,14 @@
 with Ada.Numerics.Generic_Elementary_Functions;
 with Ada.Exceptions;                    use Ada.Exceptions;
 
-with SparseB; -- Basic Linear Algebra routines, with possible binding to BLAS
+with Sparse.Vector_Ops; -- Basic Linear Algebra routines, with possible binding to BLAS
 
 package body Sparse is
 
   package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
   use REF;
 
-  package Sparse_BLA is new SparseB(Real, Index, Vector);
+  package Sparse_BLA is new Sparse.Vector_Ops(Real, Index, Vector);
   use Sparse_BLA;
 
 -- "exported":

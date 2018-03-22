@@ -64,104 +64,104 @@ procedure Test_Sparse is
     na: Natural:= 0;
   begin
     for m in 1..neq loop
-       if  m > n1  then na := na + 1; end if;
-       if  m > 1   then na := na + 1; end if;
-       na := na + 1;
-       if  m + 1 <= neq   then na := na + 1; end if;
-       if  m + n1 <= neq  then na := na + 1; end if;
+      if  m > n1  then na := na + 1; end if;
+      if  m > 1   then na := na + 1; end if;
+      na := na + 1;
+      if  m + 1 <= neq   then na := na + 1; end if;
+      if  m + n1 <= neq  then na := na + 1; end if;
     end loop;
     return na;
- end nnz;
+  end nnz;
 
-  begin
-    Put("dim:"); Put(neq); New_Line;
-    Put("nnz estim"); Put(nnz_estim); New_Line;
-    Put("nnz exact"); Put(nnz(n1, n2, neq)); New_Line;
+begin
+  Put("dim:"); Put(neq); New_Line;
+  Put("nnz estim"); Put(nnz_estim); New_Line;
+  Put("nnz exact"); Put(nnz(n1, n2, neq)); New_Line;
 
-    T0:= Clock; -- CPU_Clock;
+  T0:= Clock; -- CPU_Clock;
 
-    Put_Line("Remplissage de la matrice A");
+  Put_Line("Remplissage de la matrice A");
 
-    na := 0;
-    for m in 1..neq loop
-         A.row_ptr(m) := na + 1;
+  na := 0;
+  for m in 1..neq loop
+    A.row_ptr(m) := na + 1;
 
-         if  m > n1  then
-            na := na + 1;
-            A.col_ind(na) := m - n1;
-            A.val(na) := -1.0;
-         end if;
+    if  m > n1  then
+      na := na + 1;
+      A.col_ind(na) := m - n1;
+      A.val(na) := -1.0;
+    end if;
 
-         if  m > 1  then
-            na := na + 1;
-            A.col_ind(na) := m - 1;
-            A.val(na) := -1.0;
-         end if;
+    if  m > 1  then
+      na := na + 1;
+      A.col_ind(na) := m - 1;
+      A.val(na) := -1.0;
+    end if;
 
-         na := na + 1;
-         A.col_ind(na) := m;
-         A.val(na) := 6.0;
+    na := na + 1;
+    A.col_ind(na) := m;
+    A.val(na) := 6.0;
 
-         if  m + 1 <= neq  then
-            na := na + 1;
-            A.col_ind(na) := m + 1;
-            A.val(na) := -1.4;
-         end if;
+    if  m + 1 <= neq  then
+      na := na + 1;
+      A.col_ind(na) := m + 1;
+      A.val(na) := -1.4;
+    end if;
 
-         if  m + n1 <= neq  then
-            na := na + 1;
-            A.col_ind(na) := m + n1;
-            A.val(na) := -1.45;
-         end if;
+    if  m + n1 <= neq  then
+      na := na + 1;
+      A.col_ind(na) := m + n1;
+      A.val(na) := -1.45;
+    end if;
+  end loop;
+
+  A.row_ptr(neq+1) := na + 1;
+  A.symmetric:= False;
+
+  Put_Line("Construction de b:= Ax avec x connu : x=(1,1,...1)");
+
+  for i in 1..neq loop
+    tmp := 0.0;
+    for j in A.row_ptr(i)..A.row_ptr(i+1)-1 loop
+      tmp := tmp + A.val(j);
     end loop;
+    b(i) := tmp;
+  end loop;                -- la solution est x=(1,1,...,1)
 
-    A.row_ptr(neq+1) := na + 1;
-    A.symmetric:= False;
+  Put_Line("Initialisation de x : x:=(0,0,...0)");
 
-    Put_Line("Construction de b:= Ax avec x connu : x=(1,1,...1)");
-
-    for i in 1..neq loop
-         tmp := 0.0;
-         for j in A.row_ptr(i)..A.row_ptr(i+1)-1 loop
-            tmp := tmp + A.val(j);
-         end loop;
-         b(i) := tmp;
-    end loop;                -- la solution est x=(1,1,...,1)
-
-    Put_Line("Initialisation de x : x:=(0,0,...0)");
-
-    -- x.all:= (others=> 0.0); plante !
-    for i in x'Range loop
-      x(i):= 0.0;
-    end loop;
+  -- x.all:= (others=> 0.0); plante !
+  for i in x'Range loop
+    x(i):= 0.0;
+  end loop;
 
 --      x(1..neq/2):= (others=> -0.09);
 --      x(neq/2..neq):= (others=> 1.09);
 
-    Put_Line("Resolution de x : Ax=b");
+  Put_Line("Resolution de x : Ax=b");
 
-    T1 := Clock; -- CPU_Clock;
+  T1 := Clock; -- CPU_Clock;
 
-    BiCGStab(A.all,b.all,x.all, 1.0e-20, 1.0e-12, 1.0e-12,
-             none,
-             itmax, nite
-    );
+  BiCGStab(A.all,b.all,x.all, 1.0e-20, 1.0e-12, 1.0e-12,
+           none,
+           itmax, nite
+  );
 
-    T2 := Clock; -- CPU_Clock;
+  T2 := Clock; -- CPU_Clock;
 
-    Put("Residu en norme l1:  ||x-(1,1,...)||_1 = ");
-    tmp := 0.0;
-    for i in x'Range loop
-      tmp:= tmp + abs(x(i)-1.0);
-    end loop;
-    Put(tmp); New_Line;
+  Put("Residu en norme l1:  ||x-(1,1,...)||_1 = ");
+  tmp := 0.0;
+  for i in x'Range loop
+    tmp:= tmp + abs(x(i)-1.0);
+  end loop;
+  Put(tmp); New_Line;
 --      for i in 1..neq loop
 --         Put(i); Put(x(i), exp=> 0); new_line;
 --      end loop;
-    Put("# iterations"); Put(nite); New_Line;
+  Put("# iterations"); Put(nite); New_Line;
 
-    Put("Temps structure et remplissage"); DurIO.Put(T1 - T0, Aft => 2);
-    New_Line;
-    Put("Temps resolution              "); DurIO.Put(T2 - T1, Aft => 2);
-    New_Line;
+  Put("Temps structure et remplissage"); DurIO.Put(T1 - T0, Aft => 2);
+  New_Line;
+  Put("Temps resolution              "); DurIO.Put(T2 - T1, Aft => 2);
+  New_Line;
 end Test_Sparse;

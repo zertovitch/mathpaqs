@@ -4,7 +4,7 @@
 
 -- Compile with an "unroll-loops" optimisation !
 
-package body SparseB is
+package body Sparse.Vector_Ops is
 
   -- Internal vector routines, interfaced with BLAS when use_BLAS=true
 
@@ -47,4 +47,4 @@ package body SparseB is
 
   pragma Inline("*", Add_scaled, Scale);
 
-end SparseB;
+end Sparse.Vector_Ops;

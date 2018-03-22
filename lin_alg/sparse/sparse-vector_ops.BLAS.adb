@@ -2,7 +2,7 @@
 --
 --   This version of Ada body IS mapped to BLAS library
 
-package body SparseB is
+package body Sparse.Vector_Ops is
 
   -- identify floating point type
 
@@ -98,4 +98,4 @@ package body SparseB is
 
   pragma inline("*", Add_scaled, Scale);
 
-end SparseB;
+end Sparse.Vector_Ops;
