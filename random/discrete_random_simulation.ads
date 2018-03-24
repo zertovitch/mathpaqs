@@ -45,18 +45,19 @@ generic
   --  Probability_value is any floating-point type; can be restricted to the 0.0 .. 1.0 range.
   --
   type Probability_value is digits <>;
-  type Probability_array is array(Integer range <>) of Probability_value;
+  type Probability_array is array (Integer range <>) of Probability_value;
 
 package Discrete_Random_Simulation is
 
   ----------------------------------------------------------------------------
   --  The function Index gives the appropriate index of an array Fx containing
   --  a Cumulative Distribution Function (CDF), given a value in [0,1].
-  --  Index is given in three variants with different usefulness/performance features:
+  --  Index is given in three variants with different usefulness/performance
+  --  features (discussed in their specifications):
   --
   --     Index_Linear_Search
   --     Index_Dichotomic_Search
-  --     Index_Aliases
+  --     Index_Alias_Method
   --
   --  The Fx array type represents an empiric random variable
   --  with integer values, like 0,1,2,...n, and cumulative probabilities
@@ -81,13 +82,15 @@ package Discrete_Random_Simulation is
   --  Examples with correct data (more in Test_Discrete_Random_Simulation):
   --
   --     Flip-or-coin: (0.0, 0.5)
+  --
   --     Dice: (0.0, 1.0/6.0, 2.0/6.0, 3.0/6.0, 4.0/6.0, 5.0/6.0)
+  --
   ----------------------------------------------------------------------------
 
   -------------------------------------------------------------------------
   --  Linear search: we scan the whole array of cumulated probabilities  --
   --  in order to find the most appropriate value.                       --
-  --  O(n), best for small arrays.                                       --
+  --  Run time: O(n), best for small arrays.                             --
   -------------------------------------------------------------------------
 
   function Index_Linear_Search (
@@ -97,10 +100,10 @@ package Discrete_Random_Simulation is
   return Integer;
   pragma Inline(Index_Linear_Search);
 
-  ------------------------------------------------------------
-  --  Dichotomic search - divide and conquer algorithm.     --
-  --  O(Log_2(n))... but slower where Fx is "plateau"-ing.  --
-  ------------------------------------------------------------
+  ----------------------------------------------------------------------
+  --  Dichotomic search - divide and conquer algorithm.               --
+  --  Run time: O(Log_2(n))... but slower where Fx is "plateau"-ing.  --
+  ----------------------------------------------------------------------
 
   function Index_Dichotomic_Search (
     U01 : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
@@ -109,8 +112,31 @@ package Discrete_Random_Simulation is
   return Integer;
   pragma Inline(Index_Dichotomic_Search); --  !! check performance of inlining
 
-  --  Index_Aliases : TBD
-  --  A.J. Walker, in (Knuth Volume 2, 3.4.1.A, p.119)
+  -------------------------------------------------------------------------------
+  --  Alias method by A.J. Walker (1977) - see Knuth Volume 2, 3.4.1.A, p.119  --
+  --  Variant by Michael D. Vose (1991)                                        --
+  --  Run time: O(1)   <--- No typo: only one comparison is done, no search!   --
+  --  NB:
+  --    - Aliases need to be computed before the simulation.
+  --    - You need a random generator with lots of digits
+  --        (U01's is used for two purposes )
+  --    - Index_Alias_Method is NOT an inverse CDF, and cannot be used for
+  --        dependant random variables. For example, tail dependency is lost
+  -------------------------------------------------------------------------------
+
+  type Alias_tables (low_bound, high_bound: Integer) is private;
+
+  procedure Prepare_Aliases (
+    Fx      : in  Probability_array;  --  Fx is the Cumulative distribution function (CDF), F(x).
+    aliases : out Alias_tables        --  Should have the same bounds as Fx
+  );
+
+  function Index_Alias_Method (
+    U01     : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
+    aliases : Alias_tables
+  )
+  return Integer;
+  pragma Inline(Index_Alias_Method);
 
   --------------------------------------------------------------------------
   --  Utility: To_cumulative: conversion of an array with                 --
@@ -121,5 +147,15 @@ package Discrete_Random_Simulation is
   --  Example: Dice: To_cumulative((1..6 => 1.0/6.0));
   --
   function To_cumulative (p: Probability_array; check: Boolean:= False) return Probability_array;
+
+private
+
+  type Alias_array is array (Integer range <>) of Integer;
+  type Alias_prob_array is array (Integer range <>) of Probability_value;
+
+  type Alias_tables (low_bound, high_bound: Integer) is record
+    alias       : Alias_array (low_bound .. high_bound);
+    probability : Alias_prob_array (low_bound .. high_bound);
+  end record;
 
 end Discrete_Random_Simulation;

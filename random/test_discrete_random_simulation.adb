@@ -20,7 +20,7 @@ procedure Test_Discrete_Random_Simulation is
 
   package RIO is new Float_IO(Real); use RIO;
 
-  type Simulation_mode is (linear, dichotomic);  --  , alias);
+  type Simulation_mode is (linear, dichotomic, alias);
 
   procedure Test_CDF_by_mode(F: CDF; mode: Simulation_mode; comment: String) is
     sample: array(F'Range) of Integer := (others => 0);
@@ -28,8 +28,9 @@ procedure Test_Discrete_Random_Simulation is
     g: Generator;
     n: constant := 50_000_000;
     u: Real;
-    x: Integer;
+    ii, x: Integer:= 0;
     t0, t1: Time;
+    aliases: Alias_tables (F'First, F'Last);
   begin
     Put_Line("---------");
     Put_Line(
@@ -39,13 +40,19 @@ procedure Test_Discrete_Random_Simulation is
     New_Line;
     Reset(g);
     t0 := Clock;
+    if mode = alias then
+      Prepare_Aliases (Fx => F, aliases => aliases);
+    end if;
     for i in 1 .. n loop
+      ii := i;
       u:= Real(Random(g));
       case mode is
         when linear =>
-          x:= Index_Linear_Search (u, F);
+          x := Index_Linear_Search (u, F);
         when dichotomic =>
-          x:= Index_Dichotomic_Search (u, F);
+          x := Index_Dichotomic_Search (u, F);
+        when alias =>
+          x := Index_Alias_Method (u, aliases);
       end case;
       sample(x):= sample(x) + 1;
     end loop;
@@ -64,6 +71,9 @@ procedure Test_Discrete_Random_Simulation is
       "Elapsed time for " & Simulation_mode'Image(mode) &
       ": " & Duration'Image(t1-t0)
     );
+  exception
+    when others =>
+      Put_Line ("Error at iteration" & Integer'Image(ii));
   end Test_CDF_by_mode;
 
   procedure Test_CDF(F: CDF; comment: String) is
