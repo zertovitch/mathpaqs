@@ -32,6 +32,7 @@ procedure Test_Discrete_Random_Simulation is
     t0, t1, t2: Time;
     aliases: Alias_tables (F'First, F'Last);
     probs: constant Pba (F'Range) := To_probs (F);
+    diff, max_diff: Real := 0.0;
   begin
     Put_Line("---------");
     Put_Line(
@@ -61,18 +62,25 @@ procedure Test_Discrete_Random_Simulation is
     t2 := Clock;
     --
     for xi in sample'Range loop
-      Put(xi, 4);
-      Put(": # occurrences:");
-      Put(sample(xi), 10);
-      Put("   ");
       pxi := Real(sample(xi)) / Real(n);
-      Put(pxi, 2, 5, 0);
-      Put(";  exact value");
-      Put(probs(xi), 2, 5, 0);
-      Put(";  abs diff.");
-      Put(abs(pxi - probs(xi)), 2, 6, 0);
-      Put_Line("; " & comment);
+      diff := abs(pxi - probs(xi));
+      max_diff := Real'Max(max_diff, diff);
+      if xi not in sample'First + 5 .. sample'Last - 5 then
+        Put(xi, 4);
+        Put(": #occ:");
+        Put(sample(xi), 9);
+        Put(" ->");
+        Put(pxi, 2, 4, 0);
+        Put("; exact");
+        Put(probs(xi), 2, 4, 0);
+        Put("; diff");
+        Put(diff, 2, 6, 0);
+        Put_Line("; " & comment);
+      end if;
     end loop;
+    New_Line;
+    Put("Max diff");
+    Put(max_diff, 2, 6, 0);
     New_Line;
     Put_Line (
       "Elapsed time for " & Simulation_mode'Image(mode) &
@@ -106,26 +114,24 @@ procedure Test_Discrete_Random_Simulation is
   truncated_poisson: Pba(0..max_poisson);
   procedure Fill_truncated_poisson is
     lambda: constant := 7.0;
-    sum : Real := 0.0;
     p: Real;
   begin
     Put("Poisson, lambda=");
     Put(lambda, 2,10,0);
     New_Line;
-    truncated_poisson(0):= 0.0;
-    for k in 0 .. max_poisson - 1 loop
+    for k in 0 .. max_poisson loop
       p:= Exp(-lambda) * (lambda ** k) / Gamma(Real(k+1));
-      sum := sum + p;
-      Put("            k="); Put(k, 3);
-      Put("          p_k="); Put(p, 2,10,0);
-      Put("          sum="); Put(sum, 2,10,0);
-      New_Line;
-      truncated_poisson(k + 1):= sum;
+      --  Put("            k="); Put(k, 3);
+      --  Put("          p_k="); Put(p, 2,10,0);
+      --  New_Line;
+      truncated_poisson(k):= p;
     end loop;
   end Fill_truncated_poisson;
 
-  big_size : constant := 200;
-  big_one: constant Pba := To_cumulative((1..big_size => 1.0 / Real(big_size)), check => True);
+  big_one: Pba (1..200);
+  sum: Real;
+  use Ada.Numerics.Float_Random;
+  gen: Generator;
 
   --  *WRONG* usage:
   flip_coin_wrong_side: constant Pba := (0.5, 1.0);
@@ -139,8 +145,27 @@ begin
   Test_CDF(dice_other, "Dice, using ""To_cumulative"" function");
   Test_CDF(empiric_a, "Empiric A: p = {0.01, 0.02, 0.04, 0.08, 0.16, 0.09, 0.1, 0.5}");
   Fill_truncated_poisson;
-  Test_CDF(truncated_poisson, "Truncated Poisson");
-  Test_CDF(big_one, "Big CDF");
+  Test_CDF(To_cumulative(truncated_poisson), "Truncated Poisson");
+  --  Probabilities are randomly set.
+  sum := 0.0;
+  for i in big_one'Range loop
+    big_one(i) := Real(Random(gen));
+    sum := sum + big_one(i);
+  end loop;
+  for i in big_one'Range loop
+    big_one(i) := big_one(i) / sum;
+  end loop;
+  Test_CDF(To_cumulative(big_one), "Big CDF A, randomly set probs.");
+  --  Probabilities are exponenially decreasing.
+  sum := 0.0;
+  for i in big_one'Range loop
+    big_one(i) := Exp(Real(-i));
+    sum := sum + big_one(i);
+  end loop;
+  for i in big_one'Range loop
+    big_one(i) := big_one(i) / sum;
+  end loop;
+  Test_CDF(To_cumulative(big_one), "Big CDF B, probs. expon. decr.");
   --
   if do_wrongs then
     New_Line(4);
