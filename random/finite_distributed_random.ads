@@ -1,6 +1,8 @@
-----------------------------------------------
---  Random generation for enumerated types  --
-----------------------------------------------
+-----------------------------------------------------------------------
+--  Random generation for enumerated types                           --
+-----------------------------------------------------------------------
+--  NB: see Discrete_Random_Simulation for more advanced techniques  --
+-----------------------------------------------------------------------
 --
 --  This is part of the Mathpaqs collection of mathematical packages.
 --  Latest version may be available at:

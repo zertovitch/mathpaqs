@@ -20,33 +20,33 @@ procedure Test_Discrete_Random_Simulation is
 
   package RIO is new Float_IO(Real); use RIO;
 
-  --  Passing of mode looks somewhat complicated, but we want
-  --  to be sure it is done at compile-time.
-  generic
-    mode: Discrete_random_simulation_mode;
-  procedure Test_CDF_by_mode(F: CDF; comment: String);
+  type Simulation_mode is (linear, dichotomic);  --  , alias);
 
-  procedure Test_CDF_by_mode(F: CDF; comment: String) is
+  procedure Test_CDF_by_mode(F: CDF; mode: Simulation_mode; comment: String) is
     sample: array(F'Range) of Integer := (others => 0);
     use Ada.Numerics.Float_Random;
     g: Generator;
     n: constant := 50_000_000;
     u: Real;
     x: Integer;
-    function Index_any is new Index(mode);
     t0, t1: Time;
   begin
     Put_Line("---------");
     Put_Line(
       "Testing " & comment &
       ", total occurrences=" & Integer'Image(n) &
-      ", inverse CDF mode= " & Discrete_random_simulation_mode'Image(mode));
+      ", inverse CDF mode= " & Simulation_mode'Image(mode));
     New_Line;
     Reset(g);
     t0 := Clock;
     for i in 1 .. n loop
       u:= Real(Random(g));
-      x:= Index_any (u, F);
+      case mode is
+        when linear =>
+          x:= Index_Linear_Search (u, F);
+        when dichotomic =>
+          x:= Index_Dichotomic_Search (u, F);
+      end case;
       sample(x):= sample(x) + 1;
     end loop;
     t1 := Clock;
@@ -61,23 +61,15 @@ procedure Test_Discrete_Random_Simulation is
     end loop;
     New_Line;
     Put_Line (
-      "Elapsed time for " & Discrete_random_simulation_mode'Image(mode) &
+      "Elapsed time for " & Simulation_mode'Image(mode) &
       ": " & Duration'Image(t1-t0)
     );
   end Test_CDF_by_mode;
 
-  procedure Test_CDF_linear is new Test_CDF_by_mode(linear);
-  procedure Test_CDF_dicho is new Test_CDF_by_mode(dichotomic);
-
   procedure Test_CDF(F: CDF; comment: String) is
   begin
-    for mode in Discrete_random_simulation_mode loop
-      case mode is
-        when linear =>
-          Test_CDF_linear(F, comment);
-        when dichotomic =>
-          Test_CDF_dicho(F, comment);
-      end case;
+    for mode in Simulation_mode loop
+      Test_CDF_by_mode(F, mode, comment);
     end loop;
   end Test_CDF;
 
@@ -127,7 +119,7 @@ begin
   Test_CDF(flip_coin, "Flip or coin");
   Test_CDF(dice_1, "Dice index base 1");
   Test_CDF(dice_other, "Dice, using ""To_cumulative"" function");
-  Test_CDF(empiric_a, "Empiric A: p={0.01, 0.02, 0.04, 0.08, 0.16, 0.09, 0.1, 0.5}");
+  Test_CDF(empiric_a, "Empiric A: p = {0.01, 0.02, 0.04, 0.08, 0.16, 0.09, 0.1, 0.5}");
   Fill_truncated_poisson;
   Test_CDF(truncated_poisson, "Truncated Poisson");
   Test_CDF(big_one, "Big CDF");

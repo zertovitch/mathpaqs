@@ -49,55 +49,68 @@ generic
 
 package Discrete_Random_Simulation is
 
-  type Discrete_random_simulation_mode is
-    ( --  Linear: we scan the whole array of cumulated probabilities
-      --  in order to find the most appropriate value.
-      linear,
-      --  Dichotomic search instead of linear.
-      dichotomic
-      --  There are faster but trickier algorithms
-      --  (e.g. A.J. Walker, in (Knuth Volume 2, 3.4.1.A, p.119))
-    );
-
   ----------------------------------------------------------------------------
-  --  The function Index gives the appropriate index in an array containing --
-  --  a CDF, given a value in [0,1]. Indeed, it is an inverse CDF function. --
-  --  With the integer value it is trivial then to obtain the x for a       --
-  --  general discrete random variable: just have an array x(i) for that.   --
-  ----------------------------------------------------------------------------
-
-  generic
-    --  The simulation mode is generic for performance purposes
-    --    (and you don't want to use more than one method, do you ?) :
-    discrete_random_mode: Discrete_random_simulation_mode;
-  function Index(
-    U01 : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
-    Fx  : Probability_array   --  Fx is the Cumulative distribution function (CDF), F(x).
-                              --  Read note below for correct usage!
-  )
-  return Integer;
-
-  pragma Inline(Index);  --  For performance
-
+  --  The function Index gives the appropriate index of an array Fx containing
+  --  a Cumulative Distribution Function (CDF), given a value in [0,1].
+  --  Index is given in three variants with different usefulness/performance features:
+  --
+  --     Index_Linear_Search
+  --     Index_Dichotomic_Search
+  --     Index_Aliases
+  --
   --  The Fx array type represents an empiric random variable
-  --  with integer values, like 0,1,2,...n and cumulative probabilities
-  --  p0, p0+p1, p0+p1+p2, ... , p0+p1+...+pn = 1
+  --  with integer values, like 0,1,2,...n, and cumulative probabilities
+  --  p0, p0+p1, ... , p0+p1+...+pn = 1
+  --
+  --  Indeed, Index is an inverse CDF function.
+  --
+  --  For general discrete random variables with values that are not all integers
+  --  you can use an array x(i). Example: x(Index_Linear_Search(Random(gen), Fx)).
   --
   --  Caution:
   ------------
   --
-  --    1) The first probability value in the array must be 0.0 since the array
-  --           represents the function F(x) = P(X<x) (variant with strict "<").
+  --    1) The first probability value in the array must be 0.0. The array
+  --           represents the function F(x) = P(X<x) (variant of P with strict "<").
   --
   --    2) It is advised to avoid an 1.0 as final value for
   --           the "x=infinite case" even if it looks fine, since
   --           it will be drawn sometimes due to random U01 values
-  --           very close to 1 that satisfy, numerically, 1.0 <= U01
+  --           very close to 1 that satisfy, *numerically*, 1.0 <= U01.
   --
   --  Examples with correct data (more in Test_Discrete_Random_Simulation):
   --
   --     Flip-or-coin: (0.0, 0.5)
   --     Dice: (0.0, 1.0/6.0, 2.0/6.0, 3.0/6.0, 4.0/6.0, 5.0/6.0)
+  ----------------------------------------------------------------------------
+
+  -------------------------------------------------------------------------
+  --  Linear search: we scan the whole array of cumulated probabilities  --
+  --  in order to find the most appropriate value.                       --
+  --  O(n), best for small arrays.                                       --
+  -------------------------------------------------------------------------
+
+  function Index_Linear_Search (
+    U01 : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
+    Fx  : Probability_array   --  Fx is the Cumulative distribution function (CDF), F(x).
+  )
+  return Integer;
+  pragma Inline(Index_Linear_Search);
+
+  ------------------------------------------------------------
+  --  Dichotomic search - divide and conquer algorithm.     --
+  --  O(Log_2(n))... but slower where Fx is "plateau"-ing.  --
+  ------------------------------------------------------------
+
+  function Index_Dichotomic_Search (
+    U01 : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
+    Fx  : Probability_array   --  Fx is the Cumulative distribution function (CDF), F(x).
+  )
+  return Integer;
+  pragma Inline(Index_Dichotomic_Search); --  !! check performance of inlining
+
+  --  Index_Aliases : TBD
+  --  A.J. Walker, in (Knuth Volume 2, 3.4.1.A, p.119)
 
   --------------------------------------------------------------------------
   --  Utility: To_cumulative: conversion of an array with                 --

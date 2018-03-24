@@ -654,7 +654,7 @@ package body Generic_Real_Linear_Equations is
       for I in 1..J loop
         SUM := 0.0 ;
         for K in 1..I-1 loop
-           SUM := SUM + B(ROW(I),K)*B(ROW(K),J) ;
+          SUM := SUM + B(ROW(I),K)*B(ROW(K),J) ;
         end loop ;
         B(ROW(I),J) := B(ROW(I),J) - SUM ;
       end loop ;
@@ -721,9 +721,9 @@ package body Generic_Real_Linear_Equations is
       for J in A'First(2)-A'First(1)+I+1 .. A'Last(2) loop
         if A(I,J) /= A(A'First(1)-A'First(2)+J, A'First(2)-A'First(1)+I) then
           if abs(A(I,J)-A(A'First(1)-A'First(2)+J, A'First(2)-A'First(1)+I)) >
-             2.0 * Real'Epsilon * abs(A(I,J))
+            2.0 * Real'Epsilon * abs(A(I,J))
           then
-               raise Matrix_Data_Error with "Matrix is not symmetric";
+            raise Matrix_Data_Error with "Matrix is not symmetric";
           end if;
         end if;
       end loop;
@@ -1211,7 +1211,7 @@ package body Generic_Real_Linear_Equations is
       G := 0.0;
       S := 0.0;
       Scale := 0.0;
-      --IF (I > M .OR. I = N) GO TO 290
+      -- IF (I > M .OR. I = N) GO TO 290
       if I<=M and I/=N then  -- 290
         for K in L..N loop  -- 220
           Scale := Scale+ abs (U(I,K));
@@ -1341,7 +1341,7 @@ package body Generic_Real_Linear_Equations is
         end loop ;
         -- 530
         --  CANCELLATION OF RV1(L) IF L GREATER THAN 1
-        --540
+        -- 540
         C := 0.0;
         S := 1.0;
         for I in L..K loop  -- 560
@@ -1362,15 +1362,15 @@ package body Generic_Real_Linear_Equations is
             U(J,I) := -Y*S+Z*C;
           end loop ;  -- 550
         end loop ;  -- 560
-         -- TEST FOR CONVERGENCE
+        -- TEST FOR CONVERGENCE
 <<L565>>
         Z := W(K);
         if L=K then
           goto L650;
         end if ;
-         -- SHIFT FROM BOTTOM 2 BY 2 MINOR
+        -- SHIFT FROM BOTTOM 2 BY 2 MINOR
         if Its=30 then
-           -- SET ERROR, NO CONVERGENCE TO A SINGULAR VALUE AFTER 30 ITERATIONS
+          -- SET ERROR, NO CONVERGENCE TO A SINGULAR VALUE AFTER 30 ITERATIONS
           -- Ierr := K;
           raise Matrix_Data_Error with "No SV convergence";
         end if ;
@@ -1407,7 +1407,7 @@ package body Generic_Real_Linear_Equations is
           end loop ;  -- 570
           Z := Elementary_Functions.Sqrt(F*F+H*H);
           W(I1) := Z;
-           -- ROTATION CAN BE ARBITRARY IF Z IS ZERO
+          -- ROTATION CAN BE ARBITRARY IF Z IS ZERO
           if Z/=0.0 then  -- 580
             C := F/Z;
             S := H/Z;
@@ -1425,7 +1425,7 @@ package body Generic_Real_Linear_Equations is
         Rv1(K) := F;
         W(K) := X;
       end loop ;  -- 520
-       -- CONVERGENCE
+      -- CONVERGENCE
 <<L650>>
       if Z<0.0 then
         -- W(K) IS MADE NON-NEGATIVE
