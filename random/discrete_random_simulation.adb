@@ -55,7 +55,7 @@ package body Discrete_Random_Simulation is
   is
     k : constant Real := Real (Fx'Length);
     average : constant Probability_value := 1.0 / k;
-    probabilities: Probability_array (Fx'Range);
+    probabilities: Probability_array (Fx'Range) := To_probs (Fx);
     small, large: array (1 .. Fx'Length) of Integer;
     last_small, last_large: Natural := 0;
     less, more, j: Integer;
@@ -65,13 +65,6 @@ package body Discrete_Random_Simulation is
     then
       raise Constraint_Error with "Fx and alias table haven't the same bounds";
     end if;
-    for i in Fx'Range loop
-      if i < Fx'Last then
-        probabilities(i) := Fx(i+1) - Fx(i);
-      else
-        probabilities(i) := 1.0 - Fx(i);
-      end if;
-    end loop;
     --
     for i in probabilities'Range loop
       if probabilities (i) >= average then
@@ -148,7 +141,8 @@ package body Discrete_Random_Simulation is
     end if;
   end Index_Alias_Method;
 
-  function To_cumulative (p: Probability_array; check: Boolean:= False) return Probability_array is
+  function To_cumulative (p: Probability_array; check: Boolean:= False) return Probability_array
+  is
     sum: Probability_value := 0.0;
     Fx: Probability_array(p'Range);
     tol: constant := 1.0e-7;
@@ -167,5 +161,25 @@ package body Discrete_Random_Simulation is
     end if;
     return Fx;
   end To_cumulative;
+
+  function To_probs (Fx: Probability_array; check: Boolean:= False) return Probability_array
+  is
+    probabilities : Probability_array (Fx'Range);
+  begin
+    if check and then Fx(Fx'First) > 0.0 then
+      raise Constraint_Error with "First probability of CDF Fx must be 0.0";
+    end if;
+    for i in Fx'Range loop
+      if i < Fx'Last then
+        if check and then Fx(i+1) < Fx(i) then
+          raise Constraint_Error with "CDF Fx is decreasing";
+        end if;
+        probabilities(i) := Fx(i+1) - Fx(i);
+      else
+        probabilities(i) := 1.0 - Fx(i);
+      end if;
+    end loop;
+    return probabilities;
+  end To_probs;
 
 end Discrete_Random_Simulation;

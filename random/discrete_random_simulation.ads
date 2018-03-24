@@ -148,6 +148,11 @@ package Discrete_Random_Simulation is
   --
   function To_cumulative (p: Probability_array; check: Boolean:= False) return Probability_array;
 
+  --  Converts a CDF array, for instance: 0.0, p1, p1+p2, ..., p1+...+p_{n-1}
+  --  to a single probability array: p1, p2, ..., pn.
+  --
+  function To_probs (Fx: Probability_array; check: Boolean:= False) return Probability_array;
+
 private
 
   type Alias_array is array (Integer range <>) of Integer;
