@@ -121,19 +121,17 @@ package body Discrete_Random_Simulation is
   )
   return Integer
   is
-    n : constant Positive := aliases.alias'Length;
-    U0n: constant Real := U01 * Real (n);
-    coin : Probability_value;
-    j, jb : Integer;
-  begin
-    j := Integer (Real'Floor (U0n));  --  Random uniform choice
-    jb := j + aliases.probability'First;
-    if jb > aliases.probability'Last then
-      jb := aliases.probability'Last;  --  Very rare, but happens...
-    end if;
+    n    : constant Positive := aliases.alias'Length;
+    U0n  : constant Real := U01 * Real (n);
+    jr   : constant Real := Real'Floor (U0n);  --  Random uniform choice;
+    j    : constant Integer := Integer (jr);
+    --  Need of Min with 'Last: very rare, but happens...
+    jb   : constant Integer :=
+      Integer'Min (aliases.probability'Last, j + aliases.probability'First);
     --  Another random choice (flip or coin) using the fractional part.
-    --  This is why many digits are needed for U01.
-    coin := U0n - Real (j);
+    --  This is why enough digits are needed for U01.
+    coin : constant Probability_value := U0n - jr;  --  another uniform [0,1]
+  begin
     if coin <= aliases.probability (jb) then
       return jb;
     else
