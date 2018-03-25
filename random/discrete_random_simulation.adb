@@ -143,7 +143,10 @@ package body Discrete_Random_Simulation is
 
   function To_cumulative (p: Probability_array; check: Boolean:= False) return Probability_array
   is
-    sum: Probability_value := 0.0;
+    --  We take the 'Base type for variable "sum" because it might slightly
+    --  exceed 1.0 on last index; last sum is not stored anyway. We check
+    --  the sum with a relaxed tolerance.
+    sum: Probability_value'Base := 0.0;
     Fx: Probability_array(p'Range);
     tol: constant := 1.0e-7;
   begin
