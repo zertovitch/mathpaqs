@@ -123,9 +123,16 @@ package body Discrete_Random_Simulation is
   is
     n    : constant Positive := aliases.alias'Length;
     U0n  : constant Real := U01 * Real (n);
-    jr   : constant Real := Real'Floor (U0n);  --  Random uniform choice;
-    j    : constant Integer := Integer (jr);
-    --  Need of Min with 'Last: very rare, but happens...
+    --  Random integer j, equidistributed choice in 0 .. n-1
+    --
+    --  ** Fast variant: **
+    j    : constant Integer := Integer (U0n - 0.5);  --  Truncation
+    jr   : constant Real := Real (j);
+    --  ** Slow variant: **
+    --  jr   : constant Real := Real'Floor (U0n);  --  Truncation
+    --  j    : constant Integer := Integer (jr);
+    --
+    --  Min with 'Last is needed because j = n happens (very rarely)...
     jb   : constant Integer :=
       Integer'Min (aliases.probability'Last, j + aliases.probability'First);
     --  Another random choice (flip or coin) using the fractional part.

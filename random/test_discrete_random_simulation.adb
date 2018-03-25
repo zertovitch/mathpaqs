@@ -128,8 +128,8 @@ procedure Test_Discrete_Random_Simulation is
     end loop;
   end Fill_truncated_poisson;
 
-  big_one: Pb_array (1..200);
-  sum: Real;
+  big_A, big_B: Pb_array (1..200);
+  sum_A, sum_B: Real;
   use Ada.Numerics.Float_Random;
   gen: Generator;
 
@@ -148,31 +148,36 @@ begin
   Test_CDF(To_cumulative(truncated_poisson), "Truncated Poisson");
   --
   --  Probabilities are randomly set.
-  sum := 0.0;
-  for i in big_one'Range loop
-    big_one(i) := Real(Random(gen));
-    sum := sum + big_one(i);
+  sum_A := 0.0;
+  for i in big_A'Range loop
+    big_A(i) := Real(Random(gen));
+    sum_A := sum_A + big_A(i);
   end loop;
-  for i in big_one'Range loop
-    big_one(i) := big_one(i) / sum;
+  for i in big_A'Range loop
+    big_A(i) := big_A(i) / sum_A;
   end loop;
-  Test_CDF(To_cumulative(big_one), "Big CDF A, randomly set probs.");
+  Test_CDF(To_cumulative(big_A), "Big CDF A, randomly set probs.");
+  --
+  --  On Fast mode, HP Mini (Atom), GNAT GPL 2017 for Win32, the
+  --  following part produces NaN's *unless* there is a "goto mystery;"
+  --  at the beginning. Other options run well...
+  <<mystery>>
   --
   --  Probabilities are exponenially decreasing.
   --  We test here the quasi-plateau's that slows down
   --  the dichotomic search and where the Alias method might be better.
-  sum := 0.0;
-  for i in big_one'Range loop
+  sum_B := 0.0;
+  for i in big_B'Range loop
     --  We avoid too large exponents that would make p_i
     --  cumulate to 1 (numerically) before last index ->
     --  see "Caution #2" in spec.
-    big_one(i) := Exp(12.0*Real(-i)/Real(big_one'Last));
-    sum := sum + big_one(i);
+    big_B(i) := Exp(-4.0*Real(i)/Real(big_B'Last));
+    sum_B := sum_B + big_B(i);
   end loop;
-  for i in big_one'Range loop
-    big_one(i) := big_one(i) / sum;
+  for i in big_B'Range loop
+    big_B(i) := big_B(i) / sum_B;
   end loop;
-  Test_CDF(To_cumulative(big_one), "Big CDF B, probs. expon. decr.");
+  Test_CDF(To_cumulative(big_B), "Big CDF B, probs. expon. decr.");
   --
   if do_wrongs then
     New_Line(4);
