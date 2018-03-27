@@ -45,6 +45,4 @@ package body Sparse.Vector_Ops is
     end loop;
   end Scale;
 
-  pragma Inline("*", Add_scaled, Scale);
-
 end Sparse.Vector_Ops;

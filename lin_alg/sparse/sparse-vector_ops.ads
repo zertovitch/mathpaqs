@@ -12,4 +12,7 @@ package Sparse.Vector_Ops is
   function "*"(u,v: vector) return real;
   procedure Add_scaled( factor: real; u: in vector; v: in out vector );
   procedure Scale( factor: real; u: in out vector );
+
+  pragma Inline("*", Add_scaled, Scale);
+
 end Sparse.Vector_Ops;

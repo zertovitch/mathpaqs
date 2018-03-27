@@ -71,10 +71,10 @@ procedure Test_Beta is
     if not Very_Close(Bxab, pBxab, 1.0E-13) then
       raise Different_Incomplete_Beta_values;
     end if;
-    if not Very_Close(x, x_again, 1.0E-13) then
+    if not Very_Close(x, x_again, 1.0E-8) then
       raise Different_Inverse_Beta_values_1;
     end if;
-    if not Very_Close(x, x_again_from_precomp, 1.0E-12) then
+    if not Very_Close(x, x_again_from_precomp, 1.0E-8) then
       raise Different_Inverse_Beta_values_2;
     end if;
   end Test_incomplete_and_inverse;
