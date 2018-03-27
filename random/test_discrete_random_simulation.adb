@@ -1,22 +1,31 @@
 with Discrete_Random_Simulation;
 with Gamma_function;
+with U_Rand;
 
 with Ada.Calendar; use Ada.Calendar;
-with Ada.Numerics.Float_Random;
+--  with Ada.Numerics.Float_Random;
 with Ada.Numerics.Generic_Elementary_Functions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
+--  with System;
 
 procedure Test_Discrete_Random_Simulation is
 
-  type Real is digits 18;
-  --  We can also use the Real type, but this adds automatic checks when enabled:
+  subtype Real is Long_Float;  --  on x86: 15 digits.
+
+  --  System.Max_Digits: on x86: Extended 80-bit floating-point type, 18 digits.
+  --  Issue in this test with GNAT GPL 2017 Win32 - see below (*).
+  --  type Real is digits System.Max_Digits;
+
+  --  Prob_Value: we can also use the Real type as well, but the
+  --  range constraint adds automatic checks when enabled:
   subtype Prob_Value is Real range 0.0 .. 1.0;
   type Pb_array is array(Integer range <>) of Prob_Value;
 
   package DRS is new Discrete_Random_Simulation(Prob_Value, Pb_array); use DRS;
   package REF is new Ada.Numerics.Generic_Elementary_Functions(Real); use REF;
   package RG is new Gamma_function(Real); use RG;
+  package RUR is new U_Rand (Real); use RUR;
 
   package RIO is new Float_IO(Real); use RIO;
 
@@ -24,13 +33,12 @@ procedure Test_Discrete_Random_Simulation is
 
   procedure Test_CDF_by_mode(F: Pb_array; mode: Simulation_mode; comment: String) is
     sample: array(F'Range) of Integer := (others => 0);
-    use Ada.Numerics.Float_Random;
     g: Generator;
     n: constant := 50_000_000;
     u, pxi: Prob_Value;
     ii, x: Integer:= 0;
     t0, t1, t2: Time;
-    aliases: Alias_tables (F'First, F'Last);
+    aliases: Alias_table (F'Range);
     probs: constant Pb_array (F'Range) := To_probs (F);
     diff, max_diff: Real := 0.0;
   begin
@@ -73,14 +81,14 @@ procedure Test_Discrete_Random_Simulation is
         Put(pxi, 2, 5, 0);
         Put("; exact");
         Put(probs(xi), 2, 5, 0);
-        Put("; diff");
+        Put("; abs diff");
         Put(diff, 2, Real'Digits, 0);
         New_Line;
       end if;
     end loop;
     New_Line;
-    Put("Max diff");
-    Put(max_diff, 2, 6, 0);
+    Put("Max abs diff");
+    Put(max_diff, 2, Real'Digits, 0);
     New_Line;
     Put_Line (
       "Elapsed time for " & Simulation_mode'Image(mode) &
@@ -130,7 +138,6 @@ procedure Test_Discrete_Random_Simulation is
 
   big_A, big_B: Pb_array (1..200);
   sum_A, sum_B: Real;
-  use Ada.Numerics.Float_Random;
   gen: Generator;
 
   --  *WRONG* usage:
@@ -140,6 +147,7 @@ procedure Test_Discrete_Random_Simulation is
   do_wrongs: constant Boolean := False;
 
 begin
+  Put_Line("Digits:" & Integer'Image(Real'Digits));
   Test_CDF(flip_coin, "Flip or coin");
   Test_CDF(dice_1, "Dice index base 1");
   Test_CDF(dice_other, "Dice, using ""To_cumulative"" function");
@@ -148,6 +156,7 @@ begin
   Test_CDF(To_cumulative(truncated_poisson), "Truncated Poisson");
   --
   --  Probabilities are randomly set.
+  Reset (gen);
   sum_A := 0.0;
   for i in big_A'Range loop
     big_A(i) := Real(Random(gen));
@@ -158,11 +167,6 @@ begin
   end loop;
   Test_CDF(To_cumulative(big_A), "Big CDF A, randomly set probs.");
   --
-  --  On Fast mode, HP Mini (Atom), GNAT GPL 2017 for Win32, the
-  --  following part produces NaN's *unless* there is a "goto mystery;"
-  --  at the beginning. Other options run well...
-  <<mystery>>
-  --
   --  Probabilities are exponenially decreasing.
   --  We test here the quasi-plateau's that slows down
   --  the dichotomic search and where the Alias method might be better.
@@ -171,9 +175,17 @@ begin
     --  We avoid too large exponents that would make p_i
     --  cumulate to 1 (numerically) before last index ->
     --  see "Caution #2" in spec.
-    big_B(i) := Exp(-4.0*Real(i)/Real(big_B'Last));
+    big_B(i) := Exp(-15.0*Real(i)/Real(big_B'Last));
     sum_B := sum_B + big_B(i);
   end loop;
+  --
+  --  (*) On Fast mode, or minimally with -O2 -gnatn, GNAT GPL 2017 for Win32,
+  --  when using "type Real is digits System.Max_Digits",
+  --  the first evaluation of Exp above produces a NaN. Real = Long_Float is OK.
+  --
+  --  for i in 1..4 loop
+  --    Put("Mystery NaN  "); Put(big_B(i)); New_Line;
+  --  end loop;
   for i in big_B'Range loop
     big_B(i) := big_B(i) / sum_B;
   end loop;

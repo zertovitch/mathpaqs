@@ -110,7 +110,6 @@ package Discrete_Random_Simulation is
     Fx  : Probability_array   --  Fx is the Cumulative distribution function (CDF), F(x).
   )
   return Integer;
-  pragma Inline(Index_Dichotomic_Search); --  !! check performance of inlining
 
   -------------------------------------------------------------------------------
   --  Alias method by A.J. Walker (1977) - see Knuth Volume 2, 3.4.1.A, p.119  --
@@ -124,16 +123,17 @@ package Discrete_Random_Simulation is
   --        dependant random variables. For example, tail dependency is lost
   -------------------------------------------------------------------------------
 
-  type Alias_tables (low_bound, high_bound: Integer) is private;
+  type Alias_pair is private;
+  type Alias_table is array (Integer range <>) of Alias_pair;
 
   procedure Prepare_Aliases (
     Fx      : in  Probability_array;  --  Fx is the Cumulative distribution function (CDF), F(x).
-    aliases : out Alias_tables        --  Should have the same bounds as Fx
+    aliases : out Alias_table         --  Should have the same bounds as Fx
   );
 
   function Index_Alias_Method (
     U01     : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
-    aliases : Alias_tables
+    aliases : Alias_table
   )
   return Integer;
   pragma Inline(Index_Alias_Method);
@@ -155,12 +155,9 @@ package Discrete_Random_Simulation is
 
 private
 
-  type Alias_array is array (Integer range <>) of Integer;
-  type Alias_prob_array is array (Integer range <>) of Probability_value;
-
-  type Alias_tables (low_bound, high_bound: Integer) is record
-    alias       : Alias_array (low_bound .. high_bound);
-    probability : Alias_prob_array (low_bound .. high_bound);
+  type Alias_pair is record
+    alias     : Integer;
+    prob_flip : Probability_value;
   end record;
 
 end Discrete_Random_Simulation;

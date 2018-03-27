@@ -50,7 +50,7 @@ package body Discrete_Random_Simulation is
 
   procedure Prepare_Aliases (
     Fx      : in  Probability_array;  --  Fx is the Cumulative distribution function (CDF), F(x).
-    aliases : out Alias_tables        --  Should have the same bounds as Fx
+    aliases : out Alias_table         --  Should have the same bounds as Fx
   )
   is
     k : constant Real := Real (Fx'Length);
@@ -60,8 +60,8 @@ package body Discrete_Random_Simulation is
     last_small, last_large: Natural := 0;
     less, more, j: Integer;
   begin
-    if Fx'First /= aliases.low_bound or else
-       Fx'Last /= aliases.high_bound
+    if Fx'First /= aliases'First or else
+       Fx'Last /= aliases'Last
     then
       raise Constraint_Error with "Fx and alias table haven't the same bounds";
     end if;
@@ -83,8 +83,8 @@ package body Discrete_Random_Simulation is
       more := large (last_large);
       last_large := last_large - 1;
       --
-      aliases.probability (less) := probabilities (less) * k;
-      aliases.alias (less) := more;  --  Give from the rich to the poor.
+      aliases (less).prob_flip := probabilities (less) * k;
+      aliases (less).alias := more;  --  Give from the rich to the poor.
       --  This corresponds to removal from the game of the cubes of
       --  colour "more" used to fill the box "less" (See exercise in Knuth).
       probabilities (more) := probabilities (more) + probabilities (less) - average;
@@ -101,48 +101,46 @@ package body Discrete_Random_Simulation is
     --  Now either the "small" or the "large" stack is empty.
     while last_small > 0 loop
       j := small (last_small);
-      aliases.probability (j) := 1.0;
-      --  The alias is not used (0 probability), but numerically impossible things happens!
-      aliases.alias (j) := j;  --  Just same as non-aliased.
+      aliases (j).prob_flip := 1.0;
+      --  The alias is not used (0 probability), but numerically, impossible things happens!
+      aliases (j).alias := j;  --  Just same as non-aliased.
       last_small := last_small - 1;
     end loop;
     while last_large > 0 loop
       j := large (last_large);
-      aliases.probability (j) := 1.0;
-      --  The alias is not used (0 probability), but numerically impossible things happens!
-      aliases.alias (j) := j;  --  Just same as non-aliased.
+      aliases (j).prob_flip := 1.0;
+      --  The alias is not used (0 probability), but numerically, impossible things happens!
+      aliases (j).alias := j;  --  Just same as non-aliased.
       last_large := last_large - 1;
     end loop;
   end Prepare_Aliases;
 
   function Index_Alias_Method (
     U01     : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
-    aliases : Alias_tables
+    aliases : Alias_table
   )
   return Integer
   is
-    n    : constant Positive := aliases.alias'Length;
+    n    : constant Positive := aliases'Length;
     U0n  : constant Real := U01 * Real (n);
     --  Random integer j, equidistributed choice in 0 .. n-1
-    --
-    --  ** Fast variant: **
+    --  ** Fast (with GNAT) variant: **
     j    : constant Integer := Integer (U0n - 0.5);  --  Truncation
     jr   : constant Real := Real (j);
-    --  ** Slow variant: **
+    --  ** Slow (with GNAT) variant: **
     --  jr   : constant Real := Real'Floor (U0n);  --  Truncation
     --  j    : constant Integer := Integer (jr);
     --
-    --  Min with 'Last is needed because j = n happens (very rarely)...
-    jb   : constant Integer :=
-      Integer'Min (aliases.probability'Last, j + aliases.probability'First);
+    --  jb: Min with 'Last is needed because j = n happens (very rarely)...
+    jb   : constant Integer := Integer'Min (j + aliases'First, aliases'Last);
     --  Another random choice (flip or coin) using the fractional part.
     --  This is why enough digits are needed for U01.
     coin : constant Probability_value := U0n - jr;  --  another uniform [0,1]
   begin
-    if coin <= aliases.probability (jb) then
+    if coin <= aliases (jb).prob_flip then
       return jb;
     else
-      return aliases.alias (jb);
+      return aliases (jb).alias;
     end if;
   end Index_Alias_Method;
 
