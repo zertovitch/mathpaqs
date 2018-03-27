@@ -60,9 +60,7 @@ package body Discrete_Random_Simulation is
     last_small, last_large: Natural := 0;
     less, more, j: Integer;
   begin
-    if Fx'First /= aliases'First or else
-       Fx'Last /= aliases'Last
-    then
+    if Fx'First /= aliases'First or else Fx'Last /= aliases'Last then
       raise Constraint_Error with "Fx and alias table haven't the same bounds";
     end if;
     --
@@ -77,7 +75,7 @@ package body Discrete_Random_Simulation is
     end loop;
     --
     while last_small > 0 and then last_large > 0 loop
-      --  Take a rich - poor pair
+      --  Take a (rich - poor) pair
       less := small (last_small);
       last_small := last_small - 1;
       more := large (last_large);
@@ -85,7 +83,7 @@ package body Discrete_Random_Simulation is
       --
       aliases (less).prob_flip := probabilities (less) * k;
       aliases (less).alias := more;  --  Give from the rich to the poor.
-      --  This corresponds to removal from the game of the cubes of
+      --  This corresponds to removal, from the game, of the cubes of
       --  colour "more" used to fill the box "less" (See exercise in Knuth).
       probabilities (more) := probabilities (more) + probabilities (less) - average;
       --
@@ -98,20 +96,20 @@ package body Discrete_Random_Simulation is
         small (last_small) := more;
       end if;
     end loop;
-    --  Now either the "small" or the "large" stack is empty.
+    --  Now either the "small" or the "large" stack is empty. We empty any remaining stack.
     while last_small > 0 loop
       j := small (last_small);
+      last_small := last_small - 1;
       aliases (j).prob_flip := 1.0;
       --  The alias is not used (0 probability), but numerically, impossible things happens!
       aliases (j).alias := j;  --  Just same as non-aliased.
-      last_small := last_small - 1;
     end loop;
     while last_large > 0 loop
       j := large (last_large);
+      last_large := last_large - 1;
       aliases (j).prob_flip := 1.0;
       --  The alias is not used (0 probability), but numerically, impossible things happens!
       aliases (j).alias := j;  --  Just same as non-aliased.
-      last_large := last_large - 1;
     end loop;
   end Prepare_Aliases;
 

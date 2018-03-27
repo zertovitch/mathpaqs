@@ -112,15 +112,19 @@ package Discrete_Random_Simulation is
   return Integer;
 
   -------------------------------------------------------------------------------
-  --  Alias method by A.J. Walker (1977) - see Knuth Volume 2, 3.4.1.A, p.119  --
+  --  Alias method by A.J. Walker (1974, 1977)                                 --
+  --    see Knuth Volume 2, 3.4.1.A, p.119, ex. 7 p.139, sol.p.585             --
   --  Variant by Michael D. Vose (1991)                                        --
-  --  Run time: O(1)   <--- No typo: only one comparison is done, no search!   --
-  --  NB:
-  --    - Aliases need to be computed before the simulation.
-  --    - You need a random generator with lots of digits
-  --        (U01's is used for two purposes )
-  --    - Index_Alias_Method is NOT an inverse CDF, and cannot be used for
-  --        dependant random variables. For example, tail dependency is lost
+  --                                                                           --
+  --  https://en.wikipedia.org/wiki/Alias_method                               --
+  --                                                                           --
+  --  Run time: O(1)   <---  No typo: only one comparison is done, no search!  --
+  --  NB:                                                                      --
+  --    - Aliases need to be computed before the simulation, needs O(n) time.  --
+  --    - You need a random generator with enough digits                       --
+  --        (U01's is used for two purposes ).                                 --
+  --    - Index_Alias_Method is NOT an inverse CDF, and cannot be used for     --
+  --        dependant random variables. For example, tail dependency is lost.  --
   -------------------------------------------------------------------------------
 
   type Alias_pair is private;
