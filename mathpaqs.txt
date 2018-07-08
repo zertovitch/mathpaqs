@@ -1,0 +1,174 @@
+MATHPAQS
+========
+_____________________________________________________________________________
+Important note: it is better to unpack the Zip archive
+with its subdirectory structure. How to (re-)do this ?
+It depends on the unpacker:
+
+  unzipada mathpaqs             with Zip-Ada's UnZipAda
+  pkunzip -d mathpaqs           with PKWare's PKUnZip
+  unzip mathpaqs                with InfoZip's UnZip
+  unzip -aa -L mathpaqs         to force lower case in names and text file
+                                                line terminations under Unix
+  "Use archive's 
+     directories" option        with AZip
+  "Use Folder Names" option     with WinZip
+___________________________________________________________________________
+(A)  Mathematical, 100% portable, packages in Ada.
+     If you see "Ada 83" it also compiles
+     on Ada 95, 2005 and 2012 compilers.
+     The list of packages below is sorted by topics.
+     Each topic has a subdirectory. Of course there are many possible
+     interactions, like between Multi-precision numbers and
+     Algebra (Euclidean_Ring_Tools) - it is like combining
+     mathematics fields...
+---------------------------------------------------------------------------
+
+**>> Algebra <<**
+
+Euclidean_Ring_Tools:   Generic package:
+                        given a type with the properties of an euclidean ring
+                        (like integers or polynomials, with 0,1,+,* and
+                        integral division), it gives the Greatest Common Divisor
+                        and the Bezout factors.
+
+Frac:   Generic package: given a type with the properties of a ring,
+        it gives the fractions of it, with operators.
+
+Frac.Order:     Supplement of generic package 'Frac':
+                provides an order relation from one of the ring
+
+Frac_Euclid:    Generic package: given a type with the properties
+                of an *euclidean* ring (with division), it gives the
+                fractions field of it, with operators *and* reduction.
+
+Frac_Euclid.Order:      Supplement of generic package 'Frac_Euclid':
+                        provides an order relation from one of the ring
+
+Polynomials:    Generic package, creates polynomials on a field.
+
+ >Float_Polynomials:      = Polynomials( float,    0.0,1.0, "-",... );
+ >Rationals.Polynomials:  = Polynomials( rational, frac_0, frac_1, "-",... );
+
+Rationals:      Package for manipulation of rational numbers.
+                = Frac_Euclid( integer, 0,1, "-","+","-","*","/");
+
+ >Rationals_Order:        = Rationals.Order("<");
+
+**>> Linear Algebra <<**
+
+G_Matrices:     Generic simple matrix package, with matrix-matrix,
+                matrix-vector, vector operations
+
+Generic_Real_Linear_Equations:   by Jon Squire. Inversion, Cholesky decomposition,
+                                 LU decomposition, QR decomposition, SV decomposition
+                                 
+ConjGrad:       Fast (Bi)Conjugate Gradient iterative methods for
+                solving Ax=b. Generic -> applies to the matrix
+                storage of your choice (e.g. sparse) !
+
+**>> Numerics <<**
+
+G_FEK:          Parts of the Finite Element Kernel from M. Bercovier
+                (original in Fortran);
+                Computes values and derivatives of elementary functions
+                given the element's geometry.
+                Available so far:
+                  1D: L2 (linear)
+                  2D: Q4 (linear), Q9 (quadratic)
+                  3D: B27 (quadratic)
+                Generic -> can be instanciated for any precision!
+
+Special functions: 
+  Beta_function
+  Gamma_function
+  Phi_function
+
+**>> Multi-precision integers <<**
+
+Multi_precision_integers:       Multiple precision integers package
+                                Pure Ada 83 (compiles on both DEC Ada
+                                and GNAT)
+
+Multi_precision_integers_IO:    Text_IO, for multi-precision integers
+
+**>> (Pseudo-) Random number generation, probability models, statistics <<**
+
+Generic_Random_Functions: Functions facilitating computations
+                          with various random distributions
+                          including: Beta, Normal, Poisson, Pareto
+
+Discrete_Random_Simulation: random generation on any discrete distribution
+
+Finite_distributed_random: random generation on any enumerated type
+
+U_Rand:     Standalone random generator (Pure Ada 95, replaces easily
+            Ada's generator if it is too slow)
+
+Copulas:    An object-oriented multivariate uniform random generator
+            with dependency model of any kind. A few basic copulas are provided.
+
+Samples:    A package for building samples of random values, then computing
+            statistics from these samples            
+
+Estimators: Various statistical estimators
+
+**>> Sparse matrices <<**
+
+Sparse:     Sparse matrix package (Pure Ada 83); uses SparseB
+SparseB:    Low-level vector operations for Sparse package
+            - Pure Ada 83 [.adb] body, and
+            - DEC/Compaq/HP [.dec] body mapped to BLAS
+
+**>> Misc <<**
+
+Formulas:   a generic symbolic computation package
+Contours:   a generic contour plot package
+
+_______________________________________________________________
+(B): Programs, tests, demos using the previously cited packages
+---------------------------------------------------------------
+
+______Linear Algebra:
+Test_Sparse             Test of Sparse and ConjGrad packages.
+
+_________________ODE:
+Phases.adb              Phase diagram and vector fields for oscillators (2)
+Champ_Vt.adb            Vector fields drawing                           (1)
+
+_________________PDE:
+Diffchal.adb            Solution of heat equation by finite differences ( )
+
+____________Fractals:
+Biomorph.adb            <<biomorphe>> fractals (cow skin)               (1)
+Fractal_Design.adb      Fractal lines design                            (2)
+Koch_Haar.adb           Koch flake, Haar wavelet and others 1D fractals (1)
+Henon.adb               Henon orbitals (fractal strange attractors)     (1)
+
+__Random simulations:
+Sim_Alea.adb            Simulation of random variables                  ( )
+Porscher.adb            Probability "paradox" (in French)               ( )
+EDS_1.adb               Simulation of solutions of stochastic           (1)
+                        differential equations (SDE)
+Test_U_Rand.adb         Test of U_Rand standalone random generator      ( )
+
+_____Multi-precision:
+Test_Int.adb            Test of Multi_precision_integers package        ( )
+Test_RSA.adb            RSA cyphering using Multi_precision_integers    ( )
+
+_____Misc:
+Test_Formulas.adb       Test for Formulas                               ( )
+CR_Demo.adb             Demo for Contours (contour plot)                (1)
+
+
+------------------------------------------------------------------------
+( ) Yes, it's standalone code !
+(1) uses the PostScript version of Graph package, included in Mathpaqs
+(2) uses DOS-Graph, Mouse packages (DOSGRAPH.ZIP, DOS_PAQS.ZIP)
+         [ discontinued ]
+
+New versions
+------------
+
+http://sf.net/projects/mathpaqs
+
