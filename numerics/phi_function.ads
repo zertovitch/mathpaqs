@@ -7,7 +7,6 @@
 --  Latest version may be available at:
 --      home page:     http://mathpaqs.sf.net/
 --      project page:  http://sf.net/projects/mathpaqs/
---      mirror:        https://github.com/svn2github/mathpaqs
 --
 -------------------------
 --  Legal licensing note:
@@ -40,7 +39,9 @@ generic
   type Real is digits <>;
 
 package Phi_function is
-  --  History and notes about accuracy can be found in the implementation
+  --  History and notes about accuracy can be found in the
+  --  package body (implementation) in numerics/phi_function.adb.
+  --  See random/test_normal.adb for a test. 
 
   function Phi (x: Real) return Real;
 

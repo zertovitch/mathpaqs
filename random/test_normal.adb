@@ -1,5 +1,6 @@
---  Testing Normal_CDF and Normal_inverse_CDF.
---  For a test of simulations using Normal_inverse_CDF
+--  Testing the Normal_CDF and Normal_inverse_CDF functions.
+--
+--  For a test of **simulations** using Normal_inverse_CDF
 --  vs. the Box-Muller method, see Test_Samples.
 
 with Ada.Text_IO;                       use Ada.Text_IO;
@@ -17,8 +18,9 @@ procedure Test_Normal is
   package RIO is new Float_IO (Real);
   use GRF, RIO;
 
-  max : constant := 2000;
-  bound : constant := 8.0;
+  pos_steps   : constant := 2000;
+  total_steps : constant := 1 + 2 * pos_steps;
+  bound       : constant := 8.0;  --  The x range tested will be: [-bound .. +bound]
 
   x, y, z, diff, max_diff, sum_diff, avg_diff : Real;
 
@@ -26,17 +28,24 @@ begin
   Put_Line ("Real'Digits =" & Integer'Image (Real'Digits));
   Put ("Real'First  ="); Put (Real'First); New_Line;
   Put ("Real'Last   ="); Put (Real'Last);  New_Line;
-  Put_Line ("Total steps =" & Integer'Image (max*2));
+  Put_Line ("Total steps =" & Integer'Image (total_steps));
   max_diff:= 0.0;
   sum_diff:= 0.0;
-  for i in -max .. max loop
-    x:= Real(i) * bound / Real(max);
+  for i in -pos_steps .. pos_steps loop
+    x:= Real(i) * bound / Real(pos_steps);
     y:= Normal_CDF(x);
-    z:= Normal_inverse_CDF(y);
+    z:= Normal_inverse_CDF(y);  --  Ideally, x = z.
     diff:= x-z;
+    --
+    --  We take absolute differences to avoid errors to compensate (sum)
+    --  or to hide on negative values (max).
+    --
     max_diff:= Real'Max(max_diff, abs diff);
     sum_diff:= sum_diff + abs diff;
-    if abs i > max - 3 or else abs i < 4 then
+    --
+    --  Display some values around 0 and close to bounds:
+    --
+    if abs i > pos_steps - 3 or else abs i < 4 then
       Put("    x=;");
       Put(x);
       Put("; y=F(x)=;");
@@ -48,8 +57,8 @@ begin
       New_Line;
     end if;
   end loop;
-  avg_diff:= sum_diff / Real(1 + 2 * max);
-  Put("  Average diff = "); Put(avg_diff); New_Line;
-  Put("  Maximum diff = "); Put(max_diff); New_Line;
+  avg_diff:= sum_diff / Real(total_steps);
+  Put("  Average abs diff = "); Put(avg_diff); New_Line;
+  Put("  Maximum abs diff = "); Put(max_diff); New_Line;
 --  Skip_Line;
 end Test_Normal;
