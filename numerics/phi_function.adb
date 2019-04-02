@@ -45,10 +45,10 @@ package body Phi_function is
   end Phi_Single_Precision;
   pragma Unreferenced (Phi_Single_Precision);
 
-  package ERF_pkg is new Error_function (Real);
+  package Erf_pkg is new Error_function (Real);
 
   --  ************************************************************************
-  --  Normal cummulative distribution function
+  --  Normal cumulative distribution function
   --
   --  Returns the area under the Gaussian probability density
   --  function, integrated from minus infinity to x:
@@ -78,7 +78,7 @@ package body Phi_function is
 
   function Phi (x: Real) return Real is
   begin
-    return 0.5 * (ERF_pkg.Erf (x * 0.70710678118654752440084436210485) + 1.0);
+    return 0.5 * (Erf_pkg.Erf (x * 0.70710678118654752440084436210485) + 1.0);
   end Phi;
 
   --  ************************************************************************

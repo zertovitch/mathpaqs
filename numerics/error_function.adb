@@ -15,9 +15,6 @@ package body Error_function is
   --  abs X <= abs X * Float_Type'Model_Epsilon            -- (3)
   --  abs X <= abs X * Float_Type'Base'Model_Epsilon       -- (4)
 
-  package GEF is new Ada.Numerics.Generic_Elementary_Functions(Real);
-  use GEF;
-
   function Sign (x: Real) return Real is
   begin
     if x < 0.0 then
@@ -28,6 +25,9 @@ package body Error_function is
       return 0.0;
     end if;
   end Sign;
+
+  package GEF is new Ada.Numerics.Generic_Elementary_Functions(Real);
+  use GEF;
 
   --  ************************************************************************
   --  Complementary error function
@@ -94,8 +94,7 @@ package body Error_function is
     Xa  : constant Real := abs x;
     XSq : Real;
     S   : constant Real := Sign(x);
-    P: Real;
-    Q: Real;
+    P, Q: Real;
   begin
     if Xa < 0.5 then
       XSq := x*x;
