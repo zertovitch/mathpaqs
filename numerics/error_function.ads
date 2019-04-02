@@ -1,7 +1,7 @@
----------------------------------------------
---  PHI SPECIAL FUNCTION (Gauss function)  --
---  Test procedure: Test_Normal            --
----------------------------------------------
+-----------------------------------
+--  ERROR FUNCTION               --
+--  Test procedure: Test_Normal  --
+-----------------------------------
 --
 --  This is part of the Mathpaqs collection of mathematical packages.
 --  Latest version may be available at:
@@ -11,7 +11,7 @@
 -------------------------
 --  Legal licensing note:
 
---  Copyright (c) 2018 .. 2019 Gautier de Montmollin (Ada translation and maintenance)
+--  Copyright (c) 2019 Gautier de Montmollin (Ada translation and maintenance)
 --  Originally created by Stephen L. Moshier (see implementation for details)
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -38,14 +38,28 @@
 generic
   type Real is digits <>;
 
-package Phi_function is
+package Error_function is
 
   --  History and notes about accuracy can be found in the
-  --  package body (implementation) in numerics/phi_function.adb.
+  --  package body (implementation) in numerics/error_function.adb.
   --  See random/test_normal.adb for a test.
 
-  function Phi (x: Real) return Real;
+  --  Error function
+  ------------------
+  --
+  --                            x
+  --                            -
+  --                 2         | |          2
+  --   erf(x)  =  --------     |    exp( - t  ) dt
+  --              sqrt(pi)   | |
+  --                          -
+  --                          0
+  --
 
-  function Inverse_Phi (y : Real) return Real;
+  function Erf (x : Real) return Real;
 
-end Phi_function;
+  --  Complementary error function, ErfC = 1 - Erf
+
+  function ErfC (x : Real) return Real;
+
+end Error_function;

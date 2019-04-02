@@ -71,7 +71,7 @@ project Mathpaqs is
        for Object_Dir use "obj_fast";
    end case;
 
-   Common_Options := ("-gnat05", "-gnatwa");
+   Common_Options := ("-gnatwa");
    Debug_Options  := (
 	   "-gnatVa", "-gnato", "-g", 
 		 "-fno-inline", "-fstack-check",
