@@ -83,6 +83,7 @@ Special functions:
   Beta_function
   Gamma_function
   Phi_function
+  Error_function
 
 **>> Multi-precision integers <<**
 
