@@ -60,12 +60,12 @@ package body Phi_function is
   --
   --  1 - erf(x) =
   --
-  --                         inf.
+  --                           inf.
   --                            -
   --                 2         | |          2
   --  erfc(x)  =  --------     |    exp( - t  ) dt
-  --             sqrt(pi)   | |
-  --                         -
+  --              sqrt(pi)   | |
+  --                          -
   --                          x
   --
   --
@@ -83,10 +83,8 @@ package body Phi_function is
   --  Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
   --  ************************************************************************
 
-  function Erf (X0 : Real) return Real;
-
   function ErfC (X : Real) return Real is
-    P, Q:Real;
+    P, Q: Real;
   begin
     if X < 0.0 then
       return 2.0 - ErfC(-X);
@@ -118,15 +116,14 @@ package body Phi_function is
     return Exp (-X*X) * P/Q;
   end ErfC;
 
-  function Erf (X0 : Real) return Real is
-    X: Real:= X0;
-    XSq:Real;
-    S: constant Real := Sign(X);
+  function Erf (X : Real) return Real is
+    Xa  : constant Real := abs X;
+    XSq : Real;
+    S   : constant Real := Sign(X);
     P: Real;
     Q: Real;
   begin
-    X := abs X;
-    if X < 0.5 then
+    if Xa < 0.5 then
       XSq := X*X;
       P := 0.007547728033418631287834;
       P := 0.288805137207594084924010+XSq*P;
@@ -142,12 +139,12 @@ package body Phi_function is
       Q := 6379.60017324428279487120+XSq*Q;
       Q := 34216.5257924628539769006+XSq*Q;
       Q := 80437.3630960840172826266+XSq*Q;
-      return S*1.1283791670955125738961589031*X*P/Q;
+      return 1.1283791670955125738961589031*X*P/Q;
     end if;
-    if X >= 10.0 then
+    if Xa >= 10.0 then
       return S;
     end if;
-    return S*(1.0-ErfC(X));
+    return S * (1.0 - ErfC(Xa));
   end Erf;
 
   --  ************************************************************************
@@ -156,16 +153,15 @@ package body Phi_function is
   --  Returns the area under the Gaussian probability density
   --  function, integrated from minus infinity to x:
   --
-  --                          x
+  --                           x
   --                           -
   --                 1        | |          2
   --  ndtr(x)  = ---------    |    exp( - t /2 ) dt
   --             sqrt(2pi)  | |
   --                         -
-  --                        -inf.
+  --                       -inf.
   --
   --           =  ( 1 + erf(z) ) / 2
-  --           =  erfc(z) / 2
   --
   --  where z = x/sqrt(2). Computation is via the functions erf and erfc.
   --
@@ -182,7 +178,7 @@ package body Phi_function is
 
   function Phi (x: Real) return Real is
   begin
-    return 0.5 * (Erf (x / 1.41421356237309504880) + 1.0);
+    return 0.5 * (Erf (x * 0.70710678118654752440084436210485) + 1.0);
   end Phi;
 
   --  ************************************************************************

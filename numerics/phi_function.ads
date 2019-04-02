@@ -11,7 +11,7 @@
 -------------------------
 --  Legal licensing note:
 
---  Copyright (c) 2018 Gautier de Montmollin (Ada translation and maintenance)
+--  Copyright (c) 2018 .. 2019 Gautier de Montmollin (Ada translation and maintenance)
 --  Originally created by Stephen L. Moshier (see implementation for details)
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -39,6 +39,7 @@ generic
   type Real is digits <>;
 
 package Phi_function is
+
   --  History and notes about accuracy can be found in the
   --  package body (implementation) in numerics/phi_function.adb.
   --  See random/test_normal.adb for a test. 
@@ -46,5 +47,13 @@ package Phi_function is
   function Phi (x: Real) return Real;
 
   function Inverse_Phi (y : Real) return Real;
+
+  --  Error function
+
+  function Erf (X : Real) return Real;
+
+  --  Complementary error function, ErfC = 1 - Erf
+
+  function ErfC (X : Real) return Real;
 
 end Phi_function;
