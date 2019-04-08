@@ -143,14 +143,19 @@ begin
     Put_Line("Mean X;" & Real'Image(sum_X) & ";Mean Y;" & Real'Image(sum_Y));
   else
     Put_Line("Mean X;" & Real'Image(meas_X.mean) & ";Mean Y;" & Real'Image(meas_Y.mean));
-    Put_Line("index; quantile; exact X value; statisitical X value; exact CDF of statistical x value; statisitical Y value");
+    Put_Line(
+      "index; quantile; exact X value; statisitical X value; "&
+      "exact CDF of statistical x value; statisitical Y value"
+    );
     for q in quantiles'Range loop
       Put_Line(
         Integer'Image(q) & ';' &
         Real'Image(quantiles(q)) & ';' &
-        Real'Image(Pareto_inverse_CDF(1.0-quantiles(q),threshold,-1.0/alpha)) & ';' & -- exact x value
+        Real'Image(
+          Pareto_inverse_CDF(1.0-quantiles(q),threshold,-1.0/alpha)) & ';' & -- exact x value
         Real'Image(meas_X.VaR(q)) & ';' & -- stat. x value
-        Real'Image(Pareto_CDF(meas_X.VaR(q), threshold, alpha)) & ';' & -- exact CDF of statistical x value
+        Real'Image(
+          Pareto_CDF(meas_X.VaR(q), threshold, alpha)) & ';' & -- exact CDF of statistical x value
         Real'Image(meas_Y.VaR(q)) & ';'
         );
     end loop;
