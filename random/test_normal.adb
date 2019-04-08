@@ -18,6 +18,17 @@ procedure Test_Normal is
   package RIO is new Float_IO (Real);
   use GRF, RIO;
 
+  procedure Test_external (x: Real; Phi_x_external: Real; sys: String) is
+    Phi_x : constant Real := Normal_CDF (x);
+  begin
+    Put_Line (
+      Real'Image (x) & "; " &
+      Real'Image (Phi_x) & "; " &
+      Real'Image (Phi_x_external) & "; " &
+      Real'Image (abs (Phi_x - Phi_x_external)) & ";" & sys
+    );
+  end Test_external;
+
   pos_steps   : constant := 2000;
   total_steps : constant := 1 + 2 * pos_steps;
   bound       : constant := 8.0;  --  The x range tested will be: [-bound .. +bound]
@@ -28,6 +39,8 @@ begin
   Put_Line ("Real'Digits =" & Integer'Image (Real'Digits));
   Put ("Real'First  ="); Put (Real'First); New_Line;
   Put ("Real'Last   ="); Put (Real'Last);  New_Line;
+  New_Line;
+  Put_Line ("Testing numerical integrity: Phi^{-1}(Phi(x)) = x .");
   Put_Line ("Total steps =" & Integer'Image (total_steps));
   max_diff:= 0.0;
   sum_diff:= 0.0;
@@ -60,5 +73,50 @@ begin
   avg_diff:= sum_diff / Real(total_steps);
   Put("  Average abs diff = "); Put(avg_diff); New_Line;
   Put("  Maximum abs diff = "); Put(max_diff); New_Line;
---  Skip_Line;
+  New_Line;
+  Put_Line ("Testing a few values of Phi(x) computed by other systems.");
+  Put_Line ("x; F(x); F_ext(x); abs diff");
+  --  Wide
+  Test_external (2.92574259484689, 0.998281756504653, "Excel 2002");
+  Test_external (-3.13959349378472, 0.000845978859679408, "Excel 2002");
+  Test_external (-1.8344324597817, 0.033294853131841, "Excel 2002");
+  Test_external (-3.8479175160397, 5.95848598385906E-05, "Excel 2002");
+  Test_external (1.71534497414443, 0.956859036195643, "Excel 2002");
+  Test_external (-1.4837389275487, 0.0689391294297074, "Excel 2002");
+  Test_external (0.313262544183896, 0.622959332529198, "Excel 2002");
+  Test_external (-1.33528356995208, 0.090891839019253, "Excel 2002");
+  Test_external (-1.70667049934907, 0.0439416239849417, "Excel 2002");
+  Test_external (0.902295892739891, 0.816550179338618, "Excel 2002");
+  Test_external (3.56123259846485, 0.999815401180952, "Excel 2002");
+  Test_external (-3.02138047666817, 0.00125819400952465, "Excel 2002");
+  Test_external (-0.864391358049604, 0.193686422939807, "Excel 2002");
+  Test_external (4.38878617828374, 0.999994296169036, "Excel 2002");
+  Test_external (4.38232692457851, 0.99999412440124, "Excel 2002");
+  Test_external (0.945996285569901, 0.827924775276737, "Excel 2002");
+  Test_external (2.74279058199888, 0.996953969302392, "Excel 2002");
+  Test_external (-0.940424188959881, 0.173499991852874, "Excel 2002");
+  Test_external (-3.79268977498914, 7.45369454716593E-05, "Excel 2002");
+  Test_external (4.10698983163692, 0.999979946570136, "Excel 2002");
+  --  Narrow
+  Test_external (0.665217254914504, 0.747044297125409, "Excel 2002");
+  Test_external (0.147223920954224, 0.558522381481477, "Excel 2002");
+  Test_external (0.308781691432673, 0.621256136213673, "Excel 2002");
+  Test_external (0.967645560278044, 0.83338929941956, "Excel 2002");
+  Test_external (-0.330298509333767, 0.370587273953922, "Excel 2002");
+  Test_external (0.560993833072889, 0.712599166257638, "Excel 2002");
+  Test_external (-0.0569113911552463, 0.477307820605794, "Excel 2002");
+  Test_external (-0.504118535674396, 0.307089032841084, "Excel 2002");
+  Test_external (-0.525484858238929, 0.299623068736426, "Excel 2002");
+  Test_external (-0.364138764520489, 0.357877253289638, "Excel 2002");
+  Test_external (0.215847644275459, 0.585446712270178, "Excel 2002");
+  Test_external (0.262368429286052, 0.603481238250016, "Excel 2002");
+  Test_external (-0.857001981679202, 0.195721845891328, "Excel 2002");
+  Test_external (-0.193808071445531, 0.423163100973266, "Excel 2002");
+  Test_external (-0.966415666556947, 0.166918106410473, "Excel 2002");
+  Test_external (-0.745607255772077, 0.227952276241425, "Excel 2002");
+  Test_external (-0.186204937569133, 0.426142037654162, "Excel 2002");
+  Test_external (-0.296037866451158, 0.383600646078336, "Excel 2002");
+  Test_external (-0.965232416827455, 0.167214198868332, "Excel 2002");
+  Test_external (0.875088337567958, 0.809237121585063, "Excel 2002");
+  --  Skip_Line;
 end Test_Normal;
