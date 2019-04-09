@@ -15,7 +15,7 @@ procedure Test_Sparse is
 
   package FIO  is new Float_IO(Real);           use FIO;
   package IIO is new Integer_IO(Integer);       use IIO;
-  package DurIO is new Fixed_IO(Duration);      use DurIO;
+  package DurIO is new Fixed_IO(Duration);
 
   type Vector is array (Integer range <>) of Real;
   type p_Vector is access Vector;

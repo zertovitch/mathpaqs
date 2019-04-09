@@ -1,6 +1,5 @@
 with Ada.Characters.Handling;           use Ada.Characters.Handling;
 with Ada.Exceptions;                    use Ada.Exceptions;
-with Ada.Numerics; use Ada.Numerics;
 with Ada.Numerics.Generic_Elementary_Functions;
 with Ada.Strings.Fixed;                 use Ada.Strings.Fixed, Ada.Strings;
 with Ada.Unchecked_Deallocation;

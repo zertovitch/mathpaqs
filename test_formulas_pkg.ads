@@ -7,7 +7,6 @@ package Test_Formulas_Pkg is
   subtype Real is Long_Float;
 
   package RIO is new Ada.Text_IO.Float_IO (Real);
-  use RIO;
 
   type Dummy_type is new Integer;
   dummy : constant Dummy_type := 0;

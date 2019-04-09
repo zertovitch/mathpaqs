@@ -19,7 +19,7 @@ procedure Test_Poisson is
 
   package RIO is new Float_IO (Real);
 
-  use RRF, RIO, REF;
+  use RIO, REF;
 
   samples : constant := 1_000_000;
 

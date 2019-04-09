@@ -6,7 +6,6 @@ with Samples;
 
 with Ada.Calendar;                      use Ada.Calendar;
 with Ada.Text_IO;                       use Ada.Text_IO;
-with Ada.Numerics.Generic_Elementary_Functions;
 
 procedure Test_Pareto is
 
@@ -20,12 +19,6 @@ procedure Test_Pareto is
   -- *** Choice of a random generator: A.N.F_R, or U_Rand (faster), or...:
   package RRand renames Real_U_Rand;
   use RRand;
-
-  package REF is new Ada.Numerics.Generic_Elementary_Functions (Real);
-  use REF;
-
-  -- function Pow (X, Y : Long_Float) return Long_Float is
-  -- pragma Import (C, Pow, "pow");
 
   package RRF is new Generic_Random_Functions (Real);
   use RRF;

@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------------
 
 with GNAT.Traceback.Symbolic, Ada.Exceptions, Ada.Text_IO;
-use Ada.Exceptions, Ada.Text_IO;
+use Ada.Text_IO;
 
 with Test_Int;
 

@@ -1,7 +1,6 @@
 with Ada.Text_IO;                       use Ada.Text_IO;
 
 with Ada.Numerics.Generic_Real_Arrays;
-with Generic_Real_Linear_Equations;
 with U_Rand;
 with Copulas;
 
@@ -13,7 +12,6 @@ procedure Test_Copulas is
   package RIO is new Float_IO (Real);
 
   package GRA is new Ada.Numerics.Generic_Real_Arrays (Real);
-  package GRLE is new Generic_Real_Linear_Equations (Real, GRA, Integer_Vector);
 
   package Real_U_Rand is new U_Rand (Real);
 
@@ -31,7 +29,7 @@ procedure Test_Copulas is
     Integer_Vector
   );
 
-  use GRA, GRLE, RIO;
+  use GRA, RIO;
 
   procedure Put (A : Real_Matrix) is
   begin
