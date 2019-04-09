@@ -76,10 +76,18 @@ begin
   New_Line;
   Put_Line ("Testing a few values of Phi(x) computed by other systems.");
   Put_Line ("x; F(x); F_ext(x); abs diff");
+  --  Wolfram Alpha - https://www.wolframalpha.com/ :
+  --    (1/sqrt(2*pi)) * int e^(-(t^2)/2) dt, t=-Infinity..x
+  --    simplified to : 1/2 (1 + erf(x/sqrt(2)))
+  --    then replaced x by numerical values.
+  --
   --  Wide range around 0
-  Test_external (2.92574259484689, 0.998281756504653, "Excel 2002");
+  Test_external ( 2.92574259484689, 0.998281756504653,  "Excel 2002");
+  Test_external ( 2.92574259484689, 0.9982818243270286, "Wolfram Alpha");
   Test_external (-3.13959349378472, 0.000845978859679408, "Excel 2002");
-  Test_external (-1.8344324597817, 0.033294853131841, "Excel 2002");
+  Test_external (-3.13959349378472, 0.000845912096478163, "Wolfram Alpha");
+  Test_external (-1.8344324597817, 0.033294853131841,    "Excel 2002");
+  Test_external (-1.8344324597817, 0.033294912473320504, "Wolfram Alpha");
   Test_external (-3.8479175160397, 5.95848598385906E-05, "Excel 2002");
   Test_external (1.71534497414443, 0.956859036195643, "Excel 2002");
   Test_external (-1.4837389275487, 0.0689391294297074, "Excel 2002");
@@ -98,8 +106,10 @@ begin
   Test_external (-3.79268977498914, 7.45369454716593E-05, "Excel 2002");
   Test_external (4.10698983163692, 0.999979946570136, "Excel 2002");
   --  Narrow range around 0
-  Test_external (0.665217254914504, 0.747044297125409, "Excel 2002");
-  Test_external (0.147223920954224, 0.558522381481477, "Excel 2002");
+  Test_external (0.665217254914504, 0.747044297125409,  "Excel 2002");
+  Test_external (0.665217254914504, 0.7470442271516357, "Wolfram Alpha");
+  Test_external (0.147223920954224, 0.558522381481477,  "Excel 2002");
+  Test_external (0.147223920954224, 0.5585223599335758, "Wolfram Alpha");
   Test_external (0.308781691432673, 0.621256136213673, "Excel 2002");
   Test_external (0.967645560278044, 0.83338929941956, "Excel 2002");
   Test_external (-0.330298509333767, 0.370587273953922, "Excel 2002");
@@ -119,7 +129,8 @@ begin
   Test_external (-0.965232416827455, 0.167214198868332, "Excel 2002");
   Test_external (0.875088337567958, 0.809237121585063, "Excel 2002");
   --  Narrower range around 0: [-1/2 ; 1/2]
-  Test_external (-0.0749623361718745, 0.470122270435875, "Excel 2002");
+  Test_external (-0.0749623361718745, 0.470122270435875,  "Excel 2002");
+  Test_external (-0.0749623361718745, 0.4701223394613545, "Wolfram Alpha");
   Test_external (-0.450646843702305, 0.326122070242433, "Excel 2002");
   Test_external (0.408674999664122, 0.658610867247291, "Excel 2002");
   Test_external (-0.191501298662019, 0.424066447405214, "Excel 2002");
