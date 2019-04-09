@@ -29,9 +29,9 @@ procedure Test_Normal is
     );
   end Test_external;
 
-  pos_steps   : constant := 2000;
-  total_steps : constant := 1 + 2 * pos_steps;
-  bound       : constant := 8.0;  --  The x range tested will be: [-bound .. +bound]
+  positive_steps : constant := 8000;
+  total_steps    : constant := 1 + 2 * positive_steps;
+  bound          : constant := 8.0;  --  The x range tested will be: [-bound .. +bound]
 
   x, y, z, diff, max_diff, sum_diff, avg_diff : Real;
 
@@ -44,8 +44,8 @@ begin
   Put_Line ("Total steps =" & Integer'Image (total_steps));
   max_diff:= 0.0;
   sum_diff:= 0.0;
-  for i in -pos_steps .. pos_steps loop
-    x:= Real(i) * bound / Real(pos_steps);
+  for i in -positive_steps .. positive_steps loop
+    x:= Real(i) * bound / Real(positive_steps);
     y:= Normal_CDF(x);
     z:= Normal_inverse_CDF(y);  --  Ideally, x = z.
     diff:= x-z;
@@ -58,7 +58,11 @@ begin
     --
     --  Display some values around 0 and close to bounds:
     --
-    if abs i > pos_steps - 3 or else abs i < 4 then
+    if         abs i > positive_steps - 3  --  x close to bounds
+       or else abs i < 4                   --  x around zero
+       --  x close to 1/sqrt(2) : computation method for Erf(z) switches on z = 1/2.
+       or else abs (x - 0.7071067811865475) < 0.02
+    then
       Put("    x=;");
       Put(x);
       Put("; y=F(x)=;");
