@@ -2,10 +2,10 @@
 --  File:            gmatrice.ads or g_matrices.ads
 --
 --  Description:     Simple generic matrix package.
---                   The scalars can be of any kind (real, complex, rationals, ...)
---                   NB: For Ada 2005+ and real numbers implemented as floating-point numbers,
---                   it is better for performance and compatibility reasons to use
---                   Ada.Numerics.Generic_Real_Arrays instead.
+--                   The scalars (Field_elt) can be of any kind (real, complex, rationals, ...)
+--                   NB: For Ada 2005+ and Field_elt = floating-point numbers,
+--                       it is better, for performance and compatibility reasons,
+--                       to use Ada.Numerics.Generic_Real_Arrays instead.
 --
 --  Date / Version:  3-Feb-2005 ; 16-Oct-2001 ; ... ; 22 XII 1997
 --  Author:          Gautier de Montmollin
