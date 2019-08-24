@@ -49,7 +49,8 @@ procedure Test_Copulas is
     use RCopulas;
     copula : Copula_access;
     f : File_Type;
-    L, B : Real_Matrix (A'Range(1), A'Range(2));
+    L, B, Z : Real_Matrix (A'Range(1), A'Range(2));
+    res : Real:= 0.0;
   begin
     RRand.Reset (gen, 1);
     Construct_as_Gauss (copula, U01'Length, A);
@@ -70,10 +71,17 @@ procedure Test_Copulas is
       New_Line(f);
     end loop;
     Put_Line("Results are stored in this file: " & Name(f));
-    L:= Get_Cholesky_Matrix(Gauss_Copula(copula.all));
-    B:= L * Transpose(L);
-    Put_Line("B:= L*Lt.");
-    Put_Line("A = B Matrix equality test (bitwise) " & Boolean'Image(A = B));
+    L := Get_Cholesky_Matrix(Gauss_Copula(copula.all));
+    B := L * Transpose(L);
+    Put_Line("B := L*Lt.");
+    Put_Line("""A = B"" Matrix equality test (bitwise) " & Boolean'Image(A = B));
+    Z := A - B;
+    for i in Z'Range(1) loop
+      for j in Z'Range(2) loop
+        res:= res + abs Z(i,j);
+      end loop;
+    end loop;
+    Put_Line("""A - B = 0"" Matrix equality test (L1) " & Real'Image(res));
     Put_Line("A =");
     Put(A);
     New_Line;

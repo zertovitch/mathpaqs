@@ -1,5 +1,3 @@
--- !! To do: replace all equality tests = 0.0 and x = y by almost_zero tests
-
 with Ada.Text_IO; use Ada.Text_IO; -- for debug
 -- with INTEGER_ARRAYS_IO;  -- for debug
 -- with REAL_ARRAYS_IO; -- for debug
@@ -719,7 +717,7 @@ package body Generic_Real_Linear_Equations is
     end if;
     for I in A'Range(1) loop          -- check A for being symmetric
       for J in A'First(2)-A'First(1)+I+1 .. A'Last(2) loop
-        if A(I,J) /= A(A'First(1)-A'First(2)+J, A'First(2)-A'First(1)+I) then
+        if not Almost_zero (A(I,J) - A(A'First(1)-A'First(2)+J, A'First(2)-A'First(1)+I)) then
           if abs(A(I,J)-A(A'First(1)-A'First(2)+J, A'First(2)-A'First(1)+I)) >
             2.0 * Real'Epsilon * abs(A(I,J))
           then
@@ -1179,9 +1177,9 @@ package body Generic_Real_Linear_Equations is
       Scale := 0.0;
       if I<=M then  -- 210
         for K in I..M loop  -- 120
-          Scale := Scale+ abs (U(K,I));
+          Scale := Scale + abs U(K,I);
         end loop ;  -- 120
-        if Scale/=0.0 then  -- 210
+        if not Almost_zero (Scale) then  -- 210
           for K in I..M loop  -- 130
             U(K,I) := U(K,I)/Scale;
             S := S+U(K,I)**2;
@@ -1214,9 +1212,9 @@ package body Generic_Real_Linear_Equations is
       -- IF (I > M .OR. I = N) GO TO 290
       if I<=M and I/=N then  -- 290
         for K in L..N loop  -- 220
-          Scale := Scale+ abs (U(I,K));
+          Scale := Scale + abs U(I,K);
         end loop ;  -- 220
-        if Scale/=0.0 then  -- 290
+        if not Almost_zero (Scale) then  -- 290
           for K in L..N loop  -- 230
             U(I,K) := U(I,K)/Scale;
             S := S+U(I,K)**2;
@@ -1244,14 +1242,14 @@ package body Generic_Real_Linear_Equations is
           end loop ;  -- 280
         end if ;  -- 290
       end if ;  -- 290
-      X := Amax1(X, abs (W(I))+ abs (Rv1(I)));
+      X := Amax1(X, abs (W(I)) + abs (Rv1(I)));
     end loop ;  -- 300
     -- ACCUMULATION OF RIGHT-HAND TRANSFORMATIONS
     -- FOR I:=N STEP -1 UNTIL 1 DO
     for Ii in 1..N loop  -- 400
       I := N+1-Ii;
       if I/=N then  -- 390
-        if G/=0.0 then  -- 360
+        if not Almost_zero (G) then  -- 360
           for J in L..N loop  -- 320
           -- DOUBLE DIVISION AVOIDS POSSIBLE UNDERFLOW
             V(J,I) := (U(I,J)/U(I,L))/G;
@@ -1292,7 +1290,7 @@ package body Generic_Real_Linear_Equations is
           U(I,J) := 0.0;
         end loop ;  -- 420
       end if ;  -- 430
-      if G/=0.0 then  -- 475
+      if not Almost_zero (G) then  -- 475
         if I/=Mn then  -- 460
           for J in L..N loop  -- 450
             S := 0.0;
@@ -1408,7 +1406,7 @@ package body Generic_Real_Linear_Equations is
           Z := Elementary_Functions.Sqrt(F*F+H*H);
           W(I1) := Z;
           -- ROTATION CAN BE ARBITRARY IF Z IS ZERO
-          if Z/=0.0 then  -- 580
+          if not Almost_zero (Z) then  -- 580
             C := F/Z;
             S := H/Z;
           end if ;  -- 580
@@ -1455,7 +1453,7 @@ package body Generic_Real_Linear_Equations is
     end if ;
     for J in 1..N loop
       S := 0.0;
-      if W(J-1+W'First)/=0.0 then
+      if not Almost_zero (W(J-1+W'First)) then
         for I in 1..M loop
           S := S+U(I-1+U'First(1),J-1+U'First(2))*Y(I-1+Y'First);
         end loop ;

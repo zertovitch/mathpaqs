@@ -12,12 +12,11 @@
 --  Latest version may be available at:
 --      home page:     http://mathpaqs.sf.net/
 --      project page:  http://sf.net/projects/mathpaqs/
---      mirror:        https://github.com/svn2github/mathpaqs
 --
 -------------------------
 --  Legal licensing note:
 --
---  Copyright (c) 2009 .. 2016 Gautier de Montmollin
+--  Copyright (c) 2009 .. 2019 Gautier de Montmollin
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal

@@ -1,6 +1,8 @@
 with Generic_Random_Functions,
      Generic_Real_Linear_Equations;
 
+with Ada.Exceptions;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 
@@ -105,6 +107,17 @@ package body Copulas is
     g.dim_dep:= corr'Last(1);
     --
     C:= new Gauss_Copula'(g);
+  exception
+    when E : Matrix_Data_Error =>
+      if Index (Ada.Exceptions.Exception_Message(E), "not positive definite") > 0 then
+        --  We add an explanation about what it means in terms of correlations.
+        raise Matrix_Data_Error with
+          "Matrix is not positive definite: " &
+          "there is a set of three or more correlations in the matrix that is not consistent. " &
+          "It is possible to rectify the matrix using the Higham algorithm.";
+      else
+        raise;  --  Simple re-raise
+      end if;
   end Construct_as_Gauss;
 
   function Get_Cholesky_Matrix(C: Gauss_Copula) return Real_Matrix is
