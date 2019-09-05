@@ -127,4 +127,8 @@ begin
   Test_1 ("cos(+x/2)*cos(x/2)*cos(-(x/2))  +  cos(x/2)*cos(x/2)^2 + cos(x/2) + cos(x/2)");
   Test_1 ("cos(x/2)*cos(x/2)*cos(0.5*x) + cos(x/2) + cos(x/2) +  cos(x/2)*cos(x/2)^2 ");
   Test_1 ("sin(2*2^(1/2+3/2) + 1*1/2 + 0*7.65) + sin(8.5)", "1.59697422524698 = 2*sin(8.5)");
+  --  The Math Equation That Tried to Stump the Internet
+  --  https://www.nytimes.com/2019/08/02/science/math-equation-pedmas-bemdas-bedmas.html
+  Test_1 ("8/2*(2+2)", "16");
+  Test_1 ("8/2*4",     "16");
 end Test_Formulas;
