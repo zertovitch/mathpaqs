@@ -1,16 +1,18 @@
 --  This is a GNAT, GCC or GNAT Programming Studio (GPS) project file
---  for the Mathpaqs collection of mathematical packages:
---      home page:     http://mathpaqs.sf.net/
---      project page:  http://sf.net/projects/mathpaqs/
+--  for the Mathpaqs collection of mathematical packages.
 --
---  Build me with "gnatmake -P mathpaqs", or open me with GPS
+--      Home page:       http://mathpaqs.sf.net/
+--      Project page 1:  http://sf.net/projects/mathpaqs/
+--      Project page 2:  https://github.com/zertovitch/mathpaqs
+--
+--  Build me with "gnatmake -p -P mathpaqs", "gprbuild -p -P mathpaqs", or open me with GPS.
 --
 project Mathpaqs is
 
    for Source_Dirs use (".", "algebra", "edp", "eds", "lin_alg", "multi", "numerics", "probas", "random", "lin_alg/sparse", "stats", "graph");
    for Exec_Dir use ".";
-   type Build_Mode_Type is ("Debug", "Style_Checks", "Fast");
-   Build_Mode : Build_Mode_Type := external ("Build_Mode", "Fast");
+   type Mathpaqs_Build_Mode_Type is ("Debug", "Style_Checks", "Fast");
+   Mathpaqs_Build_Mode : Mathpaqs_Build_Mode_Type := external ("Mathpaqs_Build_Mode", "Fast");
 
    for Main use (
        --
@@ -64,7 +66,7 @@ project Mathpaqs is
          "arithmetic_compression.adb",
          "show_floats_limits.adb"
        );
-   case Build_Mode is
+   case Mathpaqs_Build_Mode is
      when "Debug" | "Style_Checks" =>
        for Object_Dir use "obj_debg";
      when "Fast" =>
@@ -93,7 +95,7 @@ project Mathpaqs is
 		 "-ftracer", "-ftree-vectorize", "-g");
    
    package Compiler is
-      case Build_Mode is
+      case Mathpaqs_Build_Mode is
          when "Debug" =>
             for Default_Switches ("ada") use Common_Options & Debug_Options ;
          when "Style_Checks" =>
@@ -111,7 +113,7 @@ project Mathpaqs is
    end Compiler;
 
    package Linker is
-      case Build_Mode is
+      case Mathpaqs_Build_Mode is
          when "Debug" | "Style_Checks" =>
             for Default_Switches ("ada") use ("-g");
          when "Fast" =>
