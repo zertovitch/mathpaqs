@@ -64,7 +64,8 @@ project Mathpaqs is
          "champ_vt.adb", "arenstorf.adb",
          "cr_demo.adb", "ppm2func.adb",
          "arithmetic_compression.adb",
-         "show_floats_limits.adb"
+         "show_floats_limits.adb",
+         "three_lakes"
        );
    case Mathpaqs_Build_Mode is
      when "Debug" | "Style_Checks" =>
@@ -78,21 +79,20 @@ project Mathpaqs is
      "-gnatwcijkmopruvz.c.n.p.t.w.x",  --  Warnings switches
      "-gnatf",  --  Full errors. Verbose details, all undefined references
      "-gnatq",  --  Don't quit, try semantics, even if parse errors
-     "-gnatQ"   --  Don't quit, write ali/tree file even if compile errors
+     "-gnatQ",  --  Don't quit, write ali/tree file even if compile errors
+     "-g"
    );
 
    Debug_Options  := (
-	   "-gnatVa", "-gnato", "-g", 
-		 "-fno-inline", "-fstack-check",
-		 "-gnatec=" & project'Project_Dir & "debug.pra",
-     "-gnatq",  --  Don't quit, try semantics, even if parse errors
-     "-gnatQ"   --  Don't quit, write ali/tree file even if compile errors
+     "-gnatVa", "-gnato",
+     "-fno-inline", "-fstack-check",
+     "-gnatec=" & project'Project_Dir & "debug.pra"
      );
    Fast_Options   := (
-	   "-O2", "-gnatpn", 
-		 "-fipa-cp-clone", "-fgcse-after-reload", 
-		 "-funroll-loops", "-fpeel-loops", "-funswitch-loops", 
-		 "-ftracer", "-ftree-vectorize", "-g");
+       "-O2", "-gnatpn", 
+       "-fipa-cp-clone", "-fgcse-after-reload", 
+       "-funroll-loops", "-fpeel-loops", "-funswitch-loops", 
+       "-ftracer", "-ftree-vectorize");
    
    package Compiler is
       case Mathpaqs_Build_Mode is
@@ -102,10 +102,10 @@ project Mathpaqs is
             for Default_Switches ("ada") use Common_Options & Debug_Options & 
               (
                 "-gnatyaknpr",  --  Style: check all casings: a:attribute, k:keywords, n:package Standard identifiers, p:pragma, r:identifier references
-                "-gnatybfhiu",  --  Style: check b:no blanks at end of lines, f:no ff/vtabs, h: no htabs, i:if-then layout, u:no unnecessary blank lines
+                "-gnatybfhu",   --  Style: check b:no blanks at end of lines, f:no ff/vtabs, h:no htabs, i:if-then layout, u:no unnecessary blank lines
                 "-gnatyx",      --  Style: check x:no extra parens
                 "-gnatye",      --  Style: check e:end/exit labels present
-                "-gnaty2CM100OS"  --  disabled: t (token sep.)
+                "-gnaty2CM100O"
               );
          when "Fast" =>
             for Default_Switches ("ada") use Common_Options & Fast_Options;
