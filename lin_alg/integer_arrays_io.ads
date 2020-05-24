@@ -20,7 +20,7 @@ package Integer_Arrays_IO is
 
   use Integer_Arrays;
 
-  package INTEGER_TYPE_IO is new Ada.Text_IO.INTEGER_IO(INTEGER_TYPE);
+  package INTEGER_TYPE_IO is new Ada.Text_IO.INTEGER_IO (Integer_Type);
      -- to get DEFAULT_FORE, DEFAULT_AFT and DEFAULT_EXP for specifications
      -- later used in body for actual GET's and PUT's of array components
 

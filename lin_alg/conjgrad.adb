@@ -8,8 +8,8 @@ package body ConjGrad is
   -- package rio is new Ada.Text_IO.float_io(real);
   -- package iio is new Ada.Text_IO.integer_io(index);
 
-  procedure ChoTri(diag,diagl:        vector;
-                   d,dl      : in out vector;
+  procedure ChoTri(diag,diagl:        Vector;
+                   d,dl      : in out Vector;
                    kminor    :    out Index) is
 
   --     compute the cholesky decomposition of a tridiagonal symetric
@@ -35,7 +35,7 @@ package body ConjGrad is
         kminor:= 1;
         return;
       end if;
-      d(1):= sqrt(diag(1));
+      d(1):= Sqrt(diag(1));
 
       for i in 2..neq loop
         j:= i-1;
@@ -45,11 +45,11 @@ package body ConjGrad is
           kminor:= i;
           return;
         end if;
-        d(i):= sqrt(d(i));
+        d(i):= Sqrt(d(i));
       end loop;
   end ChoTri;
 
-  procedure TriPr( A: Any_matrix; precd,precl,precu: in out vector) is
+  procedure TriPr( A: Any_matrix; precd,precl,precu: in out Vector) is
   --     computes the cholesky or lu decomposition of the tridiagonal part of A
 
       kminor: Index;
@@ -78,11 +78,11 @@ package body ConjGrad is
   procedure Prepare_Precondition(
               A    : Any_matrix;
               precond: t_precond;   -- kind of preconditioning
-              precd: in out vector;    -- diagonal of precondition matrix
-              precl: in out vector;    -- lower diag. of tridiag. precond. matrix
-              precu: in out vector     -- upper diagonal, if asymmetric
+              precd: in out Vector;    -- diagonal of precondition matrix
+              precl: in out Vector;    -- lower diag. of tridiag. precond. matrix
+              precu: in out Vector     -- upper diagonal, if asymmetric
             ) is
-    N: constant index:= Rows(A);
+    N : constant Index := Rows (A);
   begin
     case precond is
       when    none =>  null;
@@ -94,25 +94,25 @@ package body ConjGrad is
   end Prepare_Precondition;
 
   procedure CG ( A : in Any_matrix;
-                 b : vector;
-                 x : in out vector;    -- * input:  1st approx;
-                                       -- * output: solution of Ax=b
-                 tol: real;            -- tolerance
+                 b : Vector;
+                 x : in out Vector;    -- * input:  1st approx;
+                 --                       * output: solution of Ax=b
+                 tol: Real;            -- tolerance
                  precond: t_precond;   -- kind of preconditioning
-                 itmax: index;         -- maximum number of iterations
-                 ite: out index        -- last iteration
+                 itmax: Index;         -- maximum number of iterations
+                 ite: out Index        -- last iteration
                )
   is
 
-      neq :   constant index:= Rows(A);
+      neq : constant Index := Rows(A);
 
-      r,s,q : vector(1 .. neq); -- vecteurs de travail
+      r,s,q : Vector (1 .. neq); -- vecteurs de travail
 
-      rs, rsold, qaq, alpha, beta : real;
+      rs, rsold, qaq, alpha, beta : Real;
 
       -- tol2: constant real:= tol * tol;
 
-      precd, precl, precu: vector( x'Range );
+      precd, precl, precu: Vector( x'Range );
 
 -------------------------------------------------------------------------
 --     resolution d'un systeme lineaire symetrique defini positif
@@ -126,7 +126,6 @@ package body ConjGrad is
 
 --     methode du gradient conjugue preconditionne
 
-
 --     precd: diagonale de la matrice de preconditionnement
 --     precl: diagonale inferieure de la matrice de preconditionnement
 --     b: second membre du systeme lineaire, de long. neq
@@ -136,7 +135,7 @@ package body ConjGrad is
 --     ite: nombre d'iterations effectuees, si ite >= neq, erreur
 --     r,s,q: vecteur de travail de longueur neq
 
-     procedure SolTri (d, dl, r: vector; u: in out vector) is
+     procedure SolTri (d, dl, r: Vector; u: in out Vector) is
      --     solve the tridiagonal linear system a.u = r
      --     d: main diagonal of matrix l, the cholesky decomposition of a
      --     dl: lower diagonal of matrix l, the cholesky decomposition of a
@@ -145,7 +144,7 @@ package body ConjGrad is
 
      --     this routine uses the cholesky decomposition of the matrix a
 
-     neq: constant index:= d'Last;
+     neq: constant Index := d'Last;
 
      begin
         -- forward substitution
@@ -197,7 +196,7 @@ package body ConjGrad is
             end loop;
 
            when tridiag =>
-            soltri( precd,precl,r,s );
+            SolTri( precd,precl,r,s );
 
          end case;
 
@@ -238,7 +237,7 @@ package body ConjGrad is
 --         if  r2 / r20 < tol2 then return; end if;
          --if  sqrt(r2 / r20) < tol then return; end if;
 
-         if  sqrt(r*r) < tol then return; end if;
+         if  Sqrt (r*r) < tol then return; end if;
          -- 30-Nov-2001: critere absolu, comme bicgstab
 
       end loop;
@@ -248,15 +247,15 @@ package body ConjGrad is
    end CG;
 
    procedure BiCGStab ( A : in Any_matrix; -- (not "in" - GNAT optm pblm)
-                        b : vector;
-                        x : in out vector;    -- * input:  1st approx;
+                        b : Vector;
+                        x : in out Vector;    -- * input:  1st approx;
                                               -- * output: solution of Ax=b
-                        eps_rho  : real;      -- minimal step allowed
-                        tol_omega: real;      -- tolerance
-                        tol      : real;      -- tolerance
+                        eps_rho  : Real;      -- minimal step allowed
+                        tol_omega: Real;      -- tolerance
+                        tol      : Real;      -- tolerance
                         precond: t_precond;   -- kind of preconditioning
-                        itmax: index;         -- maximum number of iterations
-                        ite: out index        -- last iteration
+                        itmax: Index;         -- maximum number of iterations
+                        ite: out Index        -- last iteration
                       ) is
 
 --     Resolution du systeme lineaire ax=b
@@ -272,16 +271,16 @@ package body ConjGrad is
 --     itmax: nombre maximum d'iterations (par ex. itmax = neq)
 --     ite: nombre d'iterations effectuees
 
-      rhoold: real:= 1.0;
-      rho, alpha, beta, omega: real;
+      rhoold: Real := 1.0;
+      rho, alpha, beta, omega : Real;
 
-      neq: constant index:= Rows(A);
+      neq: constant Index:= Rows(A);
 
-      p,p_hat,r,r_tild,s,s_hat,t,v : vector(1 .. neq); -- vecteurs de travail
+      p,p_hat,r,r_tild,s,s_hat,t,v : Vector (1 .. neq); -- vecteurs de travail
 
-      tol2: constant real:= tol * tol;
+      tol2: constant Real:= tol * tol;
 
-      precd, precl, precu: vector( x'Range );
+      precd, precl, precu: Vector( x'Range );
 
    begin -- BiCGStab
       iteration_at_failure:= 0;
@@ -381,7 +380,7 @@ package body ConjGrad is
 
          Add_scaled( -omega, t, r );   -- r := r - omega*t
 
-         if  sqrt(r*r) < tol then return; end if;
+         if Sqrt(r*r) < tol then return; end if;
 
          rhoold := rho;
        end loop;

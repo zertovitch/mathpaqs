@@ -307,8 +307,8 @@ package body Formulas is
               exit when not following_character(str(i));
             end loop;
             declare
-              ch : constant String := str(j..i-1);
-              mch : constant String := To_Upper (ch);
+              chj : constant String := str(j..i-1);
+              mch : constant String := To_Upper (chj);
             begin
               if str(i) = '(' then
                 for s in Built_in_function loop
@@ -334,7 +334,7 @@ package body Formulas is
                 n := new Formula_Rec (pi);
               else
                 n := new Formula_Rec (var);
-                n.v := To_Unbounded_String (ch);
+                n.v := To_Unbounded_String (chj);
               end if;
             end;
             return n;
@@ -384,36 +384,36 @@ package body Formulas is
         end Factor;
 
         --  Term
-        n, left : p_Formula_Rec;
+        n, left_factor : p_Formula_Rec;
         c : Character;
       begin
-        left := Factor;
+        left_factor := Factor;
         c := str(i);
         if c = '*' or c = '/' then
           i := i + 1;
           n := new Formula_Rec (conv_symb(c));
-          n.left := left;
+          n.left := left_factor;
           n.right := Term;
           return n;
         else
-          return left;
+          return left_factor;
         end if;
       end Term;
 
       --  Expression
-      n, left : p_Formula_Rec;
+      n, left_term : p_Formula_Rec;
       c : Character;
     begin
-      left := Term;
+      left_term := Term;
       c := str(i);
       if c = '+' or c = '-' then
         i := i + 1;
         n := new Formula_Rec (conv_symb(c));
-        n.left  := left;
+        n.left  := left_term;
         n.right := Expression;
         return n;
       else
-        return left;
+        return left_term;
       end if;
     end Expression;
 
@@ -423,7 +423,7 @@ package body Formulas is
     procedure Left_Assoc (n : in out p_Formula_Rec);
 
     procedure Left_Assoc (n : in out p_Formula_Rec) is
-      left : p_Formula_Rec;
+      left_part : p_Formula_Rec;
     begin
       if n = null then  --  Should not happen, but who knows...
         return;
@@ -444,10 +444,10 @@ package body Formulas is
         if n.right /= null and then (n.right.s = oper or n.right.s = ivrs) then
           --  This has been parsed as X - {Y + Z} or  X - {Y - Z},
           --  should be {X - Y} + Z or {X - Y} - Z.
-          left := n.right.left;  --  Remember Y
+          left_part := n.right.left;  --  Remember Y
           n.right.left := n;
           n := n.right;
-          n.left.right := left;
+          n.left.right := left_part;
           --
           --  Redo on children. See 9-4-3-2 example...
           --
@@ -1128,12 +1128,12 @@ package body Formulas is
     end if;
   end Enumerate_custom;
 
-  procedure Adjust (f : in out Formula) is
+  overriding procedure Adjust (f : in out Formula) is
   begin
     f.root := Deep_copy (f.root);
   end Adjust;
 
-  procedure Finalize (f : in out Formula) is
+  overriding procedure Finalize (f : in out Formula) is
   begin
     Deep_delete (f.root);
   end Finalize;

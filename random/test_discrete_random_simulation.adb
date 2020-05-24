@@ -31,7 +31,7 @@ procedure Test_Discrete_Random_Simulation is
 
   type Simulation_mode is (linear, dichotomic, alias);
 
-  procedure Test_CDF_by_mode(F: Pb_array; mode: Simulation_mode; comment: String) is
+  procedure Test_CDF_by_mode(F: Pb_array; s_mode: Simulation_mode; comment: String) is
     sample: array(F'Range) of Integer := (others => 0);
     g: Generator;
     n: constant := 50_000_000;
@@ -46,18 +46,18 @@ procedure Test_Discrete_Random_Simulation is
     Put_Line(
       "Testing " & comment &
       ", total occurrences=" & Integer'Image(n) &
-      ", inverse CDF mode= " & Simulation_mode'Image(mode));
+      ", inverse CDF mode= " & Simulation_mode'Image(s_mode));
     New_Line;
     Reset(g);
     t0 := Clock;
-    if mode = alias then
+    if s_mode = alias then
       Prepare_Aliases (Fx => F, aliases => aliases);
     end if;
     t1 := Clock;
     for i in 1 .. n loop
       ii := i;
       u:= Real(Random(g));
-      case mode is
+      case s_mode is
         when linear =>
           x := Index_Linear_Search (u, F);
         when dichotomic =>
@@ -91,7 +91,7 @@ procedure Test_Discrete_Random_Simulation is
     Put(max_diff, 2, Real'Digits, 0);
     New_Line;
     Put_Line (
-      "Elapsed time for " & Simulation_mode'Image(mode) &
+      "Elapsed time for " & Simulation_mode'Image(s_mode) &
       ": " & Duration'Image(t1-t0) &
       " (prep.), " & Duration'Image(t2-t1) & " (simul.)"
     );
@@ -102,8 +102,8 @@ procedure Test_Discrete_Random_Simulation is
 
   procedure Test_CDF(F: Pb_array; comment: String) is
   begin
-    for mode in Simulation_mode loop
-      Test_CDF_by_mode(F, mode, comment);
+    for s_mode in Simulation_mode loop
+      Test_CDF_by_mode(F, s_mode, comment);
     end loop;
   end Test_CDF;
 

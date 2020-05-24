@@ -11,7 +11,9 @@
 --    Bulletin de la Societe vaudoise des sciences naturelles.
 --    88.2: 121-129, ISSN 0037-9603, 2002
 
-with Ada.Text_IO, Ada.Integer_Text_IO, Ada.Numerics.Generic_Elementary_Functions;
+with Ada.Text_IO,
+     Ada.Integer_Text_IO,
+     Ada.Numerics.Generic_Elementary_Functions;
 
 procedure Three_Lakes is
 
@@ -38,7 +40,7 @@ procedure Three_Lakes is
     return r;
   end "+";
 
-  function Sign( i: Real) return Real is
+  function Sign (i: Real) return Real is
   begin
     if    i < 0.0 then  return -1.0;
     elsif i = 0.0 then  return  0.0;
@@ -76,9 +78,9 @@ procedure Three_Lakes is
     begin
       Flux_tansfert;
       return
-        ( Morat     => (q_e (Morat)     - q_tr_mn                    ) * ivs (Morat),
-          Neuchatel => (q_e (Neuchatel) + q_tr_mn - q_tr_nb          ) * ivs (Neuchatel),
-          Bienne    => (q_e (Bienne)              + q_tr_nb - q_sb   ) * ivs (Bienne));
+        ( Morat     => (q_e (Morat)     - q_tr_mn                 ) * ivs (Morat),
+          Neuchatel => (q_e (Neuchatel) + q_tr_mn - q_tr_nb       ) * ivs (Neuchatel),
+          Bienne    => (q_e (Bienne)              + q_tr_nb - q_sb) * ivs (Bienne));
     end f;
     k1, k2, k3, k4 : Lake_Vector;
   begin
@@ -95,11 +97,13 @@ procedure Three_Lakes is
     x, q_e : Lake_Vector;
     q_sb, h : Real;
     n_iter : Integer;
+    out_step : Integer;
     f : File_Type;
     sep : constant Character := ';';
   begin
     h := 3600.0;
     n_iter := 24 * 20;
+    out_step := 3;
 
     x := (Morat => 428.2, Neuchatel => 429.0, Bienne => 429.4);  --  Lake levels at time t = 0.
     q_e := (Morat => 40.0, Neuchatel => 70.0, Bienne => 100.0);  --  Inflows (could be dynamic).
@@ -113,12 +117,14 @@ procedure Three_Lakes is
     end loop;
     New_Line (f);
     for i in 0 .. n_iter loop
-      Put (f, i);
-      for l in Lake loop
-        Put (f, sep);
-        Put (f, x(l), 4, 2, 0);
-      end loop;
-      New_Line (f);
+      if i mod out_step = 0 then
+        Put (f, i);
+        for l in Lake loop
+          Put (f, sep);
+          Put (f, x(l), 4, 5, 0);
+        end loop;
+        New_Line (f);
+      end if;
       Evolution (x, q_e, q_sb, h);
     end loop;
     Close (f);

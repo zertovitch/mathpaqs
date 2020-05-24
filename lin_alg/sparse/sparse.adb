@@ -56,7 +56,6 @@ package body Sparse is
 
    deb, fin, jaj: Index;
    ui, wi, wi_sum: Real;
-   rows: constant Index:= A.rows;
    val: Vector renames A.val;
    col_ind: Index_array renames A.col_ind;
    row_ptr: Index_array renames A.row_ptr;
@@ -66,7 +65,7 @@ package body Sparse is
       if  not A.symmetric  then
          -- *** la matrice est memorisee sous forme non symetrique
 
-         for i in 1..rows loop
+         for i in 1 .. A.rows loop
             deb := row_ptr(i);
             fin := row_ptr(i + 1) - 1;
             wi_sum := 0.0;
@@ -79,10 +78,10 @@ package body Sparse is
       else
          -- *** la matrice est memorisee sous forme symetrique
 
-         for i in 1..rows loop
+         for i in 1 .. A.rows loop
             w(i) := 0.0;
          end loop;
-         for i in 1..rows loop
+         for i in 1 .. A.rows loop
             deb := row_ptr(i);
             fin := row_ptr(i + 1) - 1;
             ui := u(i);

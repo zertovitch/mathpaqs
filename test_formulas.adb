@@ -14,12 +14,12 @@ procedure Test_Formulas is
     e0, e : Real;
     style : constant Output_style := normal;
     --
-    function Entropy_test (expr : String; level : Natural) return String is
+    function Entropy_test (tst_expr : String; level : Natural) return String is
     begin
       if level = 0 then
-        return expr;
+        return tst_expr;
       else
-        return Image (Parse (Entropy_test (expr, level - 1)));
+        return Image (Parse (Entropy_test (tst_expr, level - 1)));
       end if;
     end Entropy_test;
     --
@@ -60,8 +60,8 @@ procedure Test_Formulas is
     Put (f, style);
     New_Line;
     e0 := Evaluate (f, dummy);
-    for count in 1 .. 4 loop
-      Put ("Simplify #" & Integer'Image (count) & ": ");
+    for simpl_count in 1 .. 4 loop
+      Put ("Simplify #" & Integer'Image (simpl_count) & ": ");
       Simplify (f);
       Put (f, style);
       if target /= "" then

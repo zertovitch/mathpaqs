@@ -54,6 +54,7 @@ procedure BioMorph is
     end loop;
     end loop;
   end Graphe_biomorphe_2;
+  pragma Unreferenced (Graphe_biomorphe_2);
 
 begin
   InitGraph(PostScript, "Biomorphe.ps");

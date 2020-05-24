@@ -33,9 +33,11 @@ procedure Test_RSA is
   -- Encode or decode:
 
   procedure Code( msg: in out RSA_Message; expo, modu: Multi_int ) is
+    ipn : RSA_block;
   begin
     for i in msg'Range loop
-      Power( msg(i), expo, msg(i), modu );
+      Power (msg(i), expo, ipn, modu);
+      msg(i) := ipn;
     end loop;
   end Code;
 

@@ -3,8 +3,8 @@ with U_Rand;
 
 procedure Test_U_Rand is
     subtype Real is Float;
-    package Float_IO is new Text_IO.Float_IO (Real) ;
-    use Float_IO;
+    package RIO is new Text_IO.Float_IO (Real) ;
+    use RIO;
     Test_File : Text_IO.File_Type;
     File_Name : constant  String:= "URand_Test_Output.dat" ;
     subtype A_RESULT is String(1..11) ;

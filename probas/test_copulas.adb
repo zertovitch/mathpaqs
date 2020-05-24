@@ -47,13 +47,13 @@ procedure Test_Copulas is
     U01 : Real_Vector (1..dim_dep + dim_indep);
     gen : RRand.Generator;
     use RCopulas;
-    copula : Copula_access;
+    g_copula : Copula_access;
     f : File_Type;
     L, B, Z : Real_Matrix (A'Range(1), A'Range(2));
     res : Real:= 0.0;
   begin
     RRand.Reset (gen, 1);
-    Construct_as_Gauss (copula, U01'Length, A);
+    Construct_as_Gauss (g_copula, U01'Length, A);
     Create (f, Out_File, res_name & ".csv");
     for i in 1 .. dim_dep loop
       Put (f, "dep;");
@@ -63,7 +63,7 @@ procedure Test_Copulas is
     end loop;
     New_Line(f);
     for n in 1 .. 60_000 loop
-      U01 := Simulate(copula.all, gen);
+      U01 := Simulate (g_copula.all, gen);
       for i in U01'Range loop
         Put (f, U01(i));
         Put (f, ';');
@@ -71,7 +71,7 @@ procedure Test_Copulas is
       New_Line(f);
     end loop;
     Put_Line("Results are stored in this file: " & Name(f));
-    L := Get_Cholesky_Matrix(Gauss_Copula(copula.all));
+    L := Get_Cholesky_Matrix (Gauss_Copula (g_copula.all));
     B := L * Transpose(L);
     Put_Line("B := L*Lt.");
     Put_Line("""A = B"" Matrix equality test (bitwise) " & Boolean'Image(A = B));

@@ -75,32 +75,41 @@ project Mathpaqs is
    end case;
 
    Common_Options := (
-     "-gnatwa",                        --  Warnings switches
-     "-gnatwcijkmopruvz.c.n.p.t.w.x",  --  Warnings switches
+     "-gnatwa",                        --  Warnings switches (a:turn on all info/warnings marked with +)
+     "-gnatwcijkmopruvz.c.n.p.t.w.x",  --  Warnings switches (run "gnatmake" for full list)
      "-gnatf",  --  Full errors. Verbose details, all undefined references
      "-gnatq",  --  Don't quit, try semantics, even if parse errors
      "-gnatQ",  --  Don't quit, write ali/tree file even if compile errors
-     "-g"
+     "-g"       --  Generate debugging information
    );
 
-   Debug_Options  := (
-     "-gnatVa", "-gnato",
-     "-fno-inline", "-fstack-check",
+   Debug_Options := (
+     "-gnata",         --  Assertions enabled
+     "-gnato",         --  Enable overflow checking in STRICT mode
+     "-gnatVa",        --  Enable all validity checking options
+     "-fstack-check",
+     "-fno-inline",
+     --
      "-gnatec=" & project'Project_Dir & "debug.pra"
-     );
-   Fast_Options   := (
-       "-O2", "-gnatpn", 
-       "-fipa-cp-clone", "-fgcse-after-reload", 
-       "-funroll-loops", "-fpeel-loops", "-funswitch-loops", 
-       "-ftracer", "-ftree-vectorize");
+   );
+
+   Fast_Options := (
+     "-O2",
+     "-gnatpn", 
+     "-fipa-cp-clone", "-fgcse-after-reload", 
+     "-funroll-loops", "-fpeel-loops", "-funswitch-loops", 
+     "-ftracer", "-fweb", "-ftree-vectorize",
+     "-frename-registers", "-ffunction-sections"
+   );
    
    package Compiler is
       case Mathpaqs_Build_Mode is
          when "Debug" =>
-            for Default_Switches ("ada") use Common_Options & Debug_Options ;
+            for Default_Switches ("ada") use Common_Options & Debug_Options;
          when "Style_Checks" =>
             for Default_Switches ("ada") use Common_Options & Debug_Options & 
               (
+                "-gnatwh",      --  Warnings switches (h:turn on warnings for hiding declarations)
                 "-gnatyaknpr",  --  Style: check all casings: a:attribute, k:keywords, n:package Standard identifiers, p:pragma, r:identifier references
                 "-gnatybfhu",   --  Style: check b:no blanks at end of lines, f:no ff/vtabs, h:no htabs, i:if-then layout, u:no unnecessary blank lines
                 "-gnatyx",      --  Style: check x:no extra parens

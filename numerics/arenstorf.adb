@@ -225,23 +225,23 @@ procedure Arenstorf is
   procedure Degrade is
     p, q: Float; c: Natural;
   begin
-   for i in 0..n_meth-1 loop
-    for j in 0..spal - 1 loop
-      c:= pala + spal*i + j;
-      p:= Float(i) / Float(n_meth-1);
-      q:= Float(j) / Float(spal - 1);
-      SetRGBPalette(c, Integer(p*63.0), Integer(q*63.0), 63-Integer(p*63.0));
+    for i in 0..n_meth-1 loop
+      for j in 0..spal - 1 loop
+        c:= pala + spal*i + j;
+        p:= Float(i) / Float(n_meth-1);
+        q:= Float(j) / Float(spal - 1);
+        SetRGBPalette(c, Integer(p*63.0), Integer(q*63.0), 63-Integer(p*63.0));
+      end loop;
     end loop;
-   end loop;
   end Degrade;
 
   dessine: constant array(t_meth) of Boolean:=
-    (Euler1 => true,
-     Runge_Kutta_class4 | Runge_Kutta_3_8_4 => false,
-     Butcher6 => true,
-     DoPriF7 => false,
-     DoPriF8 => false,
-     DoPriV8 => true );
+    (Euler1   => True,
+     Runge_Kutta_class4 | Runge_Kutta_3_8_4 => False,
+     Butcher6 => True,
+     DoPriF7  => False,
+     DoPriF8  => False,
+     DoPriV8  => True );
 
     rapXY: Float;
 

@@ -4,7 +4,7 @@
 
 package body G_Matrices is
 
-  function Id(order: Positive) return Matrix is
+  function Id (order: Positive) return Matrix is
     I: Matrix(1..order,1..order);
   begin
     for k in I'Range(1) loop
@@ -15,92 +15,92 @@ package body G_Matrices is
     return I;
   end Id;
 
-  function "*"(l:Field_elt; A:Matrix) return Matrix is
+  function "*" (l:Field_elt; A:Matrix) return Matrix is
     l_A: Matrix(A'Range(1),A'Range(2));
   begin
     for i in A'Range(1) loop
       for j in A'Range(2) loop
-        l_A(i,j):= l*A(i,j);
+        l_A(i,j) := l*A(i,j);
       end loop;
     end loop;
     return l_A;
   end "*";
 
-  function Transpose(A: Matrix) return Matrix is
+  function Transpose (A: Matrix) return Matrix is
     B: Matrix(A'Range(2),A'Range(1));
   begin
     for i in A'Range(1) loop
       for j in A'Range(2) loop
-        b(j,i):= a(i,j);
+        B (j,i) := A (i,j);
       end loop;
     end loop;
     return B;
   end Transpose;
 
-  function "*"(l: Field_elt; v: Vector) return Vector is
+  function "*" (l: Field_elt; v: Vector) return Vector is
     r: Vector(v'Range);
   begin
     for i in v'Range loop r(i):= v(i)*l; end loop;
     return r;
   end "*";
 
-  function "-"(a: Vector) return Vector is
+  function "-" (a: Vector) return Vector is
     r: Vector(a'Range);
   begin
     for i in a'Range loop r(i):= -a(i); end loop;
     return r;
   end "-";
 
-  function "+"(a,b: Vector) return Vector is
+  function "+" (a,b: Vector) return Vector is
     r: Vector(a'Range);
   begin
     for i in a'Range loop r(i):= a(i)+b(i); end loop;
     return r;
   end "+";
 
-  function "-"(a,b: Vector) return Vector is
+  function "-" (a,b: Vector) return Vector is
     r: Vector(a'Range);
   begin
     for i in a'Range loop r(i):= a(i)-b(i); end loop;
     return r;
   end "-";
 
-  function "*"(a,b: Vector) return Field_elt is
+  function "*" (a,b: Vector) return Field_elt is
     r: Field_elt:= zero;
   begin
     for i in a'Range loop r:= r + a(i)*b(i); end loop;
     return r;
   end "*";
 
-  function Norm(a: Vector) return Field_elt is
+  function Norm (a: Vector) return Field_elt is
     r: Field_elt:= zero;
   begin
     for i in a'Range loop r:= r + a(i)*a(i); end loop;
     return Sqrt(r);
   end Norm;
 
-  function Square_norm(a: Vector) return Field_elt is
+  function Square_norm (a: Vector) return Field_elt is
     r: Field_elt:= zero;
   begin
     for i in a'Range loop r:= r + a(i)*a(i); end loop;
     return r;
   end Square_norm;
 
-  function Distance(a,b: Vector) return Field_elt is
+  function Distance (a,b: Vector) return Field_elt is
     r: Field_elt:= zero; ab: Field_elt;
   begin
     for i in a'Range loop ab:=a(i)-b(i); r:= r + ab*ab; end loop;
     return Sqrt(r);
   end Distance;
 
-  function Square_dist(a,b: Vector) return Field_elt is
+  function Square_dist (a,b: Vector) return Field_elt is
     r: Field_elt:= zero; ab: Field_elt;
   begin
     for i in a'Range loop ab:=a(i)-b(i); r:= r + ab*ab; end loop;
     return r;
   end Square_dist;
 
-  function "*"(A,B: Matrix) return Matrix is
+  function "*" (A,B: Matrix) return Matrix is
     r: Field_elt;
     AB: Matrix(A'Range(1),B'Range(2));
   begin
@@ -117,7 +117,7 @@ package body G_Matrices is
     return AB;
   end "*";
 
-  function "+"(A,B: Matrix) return Matrix is
+  function "+" (A,B: Matrix) return Matrix is
     ApB: Matrix(A'Range(1),A'Range(2));
   begin
     for i in A'Range(1) loop
@@ -128,18 +128,18 @@ package body G_Matrices is
     return ApB;
   end "+";
 
-  function "-"(A,B: Matrix) return Matrix is
+  function "-" (A,B: Matrix) return Matrix is
     AmB: Matrix(A'Range(1),A'Range(2));
   begin
     for i in A'Range(1) loop
       for j in A'Range(2) loop
-        AmB(i,j):= A(i,j)-B(i,j);
+        AmB(i,j) := A(i,j)-B(i,j);
       end loop;
     end loop;
     return AmB;
   end "-";
 
-  function "*"(A: Matrix; x: Vector) return Vector is
+  function "*" (A: Matrix; x: Vector) return Vector is
     r: Field_elt;
     Ax: Vector(A'Range(1));
   begin
@@ -147,7 +147,7 @@ package body G_Matrices is
     for i in A'Range(1) loop
       r:= zero;
       for j in x'Range loop
-          r:= r + A(i,j-x'First+A'First(2)) * x(j);
+        r := r + A(i,j-x'First+A'First(2)) * x(j);
       end loop;
       Ax(i):= r;
     end loop;

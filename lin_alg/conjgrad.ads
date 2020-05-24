@@ -59,7 +59,7 @@ package ConjGrad is
   procedure CG ( A : in Any_matrix;
                  b : Vector;
                  x : in out Vector;    -- * input:  1st approx;
-                                       -- * output: solution of Ax=b
+                 --                       * output: solution of Ax=b
                  tol: Real;            -- tolerance
                  precond: t_precond;   -- kind of preconditioning
                  itmax: Index;         -- maximum number of iterations
@@ -73,7 +73,7 @@ package ConjGrad is
   procedure BiCGStab ( A : in Any_matrix;
                        b : Vector;
                        x : in out Vector;    -- * input:  1st approx;
-                                             -- * output: solution of Ax=b
+                       --                       * output: solution of Ax=b
                        eps_rho  : Real;      -- minimal step allowed
                        tol_omega: Real;      -- tolerance
                        tol      : Real;      -- tolerance

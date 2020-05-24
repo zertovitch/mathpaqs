@@ -165,7 +165,7 @@ private
     root : p_Formula_Rec := null;
   end record;
 
-  procedure Adjust (f : in out Formula);
-  procedure Finalize (f : in out Formula);
+  overriding procedure Adjust (f : in out Formula);
+  overriding procedure Finalize (f : in out Formula);
 
 end Formulas;

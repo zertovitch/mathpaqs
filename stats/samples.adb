@@ -74,7 +74,7 @@ package body Samples is
     m: in out Measure -- "in" are the quantile levels (m.level)
   )
   is
-    f, value, samples, sxi, mu, s2,
+    f, value, nb_samples, sxi, mu, s2,
     inv_n, inv_nm1, n, ql, new_ql, prob_bigger: Real;
     q_idx: Integer:= m.level'First;
     cumul_samples, new_cumul_samples: Natural;
@@ -96,15 +96,15 @@ package body Samples is
     sxi:= 0.0;
     for i in reverse s.histogram'Range loop
       value:= s.min + f * Real(i);
-      samples:= Real(s.histogram(i)); -- # of points for this value
-      sxi:= sxi + samples * value;
+      nb_samples:= Real(s.histogram(i)); -- # of points for this value
+      sxi:= sxi + nb_samples * value;
       truncated_mu(i):= inv_n * sxi;
     end loop;
     --
     cumul_samples:= 0;
     for i in s.histogram'Range loop
       value:= s.min + f * Real(i);
-      samples:= Real(s.histogram(i)); -- # of points for this value
+      nb_samples:= Real(s.histogram(i)); -- # of points for this value
       new_cumul_samples:= cumul_samples + s.histogram(i);
       while q_idx <= m.level'Last and then ql <= Real(new_cumul_samples) loop
         -- With the cumulative samples, we got past at least one quantile level
