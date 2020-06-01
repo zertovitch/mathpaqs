@@ -30,18 +30,18 @@ procedure Test_Gamma is
   Different_Gamma_values: exception;
   Different_Log_Gamma_values: exception;
 
-  procedure Test(x, pgx: Real; comment: String:= "") is
-    -- pgx is precomputed Gamma(x) by Excel 2013, unless specified.
-    gx: constant Real:= Gamma(x);
-    lgx: constant Real:= Log_Gamma(x);
-    lpgx: Real;  --  Log of the precomputed pgx, if possible
+  procedure Test(x, pgx : Real; comment : String:= "") is
+    --  pgx is precomputed Gamma(x) by Excel 2013, unless specified.
+    gx  : constant Real:= Gamma (x);
+    lgx : constant Real:= Log_Gamma (x);
+    lpgx : Real;  --  Log of the precomputed pgx, if possible
   begin
     if pgx < 0.0 then
       lpgx:= lgx;
     else
-      lpgx:= Log(pgx);
+      lpgx:= Log (pgx);
     end if;
-    Put_Line(
+    Put (
       Real'Image(x) & "; " &
       Real'Image(gx) & "; " & Real'Image(pgx) & "; " &
       Real'Image(lgx) & "; " & Real'Image(lpgx) & "; " & comment
@@ -52,6 +52,7 @@ procedure Test_Gamma is
     if not Very_Close(lgx, lpgx) then
       raise Different_Log_Gamma_values;
     end if;
+    Put_Line ("; OK");
   end Test;
 
   use Ada.Numerics;  --  for Pi.

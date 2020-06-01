@@ -9,69 +9,29 @@
 --
 project Mathpaqs is
 
-   for Source_Dirs use (".", "algebra", "edp", "eds", "lin_alg", "multi", "numerics", "probas", "random", "lin_alg/sparse", "stats", "graph");
+   for Source_Dirs use (
+     ".", "algebra", "edp", "eds", "lin_alg", "multi",
+     "numerics", "probas", "random", "lin_alg/sparse", "stats", "graph"
+   );
    for Exec_Dir use ".";
    type Mathpaqs_Build_Mode_Type is ("Debug", "Style_Checks", "Fast");
    Mathpaqs_Build_Mode : Mathpaqs_Build_Mode_Type := external ("Mathpaqs_Build_Mode", "Fast");
 
    for Main use (
        --
-       -- *** Probabilities
+       --  For tests, see Mathpaqs_Test[_*]
        --
-         "test_copulas.adb",
-       --
-       -- *** Random generation & simulation
-       --
-         "test_u_rand.adb",
-         "test_random_performance.adb",
-         "test_discrete_random_simulation.adb",
-         "test_pareto.adb",
-         "test_normal.adb",
-         "test_poisson.adb",
-       --
-       -- *** Statistics
-       --
-         "test_samples.adb", 
-         "test_estimators.adb", 
-       --
-       -- *** Linear algebra
-       --
-         "test_sparse.adb", 
-         "test_cholesky.adb",
-         "test_qr.adb",
-         "test_generic_real_linear_equations.adb",
-       --
-       -- *** Algebra
-       --
-         "test_ert.adb",
-       --
-       -- ** Numerics
-       --
-         "test_beta.adb",
-         "test_gamma.adb",
-       --
-       -- *** Multiple precision integers
-       --
-         "gnat_int.adb", "test_rsa.adb",
-       --
-       -- *** Formulas
-       --
-         "test_formulas.adb",
-       --
-       -- *** Misc
-       --
-         "fractal.adb", "biomorph.adb",
-         "champ_vt.adb", "arenstorf.adb",
-         "cr_demo.adb", "ppm2func.adb",
-         "arithmetic_compression.adb",
-         "show_floats_limits.adb",
-         "three_lakes"
-       );
+       "fractal.adb", "biomorph.adb",
+       "champ_vt.adb", "arenstorf.adb",
+       "cr_demo.adb", "ppm2func.adb",
+       "arithmetic_compression.adb",
+       "show_floats_limits.adb",
+       "three_lakes"
+     );
+
    case Mathpaqs_Build_Mode is
-     when "Debug" | "Style_Checks" =>
-       for Object_Dir use "obj_debg";
-     when "Fast" =>
-       for Object_Dir use "obj_fast";
+     when "Fast" => for Object_Dir use "obj_fast";
+     when others => for Object_Dir use "obj_debg";
    end case;
 
    Common_Options := (

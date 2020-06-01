@@ -1,0 +1,55 @@
+project Mathpaqs_Test extends "mathpaqs" is  --  Check mathpaqs.gpr for details
+
+   case Mathpaqs_Build_Mode is
+     when "Fast" => for Object_Dir use "obj_fast/test";
+     when others => for Object_Dir use "obj_debg/test";
+   end case;
+   
+   for Exec_Dir use ".";
+
+   for Main use (
+       --
+       -- *** Probabilities
+       --
+         "test_copulas.adb",
+       --
+       -- *** Random generation & simulation
+       --
+         "test_u_rand.adb",
+         "test_random_performance.adb",
+         "test_discrete_random_simulation.adb",
+         "test_pareto.adb",
+         "test_normal.adb",
+         "test_poisson.adb",
+       --
+       -- *** Statistics
+       --
+         "test_samples.adb", 
+         "test_estimators.adb", 
+       --
+       -- *** Linear algebra
+       --
+         "test_sparse.adb", 
+         "test_cholesky.adb",
+         "test_qr.adb",
+         "test_generic_real_linear_equations.adb",
+       --
+       -- *** Algebra
+       --
+         "test_ert.adb",
+       --
+       -- ** Numerics
+       --
+         "test_beta.adb",
+         "test_gamma.adb",
+       --
+       -- *** Multiple precision integers
+       --
+         "gnat_int.adb", "test_rsa.adb",
+       --
+       -- *** Formulas
+       --
+         "test_formulas.adb"
+    );
+   
+end Mathpaqs_Test;
