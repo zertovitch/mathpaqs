@@ -7,6 +7,7 @@
 --  Latest version may be available at:
 --      home page:     http://mathpaqs.sf.net/
 --      project page:  http://sf.net/projects/mathpaqs/
+--      mirror:        https://github.com/zertovitch/mathpaqs
 --
 -------------------------
 --  Legal licensing note:

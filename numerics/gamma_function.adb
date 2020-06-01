@@ -1,4 +1,5 @@
--- Translated on 10-Nov-2015 by (New) P2Ada v. 28-Oct-2009
+--  Translated on 10-Nov-2015 by (New) P2Ada v. 28-Oct-2009
+--  See specification for license and credits.
 
 with Ada.Numerics.Generic_Elementary_Functions;
 with Ada.Numerics; use Ada.Numerics;

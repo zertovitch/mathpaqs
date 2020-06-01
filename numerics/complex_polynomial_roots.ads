@@ -1,22 +1,23 @@
 ------------------------------------------------------------------------------
---  File:            CoPolRoo.ads
+--  File:            complex_polynomial_roots.ads
 --  Description:     Complex roots of polynomials
---                    !! Beware of numerical errors !!
---  Date / Version:  11-Jan-2004; ... ; 10-Jan-2004
---  Author:          Gautier de Montmollin
---  References:      - Bronstein-Semendjajev,
---                     Taschenbuch der Mathematik, Verlag Harri Deutsch, 1966
---                   - John M. Gamble, programmation of Ferrari's solution
+--  Date / Version:  01-Jun-2020; 11-Jan-2004; ... ; 10-Jan-2004 ; ...
+--  Author:          Gautier de Montmollin and (?) : Ada package.
+--  References:        - Bronstein-Semendjajev,
+--                         Taschenbuch der Mathematik,
+--                         Verlag Harri Deutsch, 1966
+--                     - John M. Gamble, programmation of Ferrari's solution
 ------------------------------------------------------------------------------
 
-with Ada.Numerics.Generic_Complex_Types; 
+with Ada.Numerics.Generic_Complex_Types;
 
-generic 
-  with package Complex_Types is new Ada.Numerics.Generic_Complex_Types (<>); 
-
+generic
+  with package Complex_Types is new Ada.Numerics.Generic_Complex_Types (<>);
 
 package Complex_Polynomial_Roots is
-  use Complex_Types; 
+  use Complex_Types;
+  --  Complex_Types Defines the type Complex.
+  --  The type Real is itself a generic formal of Generic_Complex_Types.
 
   -- Degree 2: Solves a x^2 + b x + c
   procedure Solve (a,b,c: Real; r1,r2: out Complex);

@@ -1,3 +1,5 @@
+--  See specification for license and credits.
+
 with Ada.Numerics.Generic_Elementary_Functions;
 with Error_function;
 
