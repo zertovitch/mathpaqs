@@ -45,7 +45,8 @@ project Mathpaqs_Test extends "mathpaqs" is  --  Check mathpaqs.gpr for details
        --
        -- *** Multiple precision integers
        --
-         "gnat_int.adb", "test_rsa.adb",
+         "test_int.adb",
+         "test_rsa.adb",
        --
        -- *** Formulas
        --
