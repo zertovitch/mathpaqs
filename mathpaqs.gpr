@@ -10,8 +10,12 @@
 project Mathpaqs is
 
    for Source_Dirs use (
-     ".", "algebra", "edp", "eds", "lin_alg", "multi",
-     "numerics", "probas", "random", "lin_alg/sparse", "stats", "graph"
+     ".", "algebra",
+     "edp", "eds", "ode",
+     "lin_alg", "multi",
+     "numerics",
+     "probas", "random",
+     "lin_alg/sparse", "stats", "graph"
    );
    for Exec_Dir use ".";
    type Mathpaqs_Build_Mode_Type is ("Debug", "Style_Checks", "Fast");
