@@ -1,9 +1,11 @@
---  This program solves a vectorial differential equation.
---  The unknown is a vector containing the levels of three lakes.
---  The lakes are connected by two channels.
---  There is an initial condition (levels at t = 0).
---  Boundary conditions take the form of natural inflows into the lakes,
---  and a single, controlled outflow out of one of the lakes.
+--  This program solves a vectorial ordinary differential equation
+--  (or a system of ordinary differential equations).
+--
+--  * The unknown is a vector containing the levels of three lakes.
+--  * The lakes are connected by two channels.
+--  * There is an initial condition: the levels at t = 0.
+--  * Boundary conditions take the form of natural inflows into the lakes,
+--    and a single, controlled outflow out of one of the lakes.
 --
 --  Related publication:
 --    Evolution simulee des niveaux dans le systeme des Trois-Lacs,
@@ -53,6 +55,8 @@ procedure Three_Lakes is
       Neuchatel => 1.0 / 2.1581e8,
       Bienne    => 1.0 / 4.0870e7);
 
+  --  We solve numerically   x' (t) = f (x (t), t)   over the time step h.
+  --
   procedure Evolution (x : in out Lake_Vector; q_e : Lake_Vector; q_sb, h : Real) is
     --
     function f (x : Lake_Vector) return Lake_Vector is
@@ -98,7 +102,7 @@ procedure Three_Lakes is
     q_sb, h : Real;
     n_iter : Integer;
     out_step : Integer;
-    f : File_Type;
+    rf : File_Type;
     sep : constant Character := ';';
   begin
     h := 3600.0;
@@ -109,25 +113,25 @@ procedure Three_Lakes is
     q_e := (Morat => 40.0, Neuchatel => 70.0, Bienne => 100.0);  --  Inflows (could be dynamic).
     q_sb := 200.0;                                               --  Outflow (could be dynamic).
 
-    Create (f, Out_File, "3_lakes.csv");
-    Put (f, "t");
+    Create (rf, Out_File, "3_lakes.csv");
+    Put (rf, "t");
     for l in Lake loop
-      Put (f, sep);
-      Put (f, Lake'Image (l));
+      Put (rf, sep);
+      Put (rf, Lake'Image (l));
     end loop;
-    New_Line (f);
+    New_Line (rf);
     for i in 0 .. n_iter loop
       if i mod out_step = 0 then
-        Put (f, i);
+        Put (rf, i);
         for l in Lake loop
-          Put (f, sep);
-          Put (f, x(l), 4, 5, 0);
+          Put (rf, sep);
+          Put (rf, x(l), 4, 5, 0);
         end loop;
-        New_Line (f);
+        New_Line (rf);
       end if;
       Evolution (x, q_e, q_sb, h);
     end loop;
-    Close (f);
+    Close (rf);
   end Simulation;
 
 begin

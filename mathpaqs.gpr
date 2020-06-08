@@ -26,7 +26,8 @@ project Mathpaqs is
        "cr_demo.adb", "ppm2func.adb",
        "arithmetic_compression.adb",
        "show_floats_limits.adb",
-       "three_lakes"
+       "three_lakes.adb",
+       "covid_19.adb"
      );
 
    case Mathpaqs_Build_Mode is
