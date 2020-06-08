@@ -10,18 +10,22 @@
 --      E: Exposed
 --      I: Infectious
 --      R: Recovered
---  * There is a propagation in the direction S -> E -> I -> R.
+--  * There is a propagation of population in the
+--    direction S ---> E ---> I ---> R, plus new
+--    infections:  ^------<---
 --
 --  Related publication:
 --    Nowcasting and forecasting the potential domestic and
 --    international spread of the 2019-nCoV outbreak originating
 --    in Wuhan, China: a modelling study
 --
+--    https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)30260-9/fulltext
+--
 --  Simplification here:
 --    - no flights: L_{W,I}, L_{W,C}, ... = 0
 --    - zoonotic force = 0.
 
-with Ada.Text_IO, Ada.Integer_Text_IO;
+with Ada.Characters.Handling, Ada.Text_IO, Ada.Integer_Text_IO;
 
 procedure COVID_19 is
 
@@ -90,7 +94,9 @@ procedure COVID_19 is
     xt := xt + h * (1.0/6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
   end Evolution;
 
-  procedure Simulation is
+  type Scenario is (No_Lockdown, Lockdown, Lockdown_in_two_Steps);
+
+  procedure Simulation (s: Scenario) is
     use Ada.Text_IO, Ada.Integer_Text_IO, PFIO;
     x : Status_Vector;
     dt : Real;
@@ -99,11 +105,12 @@ procedure COVID_19 is
     out_step : Integer;
     rf : File_Type;
     sep : constant Character := ';';
+    use Ada.Characters.Handling;
+    basic_reproductive_number : constant := 3.5;
   begin
     dt := 1.0;
     n_iter := 365;
     out_step := 1;
-    reproductive_number := 3.4;
     x :=
       ( Susceptible => 1_000_000.0,
         Exposed     =>         0.0,
@@ -112,7 +119,7 @@ procedure COVID_19 is
       );
     --  Status numbers at time t = 0.
 
-    Create (rf, Out_File, "covid_19.csv");
+    Create (rf, Out_File, "covid_19_" & To_Lower (Scenario'Image (s)) & ".csv");
     Put (rf, "t");
     for l in Status loop
       Put (rf, sep);
@@ -128,11 +135,31 @@ procedure COVID_19 is
         end loop;
         New_Line (rf);
       end if;
+      case s is
+        when No_Lockdown =>
+          reproductive_number := basic_reproductive_number;
+        when Lockdown =>
+          if i < 40 then
+            reproductive_number := basic_reproductive_number;
+          else
+            reproductive_number := 1.0;
+          end if;
+        when Lockdown_in_two_Steps =>
+          if i < 40 then
+            reproductive_number := basic_reproductive_number;
+          elsif i < 60 then
+            reproductive_number := 2.0;
+          else
+            reproductive_number := 1.0;
+          end if;
+      end case;
       Evolution (x, reproductive_number, dt);
     end loop;
     Close (rf);
   end Simulation;
 
 begin
-  Simulation;
+  for s in Scenario loop
+    Simulation (s);
+  end loop;
 end COVID_19;
