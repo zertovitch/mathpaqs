@@ -126,9 +126,9 @@ SparseB:    Low-level vector operations for Sparse package
 Formulas:   a generic symbolic computation package
 Contours:   a generic contour plot package
 
-_______________________________________________________________
-(B): Programs, tests, demos using the previously cited packages
----------------------------------------------------------------
+______________________________________________________________________
+(B): Programs, tests, demos using or not the previously cited packages
+----------------------------------------------------------------------
 
 ______Linear Algebra:
 Test_Sparse             Test of Sparse and ConjGrad packages.
@@ -136,9 +136,11 @@ Test_Sparse             Test of Sparse and ConjGrad packages.
 _________________ODE:
 Phases.adb              Phase diagram and vector fields for oscillators (2)
 Champ_Vt.adb            Vector fields drawing                           (1)
+three_lakes.adb         Evolution of levels of interconnected lakes     ( )
+covid_19.adb            Epidemic simulation (coronavirus) - SEIR model  ( )
 
 _________________PDE:
-Diffchal.adb            Solution of heat equation by finite differences ( )
+heat.adb                Solution of heat equation by finite differences ( )
 
 ____________Fractals:
 Biomorph.adb            <<biomorphe>> fractals (cow skin)               (1)

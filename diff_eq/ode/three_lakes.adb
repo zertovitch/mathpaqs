@@ -12,6 +12,10 @@
 --    F. & G. de Montmollin,
 --    Bulletin de la Societe vaudoise des sciences naturelles.
 --    88.2: 121-129, ISSN 0037-9603, 2002
+--
+--  Related post:
+--    https://gautiersblog.blogspot.com/2020/05/the-three-lakes-problem.html
+--
 
 with Ada.Text_IO,
      Ada.Integer_Text_IO,

@@ -114,7 +114,7 @@ procedure COVID_19 is
     x :=
       ( Susceptible => 1_000_000.0,
         Exposed     =>         0.0,
-        Infectious  =>         1.0,  --  The spreader.
+        Infectious  =>         1.0,  --  Patient 1.
         Recovered   =>         0.0
       );
     --  Status numbers at time t = 0.

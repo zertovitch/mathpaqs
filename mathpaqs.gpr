@@ -32,6 +32,7 @@ project Mathpaqs is
        "cr_demo.adb", "ppm2func.adb",
        "arithmetic_compression.adb",
        "show_floats_limits.adb",
+       "heat.adb",
        "three_lakes.adb",
        "covid_19.adb"
      );
