@@ -21,9 +21,9 @@ procedure CR_Demo is
   ny : constant := 80;   --  Number of y values - 1 (zero-based)
   nc : constant := 130;  --  Number of contour levels (z-axis)
 
-  x1, y1, x2, y2, zmax, zmin: Float;
-
   -- pala: constant:= 16; palz: constant:= 255; palaz: constant:=palz-pala;
+
+  zmax, zmin: Float;
 
   procedure col_vecout(x1, y1, x2, y2, z: Float) is
     zz: constant Float:= (z-zmin)/(zmax-zmin);
@@ -32,6 +32,8 @@ procedure CR_Demo is
     SetColor(zz,0.0,1.0-zz);
     Line(x1, y1, x2, y2);
   end col_vecout;
+
+  x1, y1, x2, y2: Float;
 
   package CRG is new Contours(Float, col_vecout); use CRG;
 

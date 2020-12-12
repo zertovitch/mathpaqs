@@ -201,14 +201,14 @@ procedure Arenstorf is
               hnew:= h/fac;
               -- if hnew > hprem then hnew:= hprem; end if;
               if err < eps then
-                 x:= xp8;
-                 t:= t + h;
-                 if not accepted and then h < hnew then
-                   hnew:= h;
-                 end if;
-                 accepted:= True;
+                x:= xp8;
+                t:= t + h;
+                if not accepted and then h < hnew then
+                  hnew:= h;
+                end if;
+                accepted:= True;
               else
-                 accepted:= False;
+                accepted:= False;
               end if;
               h:= hnew;
             end if;
@@ -273,13 +273,13 @@ begin
       hprem:= h;
       t:= 0.0;
       it:= 0;
-      accepted:= true;
+      accepted:= True;
       MoveTo(Float(x(1)),Float(x(2)));
 
       while t < t_end * (1.0-prec_float(niter(meth))*uround) loop
         Evolution(meth);
         if accepted then
-         LineTo(Float(x(1)),Float(x(2)));
+        LineTo(Float(x(1)),Float(x(2)));
 --         SetColor( pala + (t_meth'Pos(meth) - t_meth'Pos(t_meth'First)) * spal
 --                        + (it*(spal-1)/niter(meth)) );
         end if;

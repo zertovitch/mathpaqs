@@ -18,16 +18,16 @@ procedure BioMorph is
   begin
     Set_math_plane(xa,ya,xb,yb);
     for I in 0..maxx loop
-    for J in 0..maxy loop
-      Coord(I,J,z.Re,z.Im);
-       for K in 1..10 loop
-         z:=Sin(z)+Exp(z)+c;
-         exit when abs(z) > s or abs(z.Re) > s or abs(z.Im) > s;
-       end loop;
-       if abs(z.Re) >= s and abs(z.Im) >= s then
-         Point(I,J);
-       end if;
-    end loop;
+      for J in 0..maxy loop
+        Coord(I,J,z.Re,z.Im);
+        for K in 1..10 loop
+          z:=Sin(z)+Exp(z)+c;
+          exit when abs(z) > s or abs(z.Re) > s or abs(z.Im) > s;
+        end loop;
+        if abs(z.Re) >= s and abs(z.Im) >= s then
+          Point(I,J);
+        end if;
+      end loop;
     end loop;
   end Graphe_biomorphe_1;
 
@@ -43,15 +43,15 @@ procedure BioMorph is
   begin
     Set_math_plane(xa,ya,xb,yb);
     for I in 0..maxx loop
-    for J in 0..maxy loop
-      Coord(I,J,z.Re,z.Im);
-      for K in 1..(palz-pala) loop
-        z:=Sin(z)+Exp(z)+c;
-        ko:= K;
-        exit when abs(z) > s or abs(z.Re) > s or abs(z.Im) > s;
+      for J in 0..maxy loop
+        Coord(I,J,z.Re,z.Im);
+        for K in 1..(palz-pala) loop
+          z:=Sin(z)+Exp(z)+c;
+          ko:= K;
+          exit when abs(z) > s or abs(z.Re) > s or abs(z.Im) > s;
+        end loop;
+        PutPixel(I,J,ko+pala); -- ! Couleur !
       end loop;
-      PutPixel(I,J,ko+pala); -- ! Couleur !
-    end loop;
     end loop;
   end Graphe_biomorphe_2;
   pragma Unreferenced (Graphe_biomorphe_2);

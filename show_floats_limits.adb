@@ -17,6 +17,8 @@ procedure Show_floats_limits is
     Put_Line("    Largest positive number  . . . . " & F'Image(F'Last));
     Put_Line("    Largest negative number  . . . . " & F'Image(F'First));
     Put_Line("    Significant decimal digits . . . " & Integer'Image(F'Digits));
+    Put_Line("    Storage bits . . . . . . . . . . " & Integer'Image(F'Size));
+    Put_Line("    Storage bytes  . . . . . . . . . " & Integer'Image(F'Size / 8));
     New_Line;
   end Show_limits;
 

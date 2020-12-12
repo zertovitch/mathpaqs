@@ -8,7 +8,7 @@ with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 
 procedure Champ_vt is
 
-  function F(x,y: Float) return Vector2 is
+  function F(x,y: Float) return vector2 is
     r2: constant Float:= x*x+y*y;
     r: constant Float:= Sqrt(r2);
     a: constant:= 0.05;
@@ -27,7 +27,7 @@ procedure Champ_vt is
 
   begin
     Set_math_plane(xa,ya, xb,yb);
-    Draw_axes(units=>true, grid_points=>true, scale=>true);
+    Draw_axes(units=>True, grid_points=>True, scale=>True);
     cal:= 0.0;
     for calibrate in reverse False..True loop
       for i in 1..points_x loop
@@ -42,7 +42,7 @@ procedure Champ_vt is
         end loop;
       end loop;
     end loop;
-  end;
+  end Dessine_Champ;
 
   procedure Dessin(d:device_type) is
   begin
@@ -51,9 +51,8 @@ procedure Champ_vt is
     Circle(0.0,0.0,1.0);
     Dessine_Champ(-3.0,-3.0,3.0,3.0, 30,20);
     CloseGraph;
-  end;
+  end Dessin;
 
 begin
   Dessin(PostScript);
-end;
-
+end Champ_vt;
