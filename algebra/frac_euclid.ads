@@ -9,49 +9,50 @@
 ------------------------------------------------------------------------------
 
 generic                              -- to provide:
-          type ring_elt is private;                  -- ring element type
-          zero, one: ring_elt;                       -- 0 and 1 elements
+          type ring_elt is private;                  --  ring element type
+          zero, one : ring_elt;                       --  0 and 1 elements
 
-          with function "-" (a:ring_elt) return ring_elt;    -- unary oper.
-          with function "+" (a,b:ring_elt) return ring_elt;  -- binary oper.
-          with function "-" (a,b:ring_elt) return ring_elt;
-          with function "*" (a,b:ring_elt) return ring_elt;
-          with function "/" (a,b:ring_elt) return ring_elt;
-                        -- returns the quotient:  a= b*q + r
-                        -- q:quotient, r:rest
+          with function "-" (a : ring_elt) return ring_elt;    --  unary oper.
+          with function "+" (a, b : ring_elt) return ring_elt;  --  binary oper.
+          with function "-" (a, b : ring_elt) return ring_elt;
+          with function "*" (a, b : ring_elt) return ring_elt;
+          with function "/" (a, b : ring_elt) return ring_elt;
+                        --  returns the quotient:  a= b*q + r
+                        --  q:quotient, r:rest
 
-package Frac_euclid is
-  type frac_elt is record a,b:ring_elt; end record;     -- define fraction
+package Frac_Euclid is
 
-  frac_0: constant frac_elt:= (zero,one);
-  frac_1: constant frac_elt:= (one,one);
+  type frac_elt is record a, b : ring_elt; end record;      --  define fraction
 
-  function Reduction(f: frac_elt) return frac_elt;
-  pragma Inline(Reduction);
+  frac_0 : constant frac_elt := (zero, one);
+  frac_1 : constant frac_elt := (one, one);
 
-  function "+" (f: frac_elt) return frac_elt;                 -- unary oper.
-  function "-" (f: frac_elt) return frac_elt;
+  function Reduction (f : frac_elt) return frac_elt;
+  pragma Inline (Reduction);
 
-  function "+" (f1,f2: frac_elt) return frac_elt;             -- binary oper.
-  function "+" (a: ring_elt; f: frac_elt) return frac_elt;
-  function "+" (f: frac_elt; a: ring_elt) return frac_elt;
-  function "-" (f1,f2: frac_elt) return frac_elt;
-  function "-" (a: ring_elt; f: frac_elt) return frac_elt;
-  function "-" (f: frac_elt; a: ring_elt) return frac_elt;
-  function "*" (f1,f2: frac_elt) return frac_elt;
-  function "*" (a: ring_elt; f: frac_elt) return frac_elt;
-  function "*" (f: frac_elt; a: ring_elt) return frac_elt;
-  function "/" (f1,f2: frac_elt) return frac_elt;
-  function "/" (a: ring_elt; f: frac_elt) return frac_elt;
-  function "/" (f: frac_elt; a: ring_elt) return frac_elt;
-  function "/" (a,b: ring_elt) return frac_elt;
+  function "+" (f : frac_elt) return frac_elt;                  --  unary oper.
+  function "-" (f : frac_elt) return frac_elt;
 
-  function Eq(f1,f2: frac_elt) return Boolean;               -- returns f1=f2
+  function "+" (f1, f2 : frac_elt) return frac_elt;             --  binary oper.
+  function "+" (a : ring_elt; f : frac_elt) return frac_elt;
+  function "+" (f : frac_elt; a : ring_elt) return frac_elt;
+  function "-" (f1, f2 : frac_elt) return frac_elt;
+  function "-" (a : ring_elt; f : frac_elt) return frac_elt;
+  function "-" (f : frac_elt; a : ring_elt) return frac_elt;
+  function "*" (f1, f2 : frac_elt) return frac_elt;
+  function "*" (a : ring_elt; f : frac_elt) return frac_elt;
+  function "*" (f : frac_elt; a : ring_elt) return frac_elt;
+  function "/" (f1, f2 : frac_elt) return frac_elt;
+  function "/" (a : ring_elt; f : frac_elt) return frac_elt;
+  function "/" (f : frac_elt; a : ring_elt) return frac_elt;
+  function "/" (a, b : ring_elt) return frac_elt;
 
-  auto_reduce: Boolean:= True;
-  reduce_in_add: Boolean:= True;
+  function Eq_frac (f1, f2 : frac_elt) return Boolean;         --  returns f1=f2
 
-  Zero_denominator:          exception;
-  Division_by_null_fraction: exception;
+  auto_reduce : Boolean := True;
+  reduce_in_add : Boolean := True;
+
+  Zero_denominator :          exception;
+  Division_by_null_fraction : exception;
 
 end Frac_Euclid;

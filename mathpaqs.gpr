@@ -82,6 +82,7 @@ project Mathpaqs is
                 "-gnatybfhu",   --  Style: check b:no blanks at end of lines, f:no ff/vtabs, h:no htabs, i:if-then layout, u:no unnecessary blank lines
                 "-gnatyx",      --  Style: check x:no extra parens
                 "-gnatye",      --  Style: check e:end/exit labels present
+          --    "-gnatytc",     --  Style: check t:token separation rules, c:comment format (two spaces)
                 "-gnaty2CM100O"
               );
          when "Fast" =>

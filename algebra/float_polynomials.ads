@@ -6,4 +6,4 @@
 with Polynomials;
 
 package Float_Polynomials is new
-           Polynomials( Float, 0.0,1.0, "-","+","-","*","/","=" ); 
+           Polynomials (Float, 0.0, 1.0, "-", "+", "-", "*", "/", "=");
