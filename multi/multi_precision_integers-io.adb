@@ -2,23 +2,25 @@
 --  File: muprinio.adb; see specification (muprinio.ads)
 -----------------------------------------------------------------------------
 
-package body Multi_precision_integers.IO is
+pragma Warnings (".I");
 
-  package IIO is new Integer_IO( index_int );
+package body Multi_Precision_Integers.IO is
 
-  table: constant array(basic_int'(0)..15) of Character:=
+  package IIO is new Integer_IO( Index_Int );
+
+  table: constant array(Basic_Int'(0)..15) of Character:=
          ('0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
 
-   -- 15-Feb-2002: Bugfix case i=0. Spotted by Duncan Sands
+-- 15-Feb-2002: Bugfix case i=0. Spotted by Duncan Sands
 
-  function Chiffres_i_non_nul(i: multi_int; base: number_base:= 10) return Natural is
-    nombre: multi_int(i.last_used);
-    la_base    : constant basic_int :=  basic_int(base);
+  function Chiffres_i_non_nul(i: Multi_int; base: Number_Base:= 10) return Natural is
+    nombre: Multi_int(i.last_used);
+    la_base    : constant Basic_Int :=  Basic_Int(base);
     nchiffres: Natural:= 1;
 
     procedure Comptage_rapide( C: Positive ) is
-      test  : multi_int(i.n);
-      base_puiss_C: constant multi_int:= Multi( basic_int(base) ) ** C;
+      test  : Multi_int(i.n);
+      base_puiss_C: constant Multi_int:= Multi( Basic_Int(base) ) ** C;
     begin
       loop
         Fill(test, nombre / base_puiss_C );
@@ -41,7 +43,7 @@ package body Multi_precision_integers.IO is
     return nchiffres;
   end Chiffres_i_non_nul;
 
-  function Number_of_digits(i: multi_int; base: number_base:= 10) return Natural is
+  function Number_of_digits(i: Multi_int; base: Number_Base:= 10) return Natural is
   begin
     if i.zero then
       return 1;
@@ -50,11 +52,11 @@ package body Multi_precision_integers.IO is
     end if;
   end Number_of_digits;
 
-  function Str(i: multi_int; base: number_base:= 10) return String is
+  function Str(i: Multi_int; base: Number_Base:= 10) return String is
     res: String(1..1 + Number_of_digits(i,base)):= (others=> 'x');
-    nombre : multi_int(i.n):= i;
-    chiffre: basic_int;
-    la_base: constant basic_int :=  basic_int(base);
+    nombre : Multi_int(i.n):= i;
+    chiffre: Basic_Int;
+    la_base: constant Basic_Int :=  Basic_Int(base);
 
   begin
     if nombre.zero or else not nombre.neg then
@@ -74,10 +76,9 @@ package body Multi_precision_integers.IO is
 
   end Str;
 
-
 -- !!! recursion !!!
 
-  function Val(s: String) return multi_int is
+  function Val(s: String) return Multi_int is
     formatting_error: exception;
   begin
     if s="" then
@@ -87,7 +88,7 @@ package body Multi_precision_integers.IO is
     elsif s(s'First)='+' then
       return  Val(s(s'First+1..s'Last));
     elsif s(s'Last) in '0'..'9' then
-      return basic_int'Value(s(s'Last..s'Last)) + 10 *
+      return Basic_Int'Value(s(s'Last..s'Last)) + 10 *
              Val(s(s'First..s'Last-1));
     else
       raise formatting_error;
@@ -95,9 +96,9 @@ package body Multi_precision_integers.IO is
   end Val;
 
   procedure Put_in_blocks(File  : in File_Type;
-                          Item  : in multi_int) is
+                          Item  : in Multi_int) is
   begin
-    if Item.neg then put(File,'-'); else put(File,'+'); end if;
+    if Item.neg then Put(File,'-'); else Put(File,'+'); end if;
     Put(File, " [ ");
     IIO.Put(File, 1+Item.n , 3);
     Put(File, " blocks ]: ");
@@ -113,28 +114,27 @@ package body Multi_precision_integers.IO is
     Put(File,'}');
   end Put_in_blocks;
 
-  procedure Put_in_blocks(Item  : in multi_int) is
+  procedure Put_in_blocks(Item  : in Multi_int) is
   begin
     Put_in_blocks( Standard_Output, Item );
   end Put_in_blocks;
 
   procedure Get(File  : in  File_Type;
-                Item  : out multi_int;
+                Item  : out Multi_int;
                 Width : in Field := 0) is
   begin
     null; -- !!!
   end Get;
 
-  procedure Get(Item  : out multi_int;
+  procedure Get(Item  : out Multi_int;
                 Width : in  Field := 0) is
 
   begin
     Get(Standard_Input, Item, Width);
   end Get;
 
-
   procedure Put(File  : in File_Type;
-                Item  : in multi_int;
+                Item  : in Multi_int;
                 Width : in Field := 0;
                 Base  : in Number_Base := Default_Base) is
 
@@ -151,7 +151,7 @@ package body Multi_precision_integers.IO is
     end if;
   end Put;
 
-  procedure Put(Item  : in multi_int;
+  procedure Put(Item  : in Multi_int;
                 Width : in Field := 0;
                 Base  : in Number_Base := Default_Base) is
 
@@ -160,16 +160,16 @@ package body Multi_precision_integers.IO is
   end Put;
 
   procedure Get(From : in  String;
-                Item : out multi_int;
+                Item : out Multi_int;
                 Last : out Positive) is
+                pragma Unreferenced (From, Item);
   begin
     Last:= 1;
     null; -- !!!
   end Get;
 
-
   procedure Put(To   : out String;
-                Item : in multi_int;
+                Item : in Multi_int;
                 Base : in Number_Base := Default_Base) is
 
     nchiffres: constant Natural:= Number_of_digits(Item, Base);
@@ -183,4 +183,4 @@ package body Multi_precision_integers.IO is
     end if;
   end Put;
 
-end Multi_precision_integers.IO;
+end Multi_Precision_Integers.IO;

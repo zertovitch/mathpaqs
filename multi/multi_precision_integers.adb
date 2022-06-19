@@ -19,11 +19,17 @@
 
 -- To-do/bug symbol: !!
 
-with Multi_precision_integers.Check;
+pragma Warnings ("C");
+pragma Warnings (".I");
+pragma Warnings (".P");
+pragma Warnings ("U");
+
+with Multi_Precision_Integers.Check;
 -- with Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 
-package body Multi_precision_integers is
+package body Multi_Precision_Integers is
+  use type Basic_Int;
 
   function Shift_Left
     (Value  : Block_type;
@@ -44,21 +50,21 @@ package body Multi_precision_integers is
   pragma Import (Intrinsic, Shift_Left);
   pragma Import (Intrinsic, Shift_Right);
 
-  package Check_internal renames Multi_precision_integers.Check;
+  package Check_internal renames Multi_Precision_Integers.Check;
 
   -- Internal_error: exception;
   -- Not_done: exception;
 
   type compar is (smaller, equal, greater);
 
-  function Min (a,b: Index_int) return Index_int is
+  function Min (a,b: Index_Int) return Index_Int is
   begin if a < b then return a; else return b; end if; end Min;
 
-  function Max (a,b: Index_int) return Index_int is
+  function Max (a,b: Index_Int) return Index_Int is
   begin if a > b then return a; else return b; end if; end Max;
 
   procedure Reduce_last_nonzero ( n: in out Multi_int ) is
-    old_last : constant Index_int:= n.last_used;
+    old_last : constant Index_Int:= n.last_used;
   begin
     if Debug then Check_internal.Test(n, test_last=> False); end if;
 
@@ -76,7 +82,7 @@ package body Multi_precision_integers is
   end Reduce_last_nonzero;
 
   function Compare_absolute (i1, i2: Multi_int) return compar is
-    l1, l2 : Index_int;
+    l1, l2 : Index_Int;
   begin
     -- On ne compare que ABS(i1) et ABS(i2)
     l1:= i1.last_used;
@@ -101,45 +107,70 @@ package body Multi_precision_integers is
 
   ----- Informations, conversions
 
-  function Multi(small: Basic_int) return Multi_int is
-    abss: constant Long_Block_type:= Long_Block_type(abs small);
-    reste: Long_Block_type;
-    negs: constant Boolean:= small < 0;
+  function Multi (small : Basic_Int) return Multi_int is
+    long : Long_Block_type_signed;
+    abss : Long_Block_type;
+    small_enough : Boolean;
+    case_first_value : Boolean;
+    heading : Long_Block_type;
+    negs : constant Boolean := small < 0;
     Conversion_overflow : exception;
-
   begin
-
-    if abss <= Long_Block_type(maxblock) then
+    long := Long_Block_type_signed (small);
+    case_first_value := long = Long_Block_type_signed'First;
+    if case_first_value then
+      --  `long` is equal to the smallest value for Long_Block_type_signed.
+      --  Then, (abs long) would overflow: e.g. -2**63 is ok, but 2**63 is
+      --  larger than the maximum 64-bit integer, 2**63 - 1.
+      small_enough := False;
+    else
+      abss := Long_Block_type (abs long);
+      small_enough := abss <= Long_Block_type (maxblock);
+    end if;
+    --
+    if small_enough then
       return Multi_int'
-             ( n=>         0,          -- 1 bloc suffit
-               blk=>      (0=> Block_type(abss)),  -- le bloc contient le nombre
-               neg=>       negs,
-               zero=>      small = 0,
-               last_used=> 0
+             (n =>         0,                        --  One block is enough.
+              blk =>      (0 => Block_type (abss)),  --  The block contains the number.
+              neg =>       negs,
+              zero =>      small = 0,
+              last_used => 0
+             );
+    elsif case_first_value then
+      heading := Shift_Right
+        (Long_Block_type (-(Long_Block_type_signed'First / 2)),  --  E.g. for 64-bit: 2**62.
+         Block_type_bits - 1);                                   --  First shift is done by the / 2.
+      return Multi_int'
+             (n =>         1,                                   --  Two blocks are needed.
+              blk =>      (0 => 0,                              --  Block #0
+                           1 => Block_type (heading)),          --  Block #1
+              neg =>       True,
+              zero =>      False,
+              last_used => 1
              );
     else
-      reste:= Shift_Right(abss, Block_type_bits);
-      if reste <= Long_Block_type(maxblock) then
-        return ( n=>         1,            -- il faut 2 blocs
-                 blk=>      (0=> Block_type(abss and maxblock), -- bloc 0
-                             1=> Block_type(reste)),  -- bloc 1
-                 neg=>       negs,
-                 zero=>      False,
-                 last_used=> 1
+      heading := Shift_Right (abss, Block_type_bits);
+      if heading <= Long_Block_type (maxblock) then
+        return (n =>         1,                                    --  Two blocks are needed.
+                blk =>      (0 => Block_type (abss and maxblock),  --  Block #0
+                             1 => Block_type (heading)),           --  Block #1
+                neg =>       negs,
+                zero =>      False,
+                last_used => 1
                );
       else
-        if Shift_Right(reste, Block_type_bits) > Long_Block_type(maxblock) then
-           raise Conversion_overflow;
+        if Shift_Right (heading, Block_type_bits) > Long_Block_type (maxblock) then
+          raise Conversion_overflow;
         end if;
 
-        return ( n=>     2,  -- il faut 3 blocs (e.g. 31 bits 15+15+1)
-                 blk=>  (0=> Block_type(abss and maxblock),   -- bloc 0
-                         1=> Block_type(reste and maxblock),  -- bloc 1
-                         2=> Block_type(Shift_Right(reste, Block_type_bits))  -- bloc 2
+        return (n =>     2,   --  Three blocks are needed. (e.g. 31 bits: 15+15+1)
+                blk =>  (0 => Block_type (abss and maxblock),                      --  Block #0
+                         1 => Block_type (heading and maxblock),                   --  Block #1
+                         2 => Block_type (Shift_Right (heading, Block_type_bits))  --  Block #2
                          ),
-                 neg=>   negs,
-                 zero=>  False,
-                 last_used=> 2
+                 neg =>   negs,
+                 zero =>  False,
+                 last_used => 2
                );
       end if;
     end if;
@@ -149,14 +180,14 @@ package body Multi_precision_integers is
   one : constant Multi_int:= Multi(1);
 
   Blocks_Per_Basic : constant Positive :=
-     (Basic_int'Size + Block_type'Size - 1) / Block_type'Size;
+     (Basic_Int'Size + Block_type'Size - 1) / Block_type'Size;
 
   -- Convert Multi_int to Basic_int (when possible, else: Cannot_fit raised)
   -- 2007:
   --  - correct code for block sizes smaller than Basic_int
   --  - fixed usage of negative flag
-  function Basic(large: Multi_int) return Basic_int is
-    type Same_as_Basic_natural is mod 2 ** Basic_int'Size;
+  function Basic(large: Multi_int) return Basic_Int is
+    type Same_as_Basic_natural is mod 2 ** Basic_Int'Size;
     function Shift_Left
       (Value  : Same_as_Basic_natural;
        Amount : Natural) return Same_as_Basic_natural;
@@ -175,7 +206,7 @@ package body Multi_precision_integers is
     end if;
     -- Case: block size and contents larger than basic
     block_value:= large.blk(large.last_used);
-    if Huge_int(block_value) > Huge_int(Basic_int'Last) then
+    if Huge_int(block_value) > Huge_int(Basic_Int'Last) then
       raise Cannot_fit;
     end if;
     declare
@@ -197,22 +228,22 @@ package body Multi_precision_integers is
       -- so we need to detect the overall overflow by locating the
       -- last bit.
       last_bit:= last_bit + Block_type_bits;
-      if last_bit > Basic_int'Size - 1 then
+      if last_bit > Basic_Int'Size - 1 then
         -- ^ "- 1" because of sign bit in Basic_int
         raise Cannot_fit;
       end if;
       result:= result + Same_as_Basic_natural(large.blk(b));
     end loop;
     if large.neg then
-      return -Basic_int(result);
+      return -Basic_Int(result);
     else
-      return Basic_int(result);
+      return Basic_Int(result);
     end if;
   end Basic;
 
   -- 14-Feb-2002: "zero" bug fixed by Duncan Sands
   procedure Fill(what: out Multi_int; with_smaller:Multi_int) is
-    l: constant Index_int:= with_smaller.last_used;
+    l: constant Index_Int:= with_smaller.last_used;
   begin
     if Debug then Check_internal.Test(with_smaller); end if;
     what.zero:= with_smaller.zero;
@@ -230,7 +261,7 @@ package body Multi_precision_integers is
     what.last_used:= l;
   end Fill;
 
-  procedure Fill(what:out Multi_int; with_basic: Basic_int) is
+  procedure Fill(what:out Multi_int; with_basic: Basic_Int) is
   begin
     Fill( what, Multi(with_basic) );
   end Fill;
@@ -271,7 +302,7 @@ package body Multi_precision_integers is
     return abs_i;
   end "Abs";
 
-  function Sign(i: Multi_int) return Basic_int is
+  function Sign(i: Multi_int) return Basic_Int is
   begin
     if    i.zero then return  0;
     elsif i.neg  then return -1;
@@ -296,10 +327,10 @@ package body Multi_precision_integers is
   -- Internal algorithm to add two numbers AS POSITIVE ( > 0 ) !
 
   procedure Add_absolute(i1,i2: in Multi_int; i3: out Multi_int) is
-    l1: constant Index_int:= i1.last_used;
-    l2: constant Index_int:= i2.last_used;
-    min_ind: constant Index_int:= Min( l1, l2 );
-    max_ind: constant Index_int:= Max( l1, l2 );
+    l1: constant Index_Int:= i1.last_used;
+    l2: constant Index_Int:= i2.last_used;
+    min_ind: constant Index_Int:= Min( l1, l2 );
+    max_ind: constant Index_Int:= Max( l1, l2 );
     s: Long_Block_type:= 0;
     retenue_finale: Block_type;
   begin
@@ -356,9 +387,9 @@ package body Multi_precision_integers is
 
   procedure Sub_absolute(i1,i2: in Multi_int; i3: in out Multi_int;
                          sgn: out Boolean) is
-    l1: constant Index_int:= i1.last_used;
-    l2: constant Index_int:= i2.last_used;
-    max_ind: constant Index_int:= Max( l1, l2 );
+    l1: constant Index_Int:= i1.last_used;
+    l2: constant Index_Int:= i2.last_used;
+    max_ind: constant Index_Int:= Max( l1, l2 );
     ai, bi: Long_Block_type;
     s: Block_type;
     retenue_finale: Long_Block_type;
@@ -496,16 +527,16 @@ package body Multi_precision_integers is
     return diff;
   end "-";
 
-  function "+" (i1: Multi_int; i2: Basic_int) return Multi_int is
+  function "+" (i1: Multi_int; i2: Basic_Int) return Multi_int is
   begin return i1 + Multi(i2); end "+";
 
-  function "+" (i1: Basic_int; i2: Multi_int) return Multi_int is
+  function "+" (i1: Basic_Int; i2: Multi_int) return Multi_int is
   begin return Multi(i1) + i2; end "+";
 
-  function "-" (i1: Multi_int; i2: Basic_int) return Multi_int is
+  function "-" (i1: Multi_int; i2: Basic_Int) return Multi_int is
   begin return i1 - Multi(i2); end "-";
 
-  function "-" (i1: Basic_int; i2: Multi_int) return Multi_int is
+  function "-" (i1: Basic_Int; i2: Multi_int) return Multi_int is
   begin return Multi(i1) - i2; end "-";
 
   ----- Begin of MULTIPLICATION part -----
@@ -529,11 +560,11 @@ package body Multi_precision_integers is
   -- 2) Better: Schönhage-Strassen algorithm (no Ada code)
 
   procedure Multiply_internal_m_m(i1,i2: in Multi_int; i3: in out Multi_int) is
-    l1: constant Index_int:= i1.last_used;
-    l2: constant Index_int:= i2.last_used;
-    last_max: constant Index_int:= l1 + l2 + 2;
+    l1: constant Index_Int:= i1.last_used;
+    l2: constant Index_Int:= i2.last_used;
+    last_max: constant Index_Int:= l1 + l2 + 2;
     prod,sum_carry,rk,i1j : Long_Block_type;
-    i,k: Index_int;
+    i,k: Index_Int;
     res: p_Block_array;
     -- res: buffer used in the "copy" variant to avoid
     -- problems with Multiply(i,j,i) or Multiply(j,i,i)
@@ -618,13 +649,13 @@ package body Multi_precision_integers is
 
   generic
     copy: Boolean;
-  procedure Multiply_internal_m_b(i1: in Multi_int; i2: Basic_int; i3: in out Multi_int);
+  procedure Multiply_internal_m_b(i1: in Multi_int; i2: Basic_Int; i3: in out Multi_int);
 
-  procedure Multiply_internal_m_b(i1: in Multi_int; i2: Basic_int; i3: in out Multi_int) is
-    l1: constant Index_int:= i1.last_used;
-    last_max: constant Index_int:= l1 + 2;
+  procedure Multiply_internal_m_b(i1: in Multi_int; i2: Basic_Int; i3: in out Multi_int) is
+    l1: constant Index_Int:= i1.last_used;
+    last_max: constant Index_Int:= l1 + 2;
     prod,sum_carry,rk,i2a : Long_Block_type;
-    k: Index_int;
+    k: Index_Int;
     res: p_Block_array;
     -- res: buffer used in the "copy" variant to avoid
     -- problems with Multiply(i,j,i) or Multiply(j,i,i)
@@ -714,13 +745,13 @@ package body Multi_precision_integers is
     end if;
   end Multiply;
 
-  procedure Multiply(i1: in Multi_int; i2: Basic_int; i3: in out Multi_int) is
+  procedure Multiply(i1: in Multi_int; i2: Basic_Int; i3: in out Multi_int) is
     use System;
   begin
     if Debug then
       declare
         m1: constant Multi_int:= i1;
-        m2: constant Basic_int:= i2;
+        m2: constant Basic_Int:= i2;
       begin
         Multiply_internal_no_copy(m1,m2,i3);
         Check_internal.Check_Multiplication(m1,Multi(m2),i3);
@@ -750,7 +781,7 @@ package body Multi_precision_integers is
     end if;
   end "*";
 
-  function "*" (i1: Multi_int; i2: Basic_int) return Multi_int is
+  function "*" (i1: Multi_int; i2: Basic_Int) return Multi_int is
   begin
     if i1.zero or i2=0 then
       return zero;
@@ -764,7 +795,7 @@ package body Multi_precision_integers is
     end if;
   end "*";
 
-  function "*" (i1: Basic_int; i2: Multi_int) return Multi_int is
+  function "*" (i1: Basic_Int; i2: Multi_int) return Multi_int is
   begin
     if i2.zero or i1=0 then
       return zero;
@@ -795,17 +826,17 @@ package body Multi_precision_integers is
   procedure Divide_absolute_normalized ( u: in out Multi_int; -- output: u = r
                                          v: in     Multi_int;
                                          q: in out Multi_int  ) is
-    qi: Index_int:= u.last_used - v.last_used - 1; -- was: q.n; D.S. Feb-2002
+    qi: Index_Int:= u.last_used - v.last_used - 1; -- was: q.n; D.S. Feb-2002
     v1: constant Long_Block_type:= Long_Block_type(v.blk(v.last_used  ));
     v2: constant Long_Block_type:= Long_Block_type(v.blk(v.last_used-1));
 
-    vlast     : constant Index_int:= v.last_used;
+    vlast     : constant Index_Int:= v.last_used;
     v1L       : constant Long_Block_type := v1;
     guess,
     comparand : Long_Block_type ;
 
-    function Divide_subtract ( ustart: Index_int ) return Block_type is
-      ui    : Index_int;
+    function Divide_subtract ( ustart: Index_Int ) return Block_type is
+      ui    : Index_Int;
       carry : Long_Block_type;
     begin
       if guess = 0 then
@@ -820,7 +851,8 @@ package body Multi_precision_integers is
         declare
           prod: constant Long_Block_type   := Long_Block_type(v.blk(vi)) * guess + carry;
           bpro: constant Block_type:= Block_type(prod and maxblock);
-          diff: constant Long_Block_type_signed   := Long_Block_type_signed(u.blk(ui)) - Long_Block_type_signed(bpro);
+          diff: constant Long_Block_type_signed :=
+            Long_Block_type_signed(u.blk(ui)) - Long_Block_type_signed(bpro);
         begin
           if diff < 0 then
             u.blk(ui) := Block_type(diff + cardblock);
@@ -929,7 +961,7 @@ package body Multi_precision_integers is
                                         r:      out Long_Block_type ) is
     n: Long_Block_type;
     Quotient_constraint_error: exception;
-    last_u_nz:  constant Index_int:= u.last_used;
+    last_u_nz:  constant Index_Int:= u.last_used;
     u_zero: constant Boolean:= u.zero;
     -- in case u and q are the same variables
     is_q_zero: Boolean:= True;
@@ -974,8 +1006,8 @@ package body Multi_precision_integers is
     rn:= i1n;
   end Solve_signs_for_Div_Rem;
 
-  procedure Div_Rem (i1: in     Multi_int; i2: in     Basic_int;
-                     q :    out Multi_int;  r:    out Basic_int) is
+  procedure Div_Rem (i1: in     Multi_int; i2: in     Basic_Int;
+                     q :    out Multi_int;  r:    out Basic_Int) is
     i1_neg: constant Boolean:= i1.neg;
     -- in case i1 and q are the same variables
     rneg: Boolean;
@@ -992,7 +1024,7 @@ package body Multi_precision_integers is
 
     lai2:= Long_Block_type(abs i2);
     Divide_absolute_big_small( i1, lai2, q, lr );
-    r:= Basic_int(lr);
+    r:= Basic_Int(lr);
 
     Solve_signs_for_Div_Rem( i1_neg,i2<0, q.neg, rneg );
     if rneg then r:= -r; end if;
@@ -1020,7 +1052,7 @@ package body Multi_precision_integers is
       procedure Normalization ( source: in     Multi_int;
                                 target: in out Multi_int ) is
         carry: Block_type:= 0;
-        tl: constant Index_int:= target.last_used;
+        tl: constant Index_Int:= target.last_used;
         blk:  Block_type;
       begin
         for i in 0 .. source.last_used loop
@@ -1109,8 +1141,8 @@ package body Multi_precision_integers is
 
     end Divide_absolute;
 
-    l1: constant Index_int:= i1.last_used;
-    l2: constant Index_int:= i2.last_used;
+    l1: constant Index_Int:= i1.last_used;
+    l2: constant Index_Int:= i2.last_used;
     rl: Long_Block_type;
   begin -- Div_Rem_internal
     if i2.zero then raise Division_by_zero; end if;
@@ -1236,9 +1268,9 @@ package body Multi_precision_integers is
     return q;
   end "/";
 
-  function "/" (i1: Multi_int; i2: Basic_int) return Multi_int is
+  function "/" (i1: Multi_int; i2: Basic_Int) return Multi_int is
     q: Multi_int(i1.last_used + 1);
-    r: Basic_int;
+    r: Basic_Int;
   begin
     Div_Rem(i1,i2, q,r);
     return q;
@@ -1252,12 +1284,12 @@ package body Multi_precision_integers is
     return r;
   end "rem";
 
-  function "rem" (i1: Multi_int; i2: Basic_int) return Multi_int is
+  function "rem" (i1: Multi_int; i2: Basic_Int) return Multi_int is
   begin return i1 rem Multi(i2); end "rem";
 
-  function "rem" (i1: Multi_int; i2: Basic_int) return Basic_int is
+  function "rem" (i1: Multi_int; i2: Basic_Int) return Basic_Int is
     q: Multi_int(i1.last_used + 1);
-    r: Basic_int;
+    r: Basic_Int;
   begin
     Div_Rem(i1,i2, q,r);
     return r;
@@ -1283,11 +1315,11 @@ package body Multi_precision_integers is
     end if;
   end "mod";
 
-  function "mod" (i1: Multi_int; i2: Basic_int) return Multi_int is
+  function "mod" (i1: Multi_int; i2: Basic_Int) return Multi_int is
   begin return i1 mod Multi(i2); end "mod";
 
-  function "mod" (i1: Multi_int; i2: Basic_int) return Basic_int is
-    r: constant Basic_int:= i1 rem i2;
+  function "mod" (i1: Multi_int; i2: Basic_Int) return Basic_Int is
+    r: constant Basic_Int:= i1 rem i2;
   begin
     if r=0 or else (i2<0) = (r<0) then  --  (A rem B) est nul ou
       return r;     -- a le meme signe que B, donc (A mod B) = (A rem B)
@@ -1301,7 +1333,7 @@ package body Multi_precision_integers is
 ----- Begin of POWER part -------
 
   procedure Power (i: Multi_int; n: Natural; ipn: out Multi_int) is
-    max_ipn_last: Index_int; -- 17-Feb-2002
+    max_ipn_last: Index_Int; -- 17-Feb-2002
   begin
     if i.zero then
       if n=0 then
@@ -1313,7 +1345,7 @@ package body Multi_precision_integers is
       end if;
     end if;
 
-    max_ipn_last:= ((1+i.last_used) * Index_int(n)-1)+2;
+    max_ipn_last:= ((1+i.last_used) * Index_Int(n)-1)+2;
     if ipn.n < max_ipn_last then
       raise Result_undersized;
     end if;
@@ -1344,7 +1376,7 @@ package body Multi_precision_integers is
   end Power;
 
   function "**" (i: Multi_int; n: Natural) return Multi_int is
-    ipn: Multi_int( (1+i.last_used) * Index_int(n)+2 );
+    ipn: Multi_int( (1+i.last_used) * Index_Int(n)+2 );
   begin
     Power(i,n,ipn);
     return ipn;
@@ -1352,7 +1384,7 @@ package body Multi_precision_integers is
 
   procedure Power (i: Multi_int; n: Multi_int; ipn: out Multi_int;
                    modulo: Multi_int) is
-    max_ipn_last: Index_int;
+    max_ipn_last: Index_Int;
   begin
     if i.zero then
       if n.zero then
@@ -1365,7 +1397,7 @@ package body Multi_precision_integers is
     end if;
 
     if n.neg then
-     raise Power_negative;
+    raise Power_negative;
     end if;
 
     if modulo.zero or else (i.neg or modulo.neg) then
@@ -1385,7 +1417,7 @@ package body Multi_precision_integers is
       declare
         nn: Multi_int(n.n):= n;
         i0, ii, dummy: Multi_int( max_ipn_last );
-        dummy_b: Basic_int;
+        dummy_b: Basic_Int;
       begin
         Subtract( nn, one, nn ); -- nn:= nn - 1;
         Fill(i0, i);
@@ -1426,7 +1458,7 @@ package body Multi_precision_integers is
     end if;
   end Equal;
 
-  function Equal (i1: Multi_int; i2:Basic_int) return Boolean is
+  function Equal (i1: Multi_int; i2:Basic_Int) return Boolean is
   begin
     return Equal( i1, Multi(i2) );
   end Equal;
@@ -1468,7 +1500,7 @@ package body Multi_precision_integers is
 
   end ">";
 
-  function ">" (i1: Multi_int; i2:Basic_int) return Boolean is
+  function ">" (i1: Multi_int; i2:Basic_Int) return Boolean is
   begin
     return i1 > Multi(i2);
   end ">";
@@ -1476,7 +1508,7 @@ package body Multi_precision_integers is
   function "<" (i1,i2: Multi_int) return Boolean is
   begin return i2>i1; end "<";
 
-  function "<" (i1: Multi_int; i2:Basic_int) return Boolean is
+  function "<" (i1: Multi_int; i2:Basic_Int) return Boolean is
   begin
     return i1 < Multi(i2);
   end "<";
@@ -1484,7 +1516,7 @@ package body Multi_precision_integers is
   function ">=" (i1,i2: Multi_int) return Boolean is
   begin return not (i2>i1); end ">=";
 
-  function ">=" (i1: Multi_int; i2:Basic_int) return Boolean is
+  function ">=" (i1: Multi_int; i2:Basic_Int) return Boolean is
   begin
     return i1 >= Multi(i2);
   end ">=";
@@ -1492,9 +1524,9 @@ package body Multi_precision_integers is
   function "<=" (i1,i2: Multi_int) return Boolean is
   begin return not (i1>i2); end "<=";
 
-  function "<=" (i1: Multi_int; i2:Basic_int) return Boolean is
+  function "<=" (i1: Multi_int; i2:Basic_Int) return Boolean is
   begin
     return i1 <= Multi(i2);
   end "<=";
 
-end Multi_precision_integers;
+end Multi_Precision_Integers;

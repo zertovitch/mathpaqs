@@ -10,18 +10,20 @@ with Ada.Text_IO;                       use Ada.Text_IO;
 with Ada.Integer_Text_IO;               use Ada.Integer_Text_IO;
 with Ada.Command_Line;                  use Ada.Command_Line;
 
-with Multi_precision_integers;          use Multi_precision_integers;
+with Multi_Precision_Integers;          use Multi_Precision_Integers;
+
+pragma Warnings (".I");
 
 procedure pi_digits is
 
-  procedure PrintPiDigits(NumDigits: Integer) is
+  procedure Print_Pi_Digits (NumDigits: Integer) is
 
-    subtype mpz_t is Multi_int(3270);
+    subtype mpz_t is Multi_Int (3270);
 
     q,r,s,t: mpz_t; --  Transformation matrix components.
 
     i, k, digit, c: Integer;
-    line: String(1 ..10);
+    text_line: String(1 ..10);
 
     tmp1, tmp2: mpz_t;
 
@@ -85,17 +87,17 @@ procedure pi_digits is
       end loop;
       Produce;
       c:= c + 1;
-      line(c) := Character'Val(Character'Pos('0')+digit);
+      text_line(c) := Character'Val(Character'Pos('0')+digit);
       i:= i + 1;
       if c = 10 then
-        Put(line & ASCII.HT & ':');
+        Put(text_line & ASCII.HT & ':');
         Put(i,0);
         New_Line;
         c:= 0;
       end if;
     end loop;
     if c /= 0 then
-      Put(line(1..c));
+      Put(text_line(1..c));
       for i in c+1..10 loop
         Put(' ');
       end loop;
@@ -103,14 +105,13 @@ procedure pi_digits is
       Put(i,0);
       New_Line;
     end if;
-  end PrintPiDigits;
+  end Print_Pi_Digits;
 
-  n: Integer;
+  n : Integer := 2_500;
 
 begin
-  n:= 2_500;
-  if Argument_Count=1 then
-    n:= Integer'Value(Argument(1));
+  if Argument_Count = 1 then
+    n := Integer'Value (Argument (1));
   end if;
-  PrintPiDigits(n);
+  Print_Pi_Digits (n);
 end pi_digits;

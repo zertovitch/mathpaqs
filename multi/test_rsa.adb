@@ -6,14 +6,14 @@
 
 with Ada.Text_IO;                       use Ada.Text_IO;
 with Ada.Integer_Text_IO;               use Ada.Integer_Text_IO;
-with Multi_precision_integers;          use Multi_precision_integers;
-with Multi_precision_integers.IO;       use Multi_precision_integers.IO;
+with Multi_Precision_Integers;          use Multi_Precision_Integers;
+with Multi_Precision_Integers.IO;       use Multi_Precision_Integers.IO;
 with Euclidean_Ring_Tools;
 
 procedure Test_RSA is
 
   RSA_max : constant := 10;
-  subtype RSA_block is Multi_int (RSA_max);
+  subtype RSA_block is Multi_Int (RSA_max);
 
   --  zero: constant RSA_block:=
   --    (n=> RSA_max, zero=> True, neg=> False, last_used=> 0,
@@ -29,6 +29,7 @@ procedure Test_RSA is
   type Int_Vec is array (Integer range <>) of Integer;
 
   function Eq_I (a, b : Integer) return Boolean renames "=";
+  pragma Unreferenced (Eq_I);
 
   package ERT is new
     Euclidean_Ring_Tools (Integer, 0, 1, "+", "-", "*", "/", "=", Int_Vec);
@@ -37,7 +38,7 @@ procedure Test_RSA is
 
   -- Encode or decode:
 
-  procedure Code (msg : in out RSA_Message; expo, modu : Multi_int) is
+  procedure Code (msg : in out RSA_Message; expo, modu : Multi_Int) is
     ipn : RSA_block;
   begin
     for i in msg'Range loop
@@ -55,7 +56,7 @@ procedure Test_RSA is
     end loop;
   end Put_in_blocks;
 
-  procedure Codec (msg : in out RSA_Message; e, d, n : Multi_int) is
+  procedure Codec (msg : in out RSA_Message; e, d, n : Multi_Int) is
     show_contents : constant Boolean := False;
   begin
     if show_contents then
@@ -76,7 +77,7 @@ procedure Test_RSA is
     end if;
   end Codec;
 
-  procedure Test_Allenby_Redfern (s : String; e, d, n : Multi_int) is
+  procedure Test_Allenby_Redfern (s : String; e, d, n : Multi_Int) is
     msg : RSA_Message (1 .. s'Last / 2);
     r : String (s'Range);
   begin
@@ -113,7 +114,7 @@ procedure Test_RSA is
     ei :    constant Integer := 109;
     di : Integer;
     the_gcd : Integer;
-    d, n : Multi_int (0);
+    d, n : Multi_Int (0);
     r : String (1 .. 200) := (others => ' ');
     function ASCRF (a : Integer) return Integer is
     begin
@@ -150,7 +151,7 @@ procedure Test_RSA is
     Put_Line (r);
   end Decode_Allenby_Redfern;
 
-  procedure Test_GM (s : String; e, d, n : Multi_int) is
+  procedure Test_GM (s : String; e, d, n : Multi_Int) is
     msg : RSA_Message (s'Range);
     r : String (s'Range);
   begin

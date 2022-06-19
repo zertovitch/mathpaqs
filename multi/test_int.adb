@@ -1,27 +1,37 @@
 ------------------------------------------------------------------------------
 --  File:            Test_int.adb
+--                   !! To do: split into a demo and a (silent) unit test
+--                             or make use of the `verbose` flag.
 --  Description:     Test for Multi_precision_integers
 --  Author:          Gautier de Montmollin
 ------------------------------------------------------------------------------
 
+with Ada.Command_Line;
 with Ada.Text_IO;                       use Ada.Text_IO;
-with Ada.Integer_Text_IO;               use Ada.Integer_Text_IO;
-with Multi_precision_integers;          use Multi_precision_integers;
-with Multi_precision_integers.IO;       use Multi_precision_integers.IO;
+with Multi_Precision_Integers;          use Multi_Precision_Integers;
+with Multi_Precision_Integers.IO;       use Multi_Precision_Integers.IO;
+
+pragma Warnings (".I");
+pragma Warnings ("U");
 
 procedure Test_Int is
+  use type Basic_Int;
+  package BIO is new Ada.Text_IO.Integer_IO (Basic_Int);
+  package IIO is new Ada.Text_IO.Integer_IO (Integer);
 
-  i,j,k,l: Multi_int(20);
+  verbose : constant Boolean := Ada.Command_Line.Argument_Count > 0;
 
-  shift: constant Multi_int:= Val("4294967296"); -- 2**32
+  i,j,k,l: Multi_Int(20);
+
+  shift: constant Multi_Int:= Val("4294967296"); -- 2**32
 
   -- Tests de puissance <<manuels>>
-  m,n,o,p, m_sur_n, reste_m_sur_n: Multi_int( 903 );
+  m,n,o,p, m_sur_n, reste_m_sur_n: Multi_Int( 903 );
 
   s    : String(1..100);
   lstr : Natural;
 
-  procedure Test_aff(s: String; i: Multi_int;
+  procedure Test_aff(s: String; i: Multi_Int;
                      detail: Boolean:= False) is
   begin
     Put_Line("-- [" & s & "]");
@@ -33,31 +43,31 @@ procedure Test_Int is
       Put(i);
     end if;
     New_Line;
-  end;
+  end Test_aff;
 
-  procedure miniput( a: multi_int ) is
+  procedure miniput( a: Multi_Int ) is
   begin
     if Number_of_digits(a) <= 60 then
-      put_in_blocks(a);
-      put(a);
+      Put_in_blocks(a);
+      Put(a);
     else
-      put("(big...)");
+      Put("(big...)");
     end if;
-  end;
+  end miniput;
 
-  function Test_egalite( a,b: multi_int;
+  function Test_egalite( a,b: Multi_Int;
                           nom: String ) return Boolean is
   begin
     if not Equal( a , b ) then
-      new_line;
-      put("Erreur [" & nom & ";a="); miniput(a);
-      put(";b=");   miniput(b);
-      put(";a-b="); miniput(a - b);
-      put("] [ret]");
-      skip_line;
-      return false;
+      New_Line;
+      Put("Erreur [" & nom & ";a="); miniput(a);
+      Put(";b=");   miniput(b);
+      Put(";a-b="); miniput(a - b);
+      Put("] [ret]");
+      Skip_Line;
+      return False;
     else
-      return true;
+      return True;
     end if;
   end Test_egalite;
 
@@ -66,11 +76,11 @@ procedure Test_Int is
     Put("[ Pressez Return SVP ]"); Skip_Line;
   end Pause;
 
-  function Decimales_Pi(N: Natural) return multi_int is
-    X,Y,S: multi_int(index_int(N));
+  function Decimales_Pi(N: Natural) return Multi_Int is
+    X,Y,S: Multi_Int(Index_Int(N));
 
-    procedure Arctg(m,c,e: Integer) is
-      i: Positive:= 1;
+    procedure Arctg (m,c,e: Basic_Int) is
+      i : Basic_Int := 1;
       moins: Boolean;
     begin
       Fill(X, (c*(Multi(10)**N)) / m);
@@ -84,9 +94,9 @@ procedure Test_Int is
           moins:= not (e=1);
         end if;
         if moins then
-           Sub(S,Y, S);
-         else
-           Add(S,Y, S);
+        Sub(S,Y, S);
+        else
+        Add(S,Y, S);
         end if;
         i:= i + 1;
       end loop;
@@ -101,8 +111,8 @@ procedure Test_Int is
 
   -- Nombres de Syracuse. Idee transmise par Eric Batard.
 
-  procedure Syracuse(i0: multi_int) is
-    i: multi_int(20);
+  procedure Syracuse(i0: Multi_Int) is
+    i: Multi_Int(20);
   begin
     Fill(i, i0);
 
@@ -114,7 +124,7 @@ procedure Test_Int is
         Fill(i, (3*i+1)/2);
       end if;
 
-      Put(i); New_line;
+      Put(i); New_Line;
 
       exit when Equal(i,1);
     end loop;
@@ -125,12 +135,12 @@ procedure Test_Int is
 
   procedure Test_Procedure_Operators is
 
-    a,b,c: Multi_int(20);
-    cm1: Multi_int(c.n-1);
-    cmu: Multi_int(a.n+b.n+1);
-    cmu2: Multi_int(a.n+b.n+3);
+    a,b,c: Multi_Int(20);
+    cm1: Multi_Int(c.n-1);
+    cmu: Multi_Int(a.n+b.n+1);
+    cmu2: Multi_Int(a.n+b.n+3);
 
-    procedure Bourrage( n: in out Multi_int ) is
+    procedure Bourrage( n: in out Multi_Int ) is
     begin
       loop
         begin
@@ -201,10 +211,11 @@ procedure Test_Int is
     Put_Line("fini.");
   end Test_Procedure_Operators;
 
-begin
+  procedure Mix_Demo_Test is
+  begin
     New_Line;
 
-    if DEBUG then
+    if Debug then
       Put_Line( "NB: the parameter DEBUG for Multi_precision_integers");
       Put_Line( "      is set on True, it means a very poor performance!");
       New_Line;
@@ -224,9 +235,9 @@ begin
 
     Fill( j, Val("123456789") * Val("1000000001000000001000000001000000001") );
 
-    Put("Bits per block on this compiler-platform combination: ");
-    Put( Bits_per_block, 0 ); New_Line;
-    New_Line;
+    Put ("Bits per block on this compiler-platform combination: ");
+    BIO.Put (Basic_Int (Bits_per_block), 0);
+    New_Line (2);
 
     Test_Procedure_Operators;
     Pause;
@@ -238,14 +249,14 @@ begin
 
     Fill(m,1);
     for i in 1..45 loop
-      Put(Number_of_digits(m)-1); Put(m); New_Line;
+      IIO.Put(Number_of_digits(m)-1); Put(m); New_Line;
       Multiply(m,10,m);
     end loop;
     Pause;
 
     Fill(m,10);
     for i in 1..7 loop
-      Put(Number_of_digits(m)-1); Put(m); New_Line;
+      IIO.Put(Number_of_digits(m)-1); Put(m); New_Line;
       Fill(m, m*m);
       -- Multiply(m,m,m);
     end loop;
@@ -265,14 +276,14 @@ begin
     Put("i=  "); Put_in_blocks(i); New_Line;
     Put("j=  "); Put_in_blocks(j); New_Line;
     Put("i*j="); Put_in_blocks(i*j); New_Line;
-    pause;
+    Pause;
 
     Fill(m,     Val("123456789"));
     Fill(m, m * Val("1000000001000000001000000001000000001000000001000000001"));
 
     Fill(j,1);
-    for i in 0..63 loop
-      --Fill(j,10**i);
+    for i in Basic_Int'(0)..63 loop
+      -- Fill(j,10**i);
       Div_Rem( m, j, o, p);
       Multiply(j, 10, j);
       Put(Multi(i), 3);
@@ -290,7 +301,7 @@ begin
     Put_Line("Pi par formule de Gauss");
 
     for dec in 1..76 loop
-      Put( Decimales_pi(dec) );
+      Put( Decimales_Pi(dec) );
       New_Line;
     end loop;
 
@@ -299,7 +310,7 @@ begin
     loop
       begin
         Put("Nombres de Syracuse, nombre de depart (ch. vide: sortie): ");
-        Get_line(s,lstr);
+        Get_Line(s,lstr);
         exit when lstr=0;
         Syracuse( Val(s(1..lstr)) );
       exception
@@ -308,7 +319,7 @@ begin
     end loop;
 
     Put_Line("Nombres Phenix");
-    for i in 1..19 loop
+    for i in Basic_Int'(1)..19 loop
       Put( Val("052631578947368421") * i );
       New_Line;
     end loop;
@@ -316,9 +327,9 @@ begin
     Pause;
 
     Test_aff( "1234567890123456789012345678901234567890",
-              Val("1234567890123456789012345678901234567890"), true);
+              Val("1234567890123456789012345678901234567890"), True);
 
-    Test_aff( "1000000 * 1000000", Val("1000000") *  Val("1000000"),true );
+    Test_aff( "1000000 * 1000000", Val("1000000") *  Val("1000000"),True );
 
     Test_aff( " Mersenne a)  (2^1931-1) MOD 193949641 [=0 car 193949641" &
               " |(2^1931-1) ]",
@@ -361,8 +372,6 @@ begin
     Test_aff( "j/1", j / 1 );     -- 56088 = 32768 + 23320
     Test_aff( "0=0/j", (0*j)/1);
 
-
-
     Test_aff( "",  j  /   123  );  --   456
     Test_aff( "",  j  / (-123) );  --   456
     Test_aff( "",(-j) /   123  );
@@ -382,21 +391,21 @@ begin
     Test_aff( "-j^5/k^5/l^4", (-(-j*j*j*j*j) /  (-(-k*k*k*k*k))) /
                                 (-l*l*l*l) );
 
-    Test_aff( "2^31 (32-bits)", Multi( Integer'Last ) );
+    Test_aff( "2^31 (32-bits)", Multi( Basic_Int'Last ) );
     Test_aff( "2^16 (32-bits)", Multi( 32768 ) );
 
     Test_aff( "-{:|:|:| 100| 0}",
                 100 * shift
-              - 200 * shift, true );
+              - 200 * shift, True );
 
     Test_aff( "-{:|:|:| 666| 0| 0}",
                 322 * (shift*shift)
-              - 988 * (shift*shift), true );
+              - 988 * (shift*shift), True );
 
     Test_aff( "0=.....", ((j-l*l)*2)-j*2+2*l**2);
 
-    Test_aff( "shift(20)", shift ** 20, true );
-    Test_aff( "1 - shift(6)", 1 - shift ** 6, true );
+    Test_aff( "shift(20)", shift ** 20, True );
+    Test_aff( "1 - shift(6)", 1 - shift ** 6, True );
       -- -{:|:|:|:| 32767| 32767| 32767| 32767| 32767| 32767}
 
     -- Maintenant, les gros moyens...
@@ -417,31 +426,31 @@ begin
       Fill( n, k );
       Fill( o, l );
       for i in 2 .. puiss loop -- on calcule les ** "betement"
-         Mult(m, j, m); -- Version "directe"
-         Fill(n, n*k );
-         Fill(o, o*l );
+      Mult(m, j, m); -- Version "directe"
+      Fill(n, n*k );
+      Fill(o, o*l );
       end loop;
 
       -- On doit avoir: m=j**i, n=k**i, o=l**i, m=n*o
 
       if puiss mod 10=0 then
-        Put( puiss, 4 );
+        IIO.Put( puiss, 4 );
       end if;
 
-      if not Equal( m, j**puiss ) then put("err m"); end if;
-      if not Equal( n, k**puiss ) then put("err n"); end if;
-      if not Equal( o, l**puiss ) then put("err o"); end if;
-      if not Equal( m, n*o ) then put("err m=n*o"); end if;
+      if not Equal( m, j**puiss ) then Put("err m"); end if;
+      if not Equal( n, k**puiss ) then Put("err n"); end if;
+      if not Equal( o, l**puiss ) then Put("err o"); end if;
+      if not Equal( m, n*o ) then Put("err m=n*o"); end if;
     end loop;
 
     New_Line;
     Put_Line("-- Test /, **, Power  ");
 
     for puiss in 1 .. 800 loop
-      if puiss mod 50=0 then Put( puiss, 4 ); end if;
+      if puiss mod 50=0 then IIO.Put( puiss, 4 ); end if;
 
-      for ik in 3..10 loop
-        for il in 11..23 loop
+      for ik in Basic_Int'(3)..10 loop
+        for il in Basic_Int'(11)..23 loop
 
           Fill( k, ik );
           Fill( l, il );
@@ -453,11 +462,11 @@ begin
 
           if not (
             Test_egalite(  m/n, o, " m/n=o ") ) then
-            put("ik="); put(Integer'Image(ik)); new_line;
-            put("il="); put(Integer'Image(il)); new_line;
-            test_aff("m",m,true);
-            test_aff("n",n,true);
-            put("kl KO"); return;
+            Put("ik="); Put(Basic_Int'Image(ik)); New_Line;
+            Put("il="); Put(Basic_Int'Image(il)); New_Line;
+            Test_aff("m",m,True);
+            Test_aff("n",n,True);
+            Put("kl KO"); return;
           end if;
         end loop;
       end loop;
@@ -503,12 +512,14 @@ begin
 
     Pause;
 
-    Test_aff( "m (=j^800) vaut...", m );
+    Test_aff( "m ( = j^800) vaut...", m );
 
     Pause;
 
-    Put_Line("m=m  " & Boolean'Image( Equal( m,m ) ));
-    Put_Line("m=j  " & Boolean'Image( Equal( m,j ) ));
+    Put_Line("m=m  " & Boolean'Image( Equal (m, m) ));
+    pragma Assert (Equal (m, m));
+    Put_Line("m=j  " & Boolean'Image( Equal (m, j) ));
+    pragma Assert (not Equal (m, j));
     Put_Line("j=m  " & Boolean'Image( Equal( j,m ) ));
     Put_Line("m<m  " & Boolean'Image( m<m ));
     Put_Line("j<m  " & Boolean'Image( j<m ));
@@ -527,5 +538,28 @@ begin
     Put_Line("1234567891 < 1234567890  " & Boolean'Image(
              Val("1234567891")<Val("1234567890") ));
 
-end Test_Int;
+  end Mix_Demo_Test;
 
+  procedure Test_Limits is
+    procedure Check_Integrity (i : Basic_Int) is
+      m : Multi_Int (2);
+    begin
+      Fill (m, i);
+      if verbose then
+        Put ("In:  "); BIO.Put (i); New_Line;
+        Put ("Out: "); Put (m); New_Line;
+      end if;
+      pragma Assert (Equal (m, i));
+    end Check_Integrity;
+  begin
+    Check_Integrity (Basic_Int'Last);
+    Check_Integrity (Basic_Int'Last - 1);
+    Check_Integrity (Basic_Int'First + 1);
+    Check_Integrity (Basic_Int'First);
+  end Test_Limits;
+
+begin
+  Put_Line ("Test_Limits...");
+  Test_Limits;
+  Mix_Demo_Test;
+end Test_Int;

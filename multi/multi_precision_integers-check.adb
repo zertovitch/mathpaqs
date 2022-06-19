@@ -1,11 +1,13 @@
 with Ada.Text_IO; use Ada.Text_IO;
 -- !! will disappear in favour of Ada.Exceptions
 
-with Multi_precision_integers.IO;
+with Multi_Precision_Integers.IO;
 
-package body Multi_precision_integers.Check is
+pragma Warnings ("C");
 
-  package IOi renames Multi_precision_integers.IO;
+package body Multi_Precision_Integers.Check is
+
+  package IOi renames Multi_Precision_Integers.IO;
 
   -- Don't be afraid by the bug reporting tools,
   -- they are unlikely to pop out of a programme ;-)
@@ -40,7 +42,7 @@ package body Multi_precision_integers.Check is
   end Close_Bug_Report;
 
   procedure Test( m: Multi_int; test_last: Boolean:= True ) is
-    last_nz: Index_int:= 0;
+    last_nz: Index_Int:= 0;
     Negative_block,
     Last_index_has_zero,
     Field_last_outside_range, Field_last_is_negative: exception;
@@ -138,4 +140,4 @@ package body Multi_precision_integers.Check is
     Test(r);
   end Check_Div_Rem;
 
-end Multi_precision_integers.Check;
+end Multi_Precision_Integers.Check;

@@ -33,6 +33,7 @@ project Mathpaqs is
        "arithmetic_compression.adb",
        "show_floats_limits.adb",
        "heat.adb",
+       "pi_digits.adb",
        "three_lakes.adb",
        "covid_19.adb"
      );
