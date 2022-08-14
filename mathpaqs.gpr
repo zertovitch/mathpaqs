@@ -1,11 +1,11 @@
---  This is a GNAT, GCC or GNAT Programming Studio (GPS) project file
+--  This is a GNAT, GCC or GNAT Studio project file
 --  for the Mathpaqs collection of mathematical packages.
 --
 --      Home page:       http://mathpaqs.sf.net/
 --      Project page 1:  http://sf.net/projects/mathpaqs/
 --      Project page 2:  https://github.com/zertovitch/mathpaqs
 --
---  Build me with "gnatmake -p -P mathpaqs", "gprbuild -p -P mathpaqs", or open me with GPS.
+--  Build me with "gnatmake -P mathpaqs", "gprbuild -P mathpaqs", or open me with GNAT Studio.
 --
 project Mathpaqs is
 
@@ -20,6 +20,8 @@ project Mathpaqs is
      "graph"
    );
    for Exec_Dir use ".";
+   for Create_Missing_Dirs use "True";  --  Flips by default the "-p" switch
+
    type Mathpaqs_Build_Mode_Type is ("Debug", "Style_Checks", "Fast");
    Mathpaqs_Build_Mode : Mathpaqs_Build_Mode_Type := external ("Mathpaqs_Build_Mode", "Fast");
 
@@ -92,12 +94,7 @@ project Mathpaqs is
    end Compiler;
 
    package Linker is
-      case Mathpaqs_Build_Mode is
-         when "Debug" | "Style_Checks" =>
-            for Default_Switches ("ada") use ("-g");
-         when "Fast" =>
-            for Default_Switches ("ada") use ("-g", "-Wl,--gc-sections");
-      end case;
+      for Default_Switches ("ada") use ("-g");
    end Linker;
 
    package Binder is
