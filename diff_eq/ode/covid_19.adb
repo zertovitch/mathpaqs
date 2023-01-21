@@ -40,14 +40,14 @@ procedure COVID_19 is
   function "*" (l : Real; v : Status_Vector) return Status_Vector is
     r : Status_Vector;
   begin
-    for i in v'Range loop r(i) := v(i) * l; end loop;
+    for i in v'Range loop r (i) := v (i) * l; end loop;
     return r;
   end "*";
 
   function "+" (a, b : Status_Vector) return Status_Vector is
     r : Status_Vector;
   begin
-    for i in a'Range loop r(i) := a(i) + b(i); end loop;
+    for i in a'Range loop r (i) := a (i) + b (i); end loop;
     return r;
   end "+";
 
@@ -78,7 +78,7 @@ procedure COVID_19 is
       --  Infectious people recover after infective period. -> Recovered.
       --  This rate is already computed: nb_infected_over_period;
       return
-        ( Susceptible => -s_to_e,
+         (Susceptible => -s_to_e,
           Exposed     =>  s_to_e - e_to_i,
           Infectious  =>           e_to_i - nb_infected_over_period,
           Recovered   =>                    nb_infected_over_period
@@ -87,16 +87,16 @@ procedure COVID_19 is
     k1, k2, k3, k4 : Status_Vector;
   begin
     --  Runge-Kutta, Order 4
-    k1 := f (xt               );
+    k1 := f (xt);
     k2 := f (xt + h * 0.5 * k1);
     k3 := f (xt + h * 0.5 * k2);
     k4 := f (xt + h *       k3);
-    xt := xt + h * (1.0/6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+    xt := xt + h * (1.0 / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
   end Evolution;
 
   type Scenario is (No_Lockdown, Lockdown, Lockdown_in_two_Steps);
 
-  procedure Simulation (s: Scenario) is
+  procedure Simulation (s : Scenario) is
     use Ada.Text_IO, Ada.Integer_Text_IO, PFIO;
     x : Status_Vector;
     dt : Real;
@@ -112,7 +112,7 @@ procedure COVID_19 is
     n_iter := 365;
     out_step := 1;
     x :=
-      ( Susceptible => 1_000_000.0,
+       (Susceptible => 1_000_000.0,
         Exposed     =>         0.0,
         Infectious  =>         1.0,  --  Patient 1.
         Recovered   =>         0.0
@@ -131,7 +131,7 @@ procedure COVID_19 is
         Put (rf, i);
         for l in Status loop
           Put (rf, sep);
-          Put (rf, x(l), 4, 5, 0);
+          Put (rf, x (l), 4, 5, 0);
         end loop;
         New_Line (rf);
       end if;

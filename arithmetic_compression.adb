@@ -26,18 +26,18 @@
 --  TYPE   REAL=EXTENDED,  for  example);  this  happens  when  the  value
 --  "underflows" the computers precision.
 
--- Translated by (New) P2Ada v. 15-Nov-2006
+--  Translated by (New) P2Ada v. 15-Nov-2006
 
 with Ada.Text_IO;                       use Ada.Text_IO;
 with Ada.Integer_Text_IO;               use Ada.Integer_Text_IO;
 
-procedure  Arithmetic_Compression is
+procedure Arithmetic_Compression is
   type Real is digits 18;
-  package RIO is new Float_IO(Real); use RIO;
+  package RIO is new Float_IO (Real); use RIO;
 
-  char_set: constant String:= "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+  char_set : constant String := "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 
-  p: constant array(char_set'Range) of Real:=  --  found empirically
+  p : constant array (char_set'Range) of Real :=  --  found empirically
     (
       6.1858296469E-02,
       1.1055412402E-02,
@@ -67,71 +67,71 @@ procedure  Arithmetic_Compression is
       2.7067980437E-03,
       2.3933136781E-01
     );
-  psum: array(char_set'Range) of Real;
+  psum : array (char_set'Range) of Real;
 
-  function Encode( s: in String) return Real is
-    po: Integer;
-    offset,len: Real;
+  function Encode (s : in String) return Real is
+    po : Integer;
+    offset, len : Real;
   begin
-    offset:= 0.0;
-    len:= 1.0;
+    offset := 0.0;
+    len := 1.0;
     for i in s'Range loop
-      po:= 0;
+      po := 0;
       for c in char_set'Range loop
-        if char_set(c)=s(i) then
-          po:= c;
+        if char_set (c) = s (i) then
+          po := c;
           exit;
         end if;
       end loop;
-      if po/=0 then
-        offset:= offset+ len * psum(po);
-        len:= len * p(po);
+      if po /= 0 then
+        offset := offset + len * psum (po);
+        len := len * p (po);
       else
-        Put("only input chars "); Put(char_set); Put(" allowed!"); New_Line;
+        Put ("only input chars "); Put (char_set); Put (" allowed!"); New_Line;
         raise Constraint_Error;
       end if;
     end loop;
     return offset + len * 0.5;
   end Encode;
 
-  function Decode(x0:Real; n:Integer) return String is
-    j: Integer;
-    s: String(1..n);
-    x: Real:= x0;
+  function Decode (x0 : Real; n : Integer) return String is
+    j : Integer;
+    s : String (1 .. n);
+    x : Real := x0;
   begin
     if x0 < 0.0 or x0 > 1.0 then
-      Put("must lie in the range [0..1]"); New_Line;
+      Put ("must lie in the range [0..1]"); New_Line;
       raise Constraint_Error;
     end if;
     for i in 1 .. n loop
-      j:= char_set'Last;
-      while x < psum(j) loop
-        j:= j - 1;
+      j := char_set'Last;
+      while x < psum (j) loop
+        j := j - 1;
       end loop;
-      s(i):= char_set(j);
-      x:= x-psum(j);
-      x:= x/p(j);
+      s (i) := char_set (j);
+      x := x - psum (j);
+      x := x / p (j);
     end loop;
     return s;
   end Decode;
 
-  inp: constant String := "ARITHMETIC CODE";
-  r: Real;
+  inp : constant String := "ARITHMETIC CODE";
+  r : Real;
 
 begin
   for i in psum'Range loop
-    psum(i):=0.0;
-    for j in 1 .. i-1 loop
-      psum(i):= psum(i)+p(j);
+    psum (i) := 0.0;
+    for j in 1 .. i - 1 loop
+      psum (i) := psum (i) + p (j);
     end loop;
   end loop;
 
-  Put("Digits: "); Put(Real'Digits,0); New_Line;
-  Put("Length of message : "); Put(inp'Length,0); New_Line;
-  Put("Length of code set: "); Put(char_set'Length,0); New_Line;
-  Put_Line("encoding String    : [" & inp & ']');
-  r:= Encode(inp);
-  Put("String is encoded by "); Put(r); New_Line;
-  Put_Line("decoding of r gives: [" & Decode(r, inp'Length) & ']');
+  Put ("Digits: "); Put (Real'Digits, 0); New_Line;
+  Put ("Length of message : "); Put (inp'Length, 0); New_Line;
+  Put ("Length of code set: "); Put (char_set'Length, 0); New_Line;
+  Put_Line ("encoding String    : [" & inp & ']');
+  r := Encode (inp);
+  Put ("String is encoded by "); Put (r); New_Line;
+  Put_Line ("decoding of r gives: [" & Decode (r, inp'Length) & ']');
 
 end Arithmetic_Compression;

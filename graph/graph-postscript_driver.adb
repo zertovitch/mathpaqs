@@ -1,6 +1,6 @@
 with Ada.Text_IO;         use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Time_display;
+with Time_Display;
 
 package body Graph.PostScript_driver is
 
@@ -12,7 +12,7 @@ package body Graph.PostScript_driver is
   procedure PsPS(s:String) is  -- SANS saut
   begin
     Put(dev_file(PostScript),s);
-    colonne:= colonne + s'length;
+    colonne:= colonne + s'Length;
   end;
 
   procedure PesPS(s:String) is  -- separation, SANS saut
@@ -53,11 +53,11 @@ package body Graph.PostScript_driver is
     NlPS;
   end;
 
-  procedure PiPS(i:integer; separ: Boolean:= True) is
-    ii: constant String:= Integer'image(i);
+  procedure PiPS(i:Integer; separ: Boolean:= True) is
+    ii: constant String:= Integer'Image(i);
     ni: Integer;
   begin
-    if ii(ii'first)=' ' then ni:= ii'first+1; else ni:= ii'first; end if;
+    if ii(ii'First)=' ' then ni:= ii'First+1; else ni:= ii'First; end if;
     declare
       nombre: constant String:= ii(ni..ii'Last);
     begin
@@ -69,13 +69,13 @@ package body Graph.PostScript_driver is
     end;
   end;
 
-  procedure xyPS(x,y:integer) is begin PiPS(x); PiPS(y); end;
-  procedure mvPS(x,y:integer) is begin xyPS(x,y); PesoPS("m"); end;
+  procedure xyPS(x,y:Integer) is begin PiPS(x); PiPS(y); end;
+  procedure mvPS(x,y:Integer) is begin xyPS(x,y); PesoPS("m"); end;
 
   -- *******
 
   -- Chainage de lignes
-  last_x_PS, last_y_PS: integer;
+  last_x_PS, last_y_PS: Integer;
 
   chainage_ouvert: Boolean;
 
@@ -206,7 +206,7 @@ package body Graph.PostScript_driver is
   end;
 
   procedure PS_Write(x,y: Integer; s:String) is
-    procedure chPS(c:character) is
+    procedure chPS(c:Character) is
     begin
       if c='(' or c=')' then PesoPS("(\"&c&") s");
                         else PesoPS('('&c&") s"); end if;
@@ -214,7 +214,7 @@ package body Graph.PostScript_driver is
   begin
     Termine_serie_lignes;
     mvPS(x,y);
-    for i in s'range loop chPS(s(i)); end loop;
+    for i in s'Range loop chPS(s(i)); end loop;
   end PS_Write;
 
   -- 3-Feb-2001 :
@@ -251,7 +251,7 @@ package body Graph.PostScript_driver is
 
     Termine_serie_lignes;
 
-    for c in rgb'range loop
+    for c in rgb'Range loop
       PesPS(".");
       Put( chf, rgb(c)+100 );
       PsoPS( chf(2..3) );
@@ -269,10 +269,10 @@ package body Graph.PostScript_driver is
     p1,p2: Natural;
   begin
     Put( h, n, Base=> 16);
-    for i in h'range loop
+    for i in h'Range loop
       if h(i)='#' then p1:= i; exit; end if;
     end loop;
-    for i in reverse h'range loop
+    for i in reverse h'Range loop
       if h(i)='#' then p2:= i; exit; end if;
     end loop;
     return h(p1+1..p2-1);
@@ -300,7 +300,7 @@ package body Graph.PostScript_driver is
     PesoPS("<< /PatternType 1 /PaintType 2 /TilingType 1");
     PesoPS("/BBox [0 0 16 16] /XStep 16 /YStep 16");
     PesoPS("/PaintProc {pop 16 16 scale 16 16 true [16 0 0 -16 0 16] {<");
-    for i in p'range loop
+    for i in p'Range loop
       PesoPS(Hexa(Double_bit(Integer(p(i)))));
     end loop;
     PesoPS(">} imagemask } >> matrix makepattern setcolor");

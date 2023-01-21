@@ -22,7 +22,7 @@ project Mathpaqs is
    for Exec_Dir use ".";
    for Create_Missing_Dirs use "True";  --  Flips by default the "-p" switch
 
-   type Mathpaqs_Build_Mode_Type is ("Debug", "Style_Checks", "Fast");
+   type Mathpaqs_Build_Mode_Type is ("Debug", "Fast");
    Mathpaqs_Build_Mode : Mathpaqs_Build_Mode_Type := external ("Mathpaqs_Build_Mode", "Fast");
 
    for Main use (
@@ -45,13 +45,21 @@ project Mathpaqs is
      when others => for Object_Dir use "obj_debg";
    end case;
 
-   Common_Options := (
+   type Mathpaqs_Styles_Checks_Type is
+      ("Off",
+       "On",
+       "Extra"
+      );
+   Mathpaqs_Styles_Checks : Mathpaqs_Styles_Checks_Type := external ("Mathpaqs_Styles_Checks", "Off");
+
+   Common_Compiler_Options := (
      "-gnatwa",                        --  Warnings switches (a:turn on all info/warnings marked with +)
+     "-gnatwh",                        --  Warnings switches (h:turn on warnings for hiding declarations)
      "-gnatwcijkmopruvz.c.n.p.t.w.x",  --  Warnings switches (run "gnatmake" for full list)
-     "-gnatf",  --  Full errors. Verbose details, all undefined references
-     "-gnatq",  --  Don't quit, try semantics, even if parse errors
-     "-gnatQ",  --  Don't quit, write ali/tree file even if compile errors
-     "-g"       --  Generate debugging information
+     "-gnatf",                         --  Full errors. Verbose details, all undefined references
+     "-gnatq",                         --  Don't quit, try semantics, even if parse errors
+     "-gnatQ",                         --  Don't quit, write ali/tree file even if compile errors
+     "-g"                              --  Generate debugging information
    );
 
    Debug_Options := (
@@ -72,24 +80,30 @@ project Mathpaqs is
      "-ftracer", "-fweb", "-ftree-vectorize",
      "-frename-registers", "-ffunction-sections"
    );
-   
+
+   Style_Checks_1 := 
+     ("-gnatyaknpr",   --  Style: check all casings: a:attribute, k:keywords, n:package Standard identifiers, p:pragma, r:identifier references
+      "-gnatyO",       --  Style: check overriding indicators
+      "-gnatyM100",    --  Style: check line length <= 100 characters
+      "-gnatyx");      --  Style: check x:no extra parens
+
+   Style_Checks_2 := 
+     ("-gnatybfhiu",   --  Style: check b:no blanks at end of lines, f:no ff/vtabs, h: no htabs, i:if-then layout, u:no unnecessary blank lines
+      "-gnatye",       --  Style: check e:end/exit labels present
+      "-gnatytc");     --  Style: check t:token separation rules, c:comment format (two spaces)
+
+   case Mathpaqs_Styles_Checks is
+      when "Off"   => null;
+      when "On"    => Common_Compiler_Options := Common_Compiler_Options & Style_Checks_1;
+      when "Extra" => Common_Compiler_Options := Common_Compiler_Options & Style_Checks_1 & Style_Checks_2;
+   end case;
+
    package Compiler is
       case Mathpaqs_Build_Mode is
          when "Debug" =>
-            for Default_Switches ("ada") use Common_Options & Debug_Options;
-         when "Style_Checks" =>
-            for Default_Switches ("ada") use Common_Options & Debug_Options & 
-              (
-                "-gnatwh",      --  Warnings switches (h:turn on warnings for hiding declarations)
-                "-gnatyaknpr",  --  Style: check all casings: a:attribute, k:keywords, n:package Standard identifiers, p:pragma, r:identifier references
-                "-gnatybfhu",   --  Style: check b:no blanks at end of lines, f:no ff/vtabs, h:no htabs, i:if-then layout, u:no unnecessary blank lines
-                "-gnatyx",      --  Style: check x:no extra parens
-                "-gnatye",      --  Style: check e:end/exit labels present
-          --    "-gnatytc",     --  Style: check t:token separation rules, c:comment format (two spaces)
-                "-gnaty2CM100O"
-              );
+            for Default_Switches ("ada") use Common_Compiler_Options & Debug_Options;
          when "Fast" =>
-            for Default_Switches ("ada") use Common_Options & Fast_Options;
+            for Default_Switches ("ada") use Common_Compiler_Options & Fast_Options;
       end case;
    end Compiler;
 
