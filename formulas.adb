@@ -226,13 +226,12 @@ package body Formulas is
       return;
     end if;
     if found = c_fin then
-      Raise_Exception (
-        Parse_Error'Identity,
-        "End of formula reached, '" & expected & "' is missing");
+      raise
+        Parse_Error with
+        "End of formula reached, '" & expected & "' is missing";
     else
-      Raise_Exception (
-        Parse_Error'Identity,
-        "'" & expected & "' was expected, found '" & found & ''');
+      raise Parse_Error with
+        "'" & expected & "' was expected, found '" & found & ''';
     end if;
   end Check;
 
@@ -246,22 +245,22 @@ package body Formulas is
     j : Integer := s'First - 1;
   begin
     for i in s'Range loop
-      case s(i) is
+      case s (i) is
         when ' ' | ASCII.HT | ASCII.CR | ASCII.LF =>
           null;
         when '*' =>  --  Replace ** by ^
-          if i < s'Last and then s(i+1)='*' then      --  Next is '*' too
+          if i < s'Last and then s (i + 1) = '*' then      --  Next is '*' too
             j := j + 1;
-            t(j) := '^';
-          elsif i > s'First and then s(i-1)='*' then  --  Previous is '*' too
+            t (j) := '^';
+          elsif i > s'First and then s (i - 1) = '*' then  --  Previous is '*' too
             null;
           else            --  No "**"
             j := j + 1;
-            t(j) := '*';
+            t (j) := '*';
           end if;
         when others =>
           j := j + 1;
-          t(j) := s(i);
+          t (j) := s (i);
       end case;
     end loop;
     return t (t'First .. j);
@@ -275,7 +274,7 @@ package body Formulas is
     ('0' .. '9' | '+' | '-' => True, others => False);
 
   procedure Parse (f : out Formula; s : String) is
-    str : constant String := No_Spaces(s) & c_fin;
+    str : constant String := No_Spaces (s) & c_fin;
     i : Integer;
     --
     function Expression return p_Formula_Rec is
@@ -289,12 +288,12 @@ package body Formulas is
             j : constant Integer := i;
           begin
             while
-              digit_or_expo (str(i)) or else
-              (expo (str(i-1)) and then first_symbol_after_expo(str(i)))
+              digit_or_expo (str (i)) or else
+              (expo (str (i - 1)) and then first_symbol_after_expo (str (i)))
             loop
               i := i + 1;
             end loop;
-            n.n := Real'Value(str(j..i-1));
+            n.n := Real'Value (str (j .. i - 1));
             return n;
           end Number;
 
@@ -304,13 +303,13 @@ package body Formulas is
           begin
             loop
               i := i + 1;
-              exit when not following_character(str(i));
+              exit when not following_character (str (i));
             end loop;
             declare
-              chj : constant String := str(j..i-1);
+              chj : constant String := str (j .. i - 1);
               mch : constant String := To_Upper (chj);
             begin
-              if str(i) = '(' then
+              if str (i) = '(' then
                 for s in Built_in_function loop
                   if mch = Conv_mstr (s) then  -- Found a built-in function
                     n := new Formula_Rec (s);
@@ -319,15 +318,15 @@ package body Formulas is
                 end loop;
                 i := i + 1;
                 if n = null then
-                  Raise_Exception (Parse_Error'Identity, "User functions not yet supported");
+                  raise Parse_Error with "User functions not yet supported";
                 else
                   n.left := Expression;
                   if n.s in Binary then  --  Function with two arguments: read 2nd argument
-                    Check (',', str(i));
+                    Check (',', str (i));
                     i := i + 1;
                     n.right := Expression;
                   end if;
-                  Check_brackets ('(', str(i));
+                  Check_brackets ('(', str (i));
                   i := i + 1;
                 end if;
               elsif mch = "PI" then
@@ -342,43 +341,43 @@ package body Formulas is
 
           --  Factor
           n, n1 : p_Formula_Rec;
-          c     : Character := str(i);
+          c     : Character := str (i);
         begin
           n := null;
-          if digit(c) then
+          if digit (c) then
             n := Number;
-          elsif letters(c) then
+          elsif letters (c) then
             n := Variable_or_function;
           elsif c = '-' or c = '+' then
-            n := new Formula_Rec (conv_symb_una(c));
+            n := new Formula_Rec (conv_symb_una (c));
             i := i + 1;
             n.left := Factor;
           end if;
-          c := str(i);
+          c := str (i);
           case c is
             when '^' =>
-              -- NB: right-associative in this parser.
+              --  NB: right-associative in this parser.
               --     x^y^z means x^(y^z) like in R and unlike
               --     in Excel where x^y^z means (x^y)^z.
               --     Ada asks for parenthesization.
               n1 := n;
-              n := new Formula_Rec(puiss);
+              n := new Formula_Rec (puiss);
               i := i + 1;
               n.left := n1;
               n.right := Factor;
             when '(' | '[' | '{' =>
               if n = null then
-                n := new Formula_Rec(conv_symb(c));
+                n := new Formula_Rec (conv_symb (c));
                 i := i + 1;
                 n.left := Expression;
-                Check_brackets (c, str(i));
+                Check_brackets (c, str (i));
                 i := i + 1;
               end if;
             when others =>
               null;  -- [P2Ada]: no otherwise / else in Pascal
           end case;
           if n = null then
-            Raise_Exception (Parse_Error'Identity, "Unexpected end in factor");
+            raise Parse_Error with "Unexpected end in factor";
           end if;
           return n;
         end Factor;
@@ -388,10 +387,10 @@ package body Formulas is
         c : Character;
       begin
         left_factor := Factor;
-        c := str(i);
+        c := str (i);
         if c = '*' or c = '/' then
           i := i + 1;
-          n := new Formula_Rec (conv_symb(c));
+          n := new Formula_Rec (conv_symb (c));
           n.left := left_factor;
           n.right := Term;
           return n;
@@ -405,10 +404,10 @@ package body Formulas is
       c : Character;
     begin
       left_term := Term;
-      c := str(i);
+      c := str (i);
       if c = '+' or c = '-' then
         i := i + 1;
-        n := new Formula_Rec (conv_symb(c));
+        n := new Formula_Rec (conv_symb (c));
         n.left  := left_term;
         n.right := Expression;
         return n;
@@ -466,14 +465,14 @@ package body Formulas is
     f.root := Expression;
     Left_Assoc_Minus (f.root);
     Left_Assoc_Divide (f.root);
-    if str(i) /= c_fin then
+    if str (i) /= c_fin then
       Deep_delete (f.root);
-      Raise_Exception (Parse_Error'Identity, "Unexpected end in formula (extra symbols)");
+      raise Parse_Error with "Unexpected end in formula (extra symbols)";
     end if;
   exception
     when E : Parse_Error =>
       Deep_delete (f.root);
-      Raise_Exception (Parse_Error'Identity, Exception_Message (E));
+      raise Parse_Error with Exception_Message (E);
   end Parse;
 
   function Parse (s : String) return Formula is
@@ -666,7 +665,7 @@ package body Formulas is
     if fb = null then
       return False;
     end if;
-    -- fa and fb are not null, at this point
+    --  fa and fb are not null, at this point
     ga := fa.s;
     gb := fb.s;
     if ga in Neutral then
@@ -715,7 +714,7 @@ package body Formulas is
     if fb = null then
       return False;
     end if;
-    -- fa and fb are not null, at this point
+    --  fa and fb are not null, at this point
     if fa.s /= fb.s then
       return False;
     end if;
@@ -766,7 +765,7 @@ package body Formulas is
   end Build_2X;
 
   function Build_X_pow_2 (X : p_Formula_Rec) return p_Formula_Rec is  --  returns X^2
-    aux : constant p_Formula_Rec := new Formula_Rec(puiss);
+    aux : constant p_Formula_Rec := new Formula_Rec (puiss);
   begin
     aux.left := X;
     aux.right := new Formula_Rec (nb);
@@ -874,17 +873,17 @@ package body Formulas is
             cst_replaces_f (Arctanh (x));
           when min =>
             if f.right.s = nb then
-              cst_replaces_f (Real'Min(x,y));
+              cst_replaces_f (Real'Min (x, y));
             end if;
           when max =>
             if f.right.s = nb then
-              cst_replaces_f (Real'Max(x,y));
+              cst_replaces_f (Real'Max (x, y));
             end if;
         end case;
       end if;
       if f.s = cosinus and then f.left /= null and then f.left.s = moins_una then
-        aux:= f.left.left;                              --  Cos(-X)  ->  Cos(X)
-        Dispose(f.left);
+        aux := f.left.left;                              --  Cos(-X)  ->  Cos(X)
+        Dispose (f.left);
         f.left := aux;
       end if;
     end Simplify_functions;
@@ -968,7 +967,7 @@ package body Formulas is
           Dispose (f);
           f := aux;
         elsif Is_constant_pair (f) then
-          cst_replaces_f ( f.left.n + f.right.n );      --  cst + cst  ->  cst
+          cst_replaces_f (f.left.n + f.right.n);        --  cst + cst  ->  cst
         elsif Is_constant (f.left, 0.0) then
           right_replaces_f;                             --  0 + X  ->  X
         elsif Is_constant (f.right, 0.0) then
@@ -993,7 +992,7 @@ package body Formulas is
           Dispose (f);
           f := aux;
         elsif Is_constant_pair (f) then
-          cst_replaces_f ( f.left.n - f.right.n );      --  cst - cst  ->  cst
+          cst_replaces_f (f.left.n - f.right.n);        --  cst - cst  ->  cst
         elsif Is_constant (f.left, 0.0) then
           aux := new Formula_Rec (moins_una);           --  0 - X   ->   -X
           aux.left := f.right;
@@ -1023,7 +1022,7 @@ package body Formulas is
           Dispose (f.right);
           f.right := aux;
         elsif Is_constant_pair (f) then
-          cst_replaces_f ( f.left.n * f.right.n );       --  cst*cst  ->  cst
+          cst_replaces_f (f.left.n * f.right.n);       --  cst*cst  ->  cst
         elsif f.left.s  = puiss and then
               f.right.s = puiss and then
           Equivalent (f.left.left, f.right.left)
@@ -1048,7 +1047,7 @@ package body Formulas is
           aux := new Formula_Rec (par);
           aux.left := new Formula_Rec (plus);
           aux.left.left := f.right;
-          aux.left.right := new Formula_Rec(nb);
+          aux.left.right := new Formula_Rec (nb);
           aux.left.right.n := 1.0;     --  (n+1) prepared
           f.right := aux;
         elsif f.left.s = puiss and then Equivalent (f.left.left, f.right) then
@@ -1076,7 +1075,7 @@ package body Formulas is
         elsif Equivalent (f.left, f.right) then
           cst_replaces_f (1.0);                         --  X/X  ->  1
         elsif Is_constant_pair (f) and then not Almost_zero (f.right.n) then
-          cst_replaces_f ( f.left.n / f.right.n );      --  cst/cst -> cst
+          cst_replaces_f (f.left.n / f.right.n);        --  cst/cst -> cst
         end if;
 
       when puiss =>
@@ -1085,7 +1084,7 @@ package body Formulas is
         elsif Is_constant (f.right, 1.0) then
           left_replaces_f;                              --  X^1  ->  X
         elsif f.left.s = nb and f.right.s = nb then     --  cst^cst  ->  cst
-          cst_replaces_f ( Exp(Log(f.left.n) * f.right.n) );
+          cst_replaces_f (Exp (Log (f.left.n) * f.right.n));
         end if;
 
       when Built_in_function =>

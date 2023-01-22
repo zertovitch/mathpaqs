@@ -14,9 +14,9 @@
 --  Latest version may be available at:
 --      home page:     http://mathpaqs.sf.net/
 --      project page:  http://sf.net/projects/mathpaqs/
---      mirror:        https://github.com/svn2github/mathpaqs
+--      mirror:        https://github.com/zertovitch/mathpaqs
 
--- Copyright (c) Gautier de Montmollin 2015 .. 2016
+--  Copyright (c) Gautier de Montmollin 2015 .. 2023
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,10 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 --
--- NB: this is the MIT License, as found 2-May-2010 on the site
--- http://www.opensource.org/licenses/mit-license.php
+--  NB: this is the MIT License, as found 2-May-2010 on the site
+--  http://www.opensource.org/licenses/mit-license.php
 
--- TO DO:
+--  TO DO:
 --   - implement user functions
 --   - (never-ending) improve Simplify (see misses at Test_Formulas)
 
@@ -118,11 +118,11 @@ package Formulas is
 
   type Character_Set is array (Character) of Boolean;
 
-  -- Custom variables or functions always begin with a letter:
+  --  Custom variables or functions always begin with a letter:
   letters  : constant Character_Set :=
     ('a' .. 'z' | 'A' .. 'Z' => True, others => False);
 
-  -- Set of following characters in custom variables or functions names is defined here:
+  --  Set of following characters in custom variables or functions names is defined here:
   following_character  : constant Character_Set :=
     ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '.' => True, others => False);
 
@@ -134,7 +134,7 @@ private
                  --                                      1 argument:
                  moins_una, plus_una,
                  par, croch, accol,
-                 -- vvv begin of built-in functions
+                 --  vvv begin of built-in functions
                  abso, sign, step,
                  round, trunc, floor, ceiling,
                  expn, logn,
@@ -143,7 +143,7 @@ private
                  sh, arcsinh, ch, arccosh, th, arctanh,
                  --                                      2 arguments:
                  min, max,
-                 -- ^^^ end of built-in functions
+                 --  ^^^ end of built-in functions
                  moins, plus, sur, fois, puiss);
 
   subtype Unary is S_Form range moins_una .. arctanh;

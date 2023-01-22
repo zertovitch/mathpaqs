@@ -29,15 +29,19 @@ project Mathpaqs is
        --
        --  For tests, see Mathpaqs_Test[_*]
        --
-       "fractal.adb", "biomorph.adb",
-       "champ_vt.adb", "arenstorf.adb",
-       "cr_demo.adb", "ppm2func.adb",
+       "arenstorf.adb",
        "arithmetic_compression.adb",
-       "show_floats_limits.adb",
+       "biomorph.adb",
+       "champ_vt.adb",
+       "covid_19.adb",
+       "cr_demo.adb",
+       "fractal.adb",
        "heat.adb",
        "pi_digits.adb",
-       "three_lakes.adb",
-       "covid_19.adb"
+       "ppm2func.adb",
+       "sim_alea.adb",
+       "show_floats_limits.adb",
+       "three_lakes.adb"
      );
 
    case Mathpaqs_Build_Mode is
@@ -52,24 +56,20 @@ project Mathpaqs is
       );
    Mathpaqs_Styles_Checks : Mathpaqs_Styles_Checks_Type := external ("Mathpaqs_Styles_Checks", "Off");
 
-   Common_Compiler_Options := (
-     "-gnatwa",                        --  Warnings switches (a:turn on all info/warnings marked with +)
+   Common_Compiler_Options :=
+    ("-gnatwa",                        --  Warnings switches (a:turn on all info/warnings marked with +)
      "-gnatwcijkmopruvz.c.n.p.t.w.x",  --  Warnings switches (run "gnatmake" for full list)
      "-gnatf",                         --  Full errors. Verbose details, all undefined references
      "-gnatq",                         --  Don't quit, try semantics, even if parse errors
      "-gnatQ",                         --  Don't quit, write ali/tree file even if compile errors
-     "-g"                              --  Generate debugging information
-   );
+     "-g");                            --  Generate debugging information
 
-   Debug_Options := (
-     "-gnata",         --  Assertions enabled
+   Debug_Options :=
+    ("-gnata",         --  Assertions enabled
      "-gnato",         --  Enable overflow checking in STRICT mode
      "-gnatVa",        --  Enable all validity checking options
      "-fstack-check",
-     "-fno-inline",
-     --
-     "-gnatec=" & project'Project_Dir & "debug.pra"
-   );
+     "-fno-inline");
 
    Fast_Options := (
      "-O2",
@@ -102,6 +102,7 @@ project Mathpaqs is
       case Mathpaqs_Build_Mode is
          when "Debug" =>
             for Default_Switches ("ada") use Common_Compiler_Options & Debug_Options;
+            for Local_Configuration_Pragmas use project'Project_Dir & "debug.pra";
          when "Fast" =>
             for Default_Switches ("ada") use Common_Compiler_Options & Fast_Options;
       end case;

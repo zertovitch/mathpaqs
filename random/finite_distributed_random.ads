@@ -8,7 +8,7 @@
 --  Latest version may be available at:
 --      home page:     http://mathpaqs.sf.net/
 --      project page:  http://sf.net/projects/mathpaqs/
---      mirror:        https://github.com/svn2github/mathpaqs
+--      mirror:        https://github.com/zertovitch/mathpaqs
 --
 
 --  17-Feb-2011: moved Uniform_random from generic function

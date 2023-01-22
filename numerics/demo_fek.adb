@@ -1,10 +1,11 @@
--- At the moment empty (only shows how to instanciate);
--- will be one day a very nice Finite Elements demo!
--- (I have working code; contact me if in need!).
+--  At the moment empty (only shows how to instanciate);
+--  will be one day a very nice Finite Elements demo!
+--  (I have working code; contact me if in need!).
 
-with Ada.Numerics.Generic_Elementary_Functions;
+with Ada.Numerics.Generic_Elementary_Functions,
+     Ada.Numerics.Generic_Real_Arrays;
 
-with G_FEK, G_Matrices;
+with G_FEK;
 
 procedure Demo_FEK is
 
@@ -12,12 +13,11 @@ procedure Demo_FEK is
   type Vector is array (Integer range <>) of F;
   type Matrix is array (Integer range <>, Integer range <>) of F;
 
-  package FEK is new G_FEK(Long_Float, Vector, Matrix);
+  package FEK is new G_FEK (Long_Float, Vector, Matrix);
 
-  package FEF is new Ada.Numerics.Generic_Elementary_Functions(F);
+  package FEF is new Ada.Numerics.Generic_Elementary_Functions (F);
 
-  package Matrices is new
-    G_Matrices(F, 0.0,1.0, "-", FEF.Sqrt,"+","-","*","/", Vector, Matrix);
+  package Matrices is new Ada.Numerics.Generic_Real_Arrays (F);
 
 begin
   null;

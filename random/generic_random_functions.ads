@@ -11,12 +11,12 @@
 --  Latest version may be available at:
 --      home page:     http://mathpaqs.sf.net/
 --      project page:  http://sf.net/projects/mathpaqs/
---      mirror:        https://github.com/svn2github/mathpaqs
+--      mirror:        https://github.com/zertovitch/mathpaqs
 --
 -------------------------
 --  Legal licensing note:
 
---  Copyright (c) 2010 .. 2018 Gautier de Montmollin
+--  Copyright (c) 2010 .. 2023 Gautier de Montmollin
 --  Parts originally created by Stephen L. Moshier (see implementation for details)
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy

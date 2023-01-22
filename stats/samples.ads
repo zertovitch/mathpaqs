@@ -1,20 +1,20 @@
 ---------------
 --  SAMPLES  --
 ---------------
--- Package for building samples of random values, then computing
--- statistics from these samples (see Get_measures)
+--  Package for building samples of random values, then computing
+--  statistics from these samples (see Get_measures)
 -------------
 --
 --  This is part of the Mathpaqs collection of mathematical packages.
 --  Latest version may be available at:
 --      home page:     http://mathpaqs.sf.net/
 --      project page:  http://sf.net/projects/mathpaqs/
---      mirror:        https://github.com/svn2github/mathpaqs
+--      mirror:        https://github.com/zertovitch/mathpaqs
 --
 -------------------------
 --  Legal licensing note:
 
---  Copyright (c) 2007..2015 Gautier de Montmollin
+--  Copyright (c) 2007..2023 Gautier de Montmollin
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -40,14 +40,14 @@
 generic
 
   type Real is digits <>;
-  type Quantile_table is array(Positive range <>) of Real;
+  type Quantile_Table is array (Positive range <>) of Real;
 
-  -- Try to correct sample bin location error compared to actual occurrence
-  -- value, by locating the quantile boundary *within* the histogram.
-  -- It improves accuracy, but may look bad with discrete variables.
-  use_sub_histogram_index: Boolean;
+  --  Try to correct sample bin location error compared to actual occurrence
+  --  value, by locating the quantile boundary *within* the histogram.
+  --  It improves accuracy, but may look bad with discrete variables.
+  use_sub_histogram_index : Boolean;
 
-  fit_to_range: Boolean:= False;
+  fit_to_range : Boolean := False;
 
 package Samples is
 
@@ -55,71 +55,70 @@ package Samples is
   -- Random sample type --
   ------------------------
 
-  type Sample(bins: Positive) is private;
+  type Sample (bins : Positive) is private;
 
   ---------------------------------------------------------
   -- (1) Define a sample with minimum and maximum values --
   ---------------------------------------------------------
 
-  procedure Initialize(
-    s       : out Sample;
-    min, max: in  Real
-  );
+  procedure Initialize
+    (s        : out Sample;
+     min, max : in  Real);
 
-  Sample_not_initialized: exception;
+  Sample_not_initialized : exception;
 
   ---------------------------------------
   -- (2) Add any number of occurrences --
   ---------------------------------------
 
-  procedure Add_occurrence(s: in out Sample; value: Real);
-  pragma Inline(Add_occurrence);
+  procedure Add_occurrence (s : in out Sample; value : Real);
+  pragma Inline (Add_occurrence);
 
-  Value_out_of_sample_range: exception;
+  Value_out_of_Sample_Range : exception;
 
-  function Occurrences(s: Sample) return Natural;
+  function Occurrences (s : Sample) return Natural;
 
   ---------------------------------------------------------------
   --  After the gathering of data: time to measure statistics  --
   ---------------------------------------------------------------
 
-  -- Getting measures from a sample after all occurrences are recorded.
+  --  Getting measures from a sample after all occurrences are recorded.
   --
-  -- The reason why types Sample and Measure are separate is that Sample is
-  -- usually very large but short-lived (used only when gathering
-  -- occurrences) and Measure is kept for longer for display and storage.
-  -- Typically Sample is discarded right after a call to Get_measures.
+  --  The reason why types Sample and Measure are separate is that Sample is
+  --  usually very large but short-lived (used only when gathering
+  --  occurrences) and Measure is kept for longer for display and storage.
+  --  Typically Sample is discarded right after a call to Get_measures.
 
-  type Measure(quantile_levels: Positive) is record
+  type Measure (quantile_levels : Positive) is record
     -------------
     -- Moments --
     -------------
-    mean,     -- = E(X), mathematical expectation
-    std_dev,  -- = sqrt(Var(X))
+    mean,     --  = E(X), mathematical expectation
+    std_dev,  --  = sqrt(Var(X))
     --
-    -- Statistical error
-    stat_err: Real;
+    --  Statistical error
+    stat_err : Real;
     --------------------------------------
     -- Information on various quantiles --
     --------------------------------------
     --
-    -- level(i): probability level p_i
-    level   : Quantile_table(1..quantile_levels);
-    -- VaR(i) such that P(X<VaR(i)) = p_i
-    -- It is actually the x-value of the cumulative density function F
-    VaR     : Quantile_table(1..quantile_levels);
-    -- TailVaR(i) = E(X|X>=VaR(i))
-    TailVaR : Quantile_table(1..quantile_levels);
+    --  level(i): probability level p_i
+    level   : Quantile_Table (1 .. quantile_levels);
+    --  VaR(i) such that P(X<VaR(i)) = p_i
+    --  It is actually the x-value of the cumulative density function F
+    VaR     : Quantile_Table (1 .. quantile_levels);
+    --  TailVaR(i) = E(X|X>=VaR(i))
+    TailVaR : Quantile_Table (1 .. quantile_levels);
   end record;
 
   ------------------------------------------------
   -- (3) Get statistical measures of the sample --
   ------------------------------------------------
 
-  procedure Get_measures(
-    s: in     Sample;
-    m: in out Measure -- "in" are the quantile levels (m.level)
-  );
+  procedure Get_Measures
+    (s : in     Sample;
+     m : in out Measure);  --  "in" are the quantile levels (m.level)
+
   --  Typically s can be discarded (and much memory freed) right
   --  after a call to Get_measures.
 
@@ -130,18 +129,18 @@ package Samples is
 
 private
 
-  type Histogram_type is array(Natural range <>) of Natural;
+  type Histogram_Type is array (Natural range <>) of Natural;
 
-  type Sample(bins: Positive) is record
-    histogram       : Histogram_type(1..bins);
-    min, max        : Real;
-    width_inv       : Real;
-    total_occurrences: Natural;
-    bins_r          : Real;
-    bins_inv        : Real;
-    factor          : Real;
-    sum, sum_sq     : Real;
-    initialized     : Boolean:= False;
+  type Sample (bins : Positive) is record
+    histogram         : Histogram_Type (1 .. bins);
+    min, max          : Real;
+    width_inv         : Real;
+    total_occurrences : Natural;
+    bins_r            : Real;
+    bins_inv          : Real;
+    factor            : Real;
+    sum, sum_sq       : Real;
+    initialized       : Boolean := False;
   end record;
 
 end Samples;

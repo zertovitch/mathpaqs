@@ -12,12 +12,12 @@
 --  Latest version may be available at:
 --      home page:     http://mathpaqs.sf.net/
 --      project page:  http://sf.net/projects/mathpaqs/
---      mirror:        https://github.com/svn2github/mathpaqs
+--      mirror:        https://github.com/zertovitch/mathpaqs
 --
 -------------------------
 --  Legal licensing note:
 
---  Copyright (c) 2011 .. 2018 Gautier de Montmollin
+--  Copyright (c) 2011 .. 2023 Gautier de Montmollin
 
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -44,8 +44,8 @@ generic
 
   --  Probability_value is any floating-point type; can be restricted to the 0.0 .. 1.0 range.
   --
-  type Probability_value is digits <>;
-  type Probability_array is array (Integer range <>) of Probability_value;
+  type Probability_Value is digits <>;
+  type Probability_Array is array (Integer range <>) of Probability_Value;
 
 package Discrete_Random_Simulation is
 
@@ -93,22 +93,20 @@ package Discrete_Random_Simulation is
   --  Run time: O(n), best for small arrays.                             --
   -------------------------------------------------------------------------
 
-  function Index_Linear_Search (
-    U01 : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
-    Fx  : Probability_array   --  Fx is the Cumulative distribution function (CDF), F(x).
-  )
+  function Index_Linear_Search
+    (U01 : Probability_Value;   --  Probability value. For simulation: random, uniform in [0,1]
+     Fx  : Probability_Array)   --  Fx is the Cumulative distribution function (CDF), F(x).
   return Integer;
-  pragma Inline(Index_Linear_Search);
+  pragma Inline (Index_Linear_Search);
 
   ----------------------------------------------------------------------
   --  Dichotomic search - divide and conquer algorithm.               --
   --  Run time: O(Log_2(n))... but slower where Fx is "plateau"-ing.  --
   ----------------------------------------------------------------------
 
-  function Index_Dichotomic_Search (
-    U01 : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
-    Fx  : Probability_array   --  Fx is the Cumulative distribution function (CDF), F(x).
-  )
+  function Index_Dichotomic_Search
+    (U01 : Probability_Value;   --  Probability value. For simulation: random, uniform in [0,1]
+     Fx  : Probability_Array)   --  Fx is the Cumulative distribution function (CDF), F(x).
   return Integer;
 
   -------------------------------------------------------------------------------
@@ -127,20 +125,20 @@ package Discrete_Random_Simulation is
   --        dependant random variables. For example, tail dependency is lost.  --
   -------------------------------------------------------------------------------
 
-  type Alias_pair is private;
-  type Alias_table is array (Integer range <>) of Alias_pair;
+  type Alias_Pair is private;
+  type Alias_Table is array (Integer range <>) of Alias_Pair;
 
   procedure Prepare_Aliases (
-    Fx      : in  Probability_array;  --  Fx is the Cumulative distribution function (CDF), F(x).
-    aliases : out Alias_table         --  Should have the same bounds as Fx
+    Fx      : in  Probability_Array;  --  Fx is the Cumulative distribution function (CDF), F(x).
+    aliases : out Alias_Table         --  Should have the same bounds as Fx
   );
 
   function Index_Alias_Method (
-    U01     : Probability_value;  --  Probability value. For simulation: random, uniform in [0,1]
-    aliases : Alias_table
+    U01     : Probability_Value;  --  Probability value. For simulation: random, uniform in [0,1]
+    aliases : Alias_Table
   )
   return Integer;
-  pragma Inline(Index_Alias_Method);
+  pragma Inline (Index_Alias_Method);
 
   --------------------------------------------------------------------------
   --  Utility: To_cumulative: conversion of an array with                 --
@@ -150,18 +148,20 @@ package Discrete_Random_Simulation is
   --
   --  Example: Dice: To_cumulative((1..6 => 1.0/6.0));
   --
-  function To_cumulative (p: Probability_array; check: Boolean:= False) return Probability_array;
+  function To_Cumulative
+    (p : Probability_Array; check : Boolean := False) return Probability_Array;
 
   --  Converts a CDF array, for instance: 0.0, p1, p1+p2, ..., p1+...+p_{n-1}
   --  to a single probability array: p1, p2, ..., pn.
   --
-  function To_probs (Fx: Probability_array; check: Boolean:= False) return Probability_array;
+  function To_Probs
+    (Fx : Probability_Array; check : Boolean := False) return Probability_Array;
 
 private
 
   type Alias_pair is record
     alias     : Integer;
-    prob_flip : Probability_value;
+    prob_flip : Probability_Value;
   end record;
 
 end Discrete_Random_Simulation;
