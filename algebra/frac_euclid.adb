@@ -18,7 +18,7 @@ package body Frac_Euclid is
   function Reduction (f : frac_elt) return frac_elt is
     p : ring_elt;
   begin
-    if f.b = zero then raise Zero_denominator; end if;
+    if f.b = zero then raise Zero_Denominator; end if;
     if f.a = zero then return (zero, one); end if;
     GCD (f.a, f.b, p);
     return (f.a / p, f.b / p);
@@ -40,7 +40,7 @@ package body Frac_Euclid is
   function "+" (f1, f2 : frac_elt) return frac_elt is
     p, u, v : ring_elt;
   begin
-    if (f1.b = zero) or (f2.b = zero) then raise Zero_denominator; end if;
+    if (f1.b = zero) or (f2.b = zero) then raise Zero_Denominator; end if;
     if reduce_in_add then
       GCD (f1.b, f2.b, p);
       u := f1.b / p;
@@ -73,7 +73,7 @@ package body Frac_Euclid is
 
   function "-" (f : frac_elt; a : ring_elt) return frac_elt is
   begin
-    return Auto_Red ((-a * f.b + f.a, f.b));
+    return Auto_Red (((-a) * f.b + f.a, f.b));
   end "-";
 
   function "*" (f1, f2 : frac_elt) return frac_elt is
@@ -93,31 +93,31 @@ package body Frac_Euclid is
 
   function "/" (f1, f2 : frac_elt) return frac_elt is
   begin
-    if f2.a = zero then raise Division_by_null_fraction; end if;
+    if f2.a = zero then raise Division_by_Null_Fraction; end if;
     return Auto_Red ((f1.a * f2.b, f1.b * f2.a));
   end "/";
 
   function "/" (a : ring_elt; f : frac_elt) return frac_elt is
   begin
-    if f.a = zero then raise Division_by_null_fraction; end if;
+    if f.a = zero then raise Division_by_Null_Fraction; end if;
     return Auto_Red ((a * f.b, f.a));
   end "/";
 
   function "/" (f : frac_elt; a : ring_elt) return frac_elt is
   begin
-    if a = zero then raise Zero_denominator; end if;
+    if a = zero then raise Zero_Denominator; end if;
     return Auto_Red ((f.a, f.b * a));
   end "/";
 
   function "/" (a, b : ring_elt) return frac_elt is
   begin
-    if b = zero then raise Zero_denominator; end if;
+    if b = zero then raise Zero_Denominator; end if;
     return Auto_Red ((a, b));
   end "/";
 
-  function Eq (f1, f2 : frac_elt) return Boolean is
+  function Eq_Frac (f1, f2 : frac_elt) return Boolean is
   begin
-    return (f1.a * f2.b = f1.b * f2.a);
-  end Eq;
+    return f1.a * f2.b = f1.b * f2.a;
+  end Eq_Frac;
 
 end Frac_Euclid;

@@ -37,6 +37,7 @@ project Mathpaqs_Test extends "mathpaqs" is  --  Check mathpaqs.gpr for details
        -- *** Algebra
        --
          "test_ert.adb",
+         "test_rationals.adb",
          --  "test_float_poly.adb",
        --
        -- ** Numerics

@@ -23,7 +23,7 @@ package body Euclidean_Ring_Tools is
   end Fill;
 
   procedure GCD_and_Bezout (a, b : in Ring_Element; s, t, the_gcd : out Ring_Element) is
-    -- Program 1.8, Introduction to number theory, RBJT Allenby & EJ Redfern
+    --  Program 1.8, Introduction to number theory, RBJT Allenby & EJ Redfern
     ta, tb : array (1 .. 3) of Ring_Element;
     q, r : Ring_Element;
   begin
