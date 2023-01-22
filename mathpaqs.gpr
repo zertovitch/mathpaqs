@@ -12,9 +12,9 @@ project Mathpaqs is
    for Source_Dirs use (
      ".",
      "algebra",
-     "diff_eq/pde", "diff_eq/sde", "diff_eq/ode",
-     "lin_alg", "lin_alg/sparse",
-     "multi",
+     "diff_eq/pde", "diff_eq/sde", "diff_eq/ode",  --  Differential Equations (partial / stochastic / ordinary)
+     "lin_alg", "lin_alg/sparse",                  --  Linear Algebra / sparse matrices
+     "multi",                                      --  Multi-precision integers
      "numerics",
      "probas", "random", "stats",
      "graph"
@@ -54,7 +54,6 @@ project Mathpaqs is
 
    Common_Compiler_Options := (
      "-gnatwa",                        --  Warnings switches (a:turn on all info/warnings marked with +)
-     "-gnatwh",                        --  Warnings switches (h:turn on warnings for hiding declarations)
      "-gnatwcijkmopruvz.c.n.p.t.w.x",  --  Warnings switches (run "gnatmake" for full list)
      "-gnatf",                         --  Full errors. Verbose details, all undefined references
      "-gnatq",                         --  Don't quit, try semantics, even if parse errors
@@ -90,7 +89,8 @@ project Mathpaqs is
    Style_Checks_2 := 
      ("-gnatybfhiu",   --  Style: check b:no blanks at end of lines, f:no ff/vtabs, h: no htabs, i:if-then layout, u:no unnecessary blank lines
       "-gnatye",       --  Style: check e:end/exit labels present
-      "-gnatytc");     --  Style: check t:token separation rules, c:comment format (two spaces)
+      "-gnatytc",      --  Style: check t:token separation rules, c:comment format (two spaces)
+      "-gnatwh");      --  Warnings switches (h:turn on warnings for hiding declarations)
 
    case Mathpaqs_Styles_Checks is
       when "Off"   => null;
