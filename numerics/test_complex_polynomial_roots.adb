@@ -8,9 +8,11 @@ with Ada.Text_IO.Complex_IO;
 
 with Complex_Polynomial_Roots;
 
+with System;
+
 procedure Test_Complex_Polynomial_Roots is
 
-  type TReal is digits 18;
+  type TReal is digits System.Max_Digits;
 
   package CT is new Ada.Numerics.Generic_Complex_Types (TReal);
   package CPR is new Complex_Polynomial_Roots (CT);

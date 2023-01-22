@@ -31,8 +31,10 @@
 with Ada.Text_IO;                       use Ada.Text_IO;
 with Ada.Integer_Text_IO;               use Ada.Integer_Text_IO;
 
+with System;
+
 procedure Arithmetic_Compression is
-  type Real is digits 18;
+  type Real is digits System.Max_Digits;
   package RIO is new Float_IO (Real); use RIO;
 
   char_set : constant String := "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";

@@ -8,36 +8,28 @@
 --
 --  Author:          Gautier de Montmollin
 ------------------------------------------------------------------------------
-with Ada.Text_IO;                       use Ada.Text_IO;
-with Ada.Numerics.Generic_Elementary_Functions;
+with Ada.Text_IO,
+     Ada.Numerics.Generic_Elementary_Functions,
+     Ada.Numerics.Generic_Real_Arrays;
 
-with Dormand_Prince_8, G_Matrices;
-with Graph;                             use Graph;
+with Dormand_Prince_8;
+with Graph;
+
+with System;
 
 procedure Arenstorf is
 
-  type Prec_Float is digits 18;
+  type Prec_Float is digits System.Max_Digits;
 
   package LFEF is new
                Ada.Numerics.Generic_Elementary_functions (Prec_Float);
   use LFEF;
 
-  type Vector is array (Integer range <>) of Prec_Float;
-  type Matrix is array (Integer range <>, Integer range <>) of Prec_Float;
-
-  package LFM is new
-    G_Matrices
-      (Prec_Float,
-       0.0, 1.0,
-       "-", Sqrt, "+", "-", "*", "/",
-       Vector,
-       Matrix);
+  package LFM is new Ada.Numerics.Generic_Real_Arrays (Prec_Float);
   use LFM;
 
 --  package PFMM is new Min_Max(prec_float,">");
 --  use PFMM;
-
-  package PFIO is new Float_IO (Prec_Float); use PFIO;
 
 --  Restricted three body problem
 
@@ -48,7 +40,7 @@ procedure Arenstorf is
 
   h, t, t_end : Prec_Float;
 
-  subtype Vector4 is Vector (1 .. 4);
+  subtype Vector4 is Real_Vector (1 .. 4);
 
   x : Vector4;  --  = (x1,x2, x1',x2')
   x0 : constant Vector4 :=
@@ -239,7 +231,7 @@ procedure Arenstorf is
         c := pala + spal * i + j;
         p := Float (i) / Float (n_meth - 1);
         q := Float (j) / Float (spal - 1);
-        SetRGBPalette (c, Integer (p * 63.0), Integer (q * 63.0), 63 - Integer (p * 63.0));
+        Graph.SetRGBPalette (c, Integer (p * 63.0), Integer (q * 63.0), 63 - Integer (p * 63.0));
       end loop;
     end loop;
   end Degrade;
@@ -252,7 +244,12 @@ procedure Arenstorf is
      DoPriF8  => False,
      DoPriV8  => True);
 
-    rapXY : Float;
+  rapXY : Float;
+
+  package PFIO is new Ada.Text_IO.Float_IO (Prec_Float);
+  use Ada.Text_IO, PFIO;
+
+  use Graph;
 
 begin
 

@@ -8,7 +8,8 @@
 
 with Ada.Text_IO;                       use Ada.Text_IO;
 with Ada.Float_Text_IO;                 use Ada.Float_Text_IO;
-with Float_Polynomials;                 use Float_Polynomials;
+
+with Float_Polynomials;
 
 with Polynomials.Output;
 
@@ -24,11 +25,17 @@ procedure Test_Float_Poly is
   end Fl_Put;
 
   package PolyOut is new Float_Polynomials.Output (Fl_Put, ">");
-  use PolyOut;
 
-  procedure Show_Bezout (a, b : Polynomial) is
-    subtype Polyfix is Polynomial (0 .. Integer'Max (Deg (a), Deg (b)));
+  use Float_Polynomials, PolyOut;
+
+  procedure Show_Bezout (a, b : Float_Polynomials.Polynomial) is
+
+
+    subtype Polyfix is
+      Polynomial (0 .. Integer'Max (Deg (a), Deg (b)));
+
     type Array_of_Polynomials is array (Integer range <>) of Polyfix;
+
     package PEuclid is new
        Euclidean_Ring_Tools (
          Polyfix,
@@ -36,7 +43,6 @@ procedure Test_Float_Poly is
          (0 => 1.0, others => 0.0),  --  "One" polynomial (mathematically, the constant 1)
          "+", "-", "*", "/",
          Eq,
-         Fill,
          --  Problem here: source can be an unconstrained Polynomial.
          --  BTW, GNAT obviously accepts "+", "-", etc. for the constrained Polyfix...
          Array_of_Polynomials
@@ -73,7 +79,7 @@ begin
   Put ("Primitive,  p(y)  ="); Put (Primitive (d), "y"); New_Line;
   Put ("Derivative, p'(z) ="); Put (Derivate (d), "z"); New_Line;
   New_Line;
-  Put ("[return]"); Skip_Line;
+  Put ("[Press Return]"); Skip_Line;
 
   Put_Line ("GCD/Bezout");
   Show_Bezout (a, b);

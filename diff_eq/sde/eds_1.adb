@@ -10,14 +10,14 @@ with Ada.Float_Text_IO;                 use Ada.Float_Text_IO;
 with Ada.Numerics;                      use Ada.Numerics;
 with Ada.Numerics.Elementary_functions; use Ada.Numerics.Elementary_functions;
 
-with Box_Muller;
+with Generic_Random_Functions;
 
 with Graph;                             use Graph;
 with Graph.Standard_fonts;              use Graph.Standard_fonts;
 
 procedure EDS_1 is
 
-  package BMF is new Box_Muller(Float);   use BMF;
+  package FR is new Generic_Random_Functions (Float);
 
   type Vector is array(Natural range <>) of Float;
 

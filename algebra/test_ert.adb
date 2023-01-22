@@ -9,9 +9,11 @@ with Euclidean_Ring_Tools;
 
 with Ada.Text_IO;
 
+with Interfaces;
+
 procedure Test_ERT is
 
-  subtype My_Int is Long_Long_Integer;
+  type My_Int is new Interfaces.Integer_64;
 
   use Ada.Text_IO;
   package IIO is new Integer_IO (My_Int); use IIO;

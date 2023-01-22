@@ -1,9 +1,9 @@
 with Ada.Text_IO;
+with System;
 
 procedure Show_floats_limits is
 
-  --  Presumably the Intel extended double precision (80 bits, i.e. 10 bytes)
-  type Digits_18 is digits 18;
+  type Digits_Max is digits System.Max_Digits;  --  15 or 18 on Intel
 
   generic
     type F is digits <>;
@@ -35,12 +35,10 @@ procedure Show_floats_limits is
   --
   procedure SLF  is new Show_limits (Long_Float,      "Long_Float");
 
-  procedure SLLF is new Show_limits (Long_Long_Float, "Long_Long_Float");
-  procedure SD18 is new Show_limits (Digits_18,       "Digits_18");
+  procedure SDMax is new Show_limits (Digits_Max,     "Digits_Max");
 
 begin
   SF;
   SLF;
-  SLLF;
-  SD18;
+  SDMax;
 end Show_floats_limits;

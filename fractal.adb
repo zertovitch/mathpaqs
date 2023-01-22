@@ -11,9 +11,11 @@ with Graph;
 
 with Ada.Numerics.Generic_Elementary_Functions;
 
+with System;
+
 procedure Fractal is
 
-  type Real is digits 18;
+  type Real is digits System.Max_Digits;
   package REF is new Ada.Numerics.Generic_Elementary_Functions (Real);
 
   type Pt is record

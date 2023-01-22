@@ -19,9 +19,11 @@ with Integer_Arrays_IO;
 with Ada.Text_IO ; use Ada.Text_IO ;
 with Ada.Numerics.Generic_Real_Arrays;
 
+with System;
+
 procedure Test_Generic_Real_Linear_Equations is
 
-  subtype Real is Long_Float; -- digits 12 ;
+  type Real is digits System.Max_Digits;
 
   package Real_Arrays is new Ada.Numerics.Generic_Real_Arrays(Real);
   use Real_Arrays;
