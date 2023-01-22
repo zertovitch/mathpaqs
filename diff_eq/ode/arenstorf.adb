@@ -91,7 +91,7 @@ procedure Arenstorf is
   --  Pour DoPri8 (pas variable)
   accepted : Boolean;
   eps : constant := 1.0E-13;   --  Entre E-7 et E-13
-  uround : constant := Prec_Float'Epsilon;
+  uround : constant := Prec_Float'Model_Epsilon;
   hnew : Prec_Float;
   hprem, hdern, hmin, hmax : Prec_Float;
   it : Natural;

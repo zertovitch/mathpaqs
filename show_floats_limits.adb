@@ -17,7 +17,7 @@ procedure Show_floats_limits is
     Put_Line ("    Largest positive number  . . . . " & F'Image (F'Last));
     Put_Line ("    Largest negative number  . . . . " & F'Image (F'First));
     Put_Line ("    Model_Small  . . . . . . . . . . " & F'Image (F'Model_Small));
-    Put_Line ("    Epsilon  . . . . . . . . . . . . " & F'Image (F'Epsilon));
+    Put_Line ("    Epsilon (Ada 83 only)  . . . . . " & F'Image (F'Epsilon));
     Put_Line ("    Model_Epsilon  . . . . . . . . . " & F'Image (F'Model_Epsilon));
     Put_Line ("    Significant decimal digits . . . " & Integer'Image (F'Digits));
     Put_Line ("    Storage bits . . . . . . . . . . " & Integer'Image (F'Size));

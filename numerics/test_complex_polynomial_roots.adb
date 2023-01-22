@@ -61,8 +61,7 @@ procedure Test_Complex_Polynomial_Roots is
   ptol : array (2..4) of Integer;
 
 begin
-  Put ("TReal'Epsilon:       ");  Put(TReal'Epsilon);       New_Line; -- Ada 83
-  Put ("TReal'Model_Epsilon: ");  Put(TReal'Model_Epsilon); New_Line; -- Ada 95
+  Put ("TReal'Model_Epsilon: ");  Put(TReal'Model_Epsilon); New_Line;
   Put ("TReal'Digits:         "); Put(IImg(TReal'Digits));  New_Line;
   Put_Line ("--");
 
