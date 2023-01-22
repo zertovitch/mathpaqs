@@ -47,4 +47,6 @@ begin
   New_Line;
   Put_Line ("Now, we provoke an exception with (1,0) / (0,1):");
   r := ((1, 0) / (0, 1));
+
+  Aff (r);
 end Test_Rationals;
