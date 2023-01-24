@@ -16,6 +16,10 @@ with Ada.Containers.Vectors;
 --   ^ Temporary, used for checking the specification;
 --     we will build a Vector container type more appropriate for
 --     the purpose: we need a direct access to the data array.
+--     Only the Set_Length, Length, Is_Empty, Element and
+--     Replace_Element methods are kept from Ada.Containers.Vectors.
+
+with Ada.Finalization;
 
 generic
 
@@ -68,7 +72,7 @@ package Universal_Matrices is
   --  Possible derivations: dense, sparse, band storage matrices.  --
   -------------------------------------------------------------------
 
-  type Matrix is interface;
+  type Matrix is abstract new Ada.Finalization.Controlled with null record;
 
   -------------------------
   --  Matrix operations  --
