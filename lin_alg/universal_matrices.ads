@@ -1,7 +1,7 @@
 --  Draft of a specification for an universal matrix package.
 
 --  The elements of the vectors and matrices can be of any algebraic ring
---  and their implementation, eventually approximate:
+--  and their implementation, possibly approximate:
 --
 --    - integers (stored as Integer, Integer_n or Big_Integer)
 --    - modular integers
@@ -13,6 +13,9 @@
 --    - ...
 
 with Ada.Containers.Vectors;
+--   ^ Temporary, used for checking the specification;
+--     we will build a Vector container type more appropriate for
+--     the purpose: we need a direct access to the data array.
 
 generic
 
