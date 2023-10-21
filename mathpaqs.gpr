@@ -51,8 +51,8 @@ project Mathpaqs is
 
    type Mathpaqs_Styles_Checks_Type is
       ("Off",
-       "On",
-       "Extra"
+       "Level_1",
+       "Level_2"
       );
    Mathpaqs_Styles_Checks : Mathpaqs_Styles_Checks_Type := external ("Mathpaqs_Styles_Checks", "Off");
 
@@ -94,8 +94,8 @@ project Mathpaqs is
 
    case Mathpaqs_Styles_Checks is
       when "Off"   => null;
-      when "On"    => Common_Compiler_Options := Common_Compiler_Options & Style_Checks_1;
-      when "Extra" => Common_Compiler_Options := Common_Compiler_Options & Style_Checks_1 & Style_Checks_2;
+      when "Level_1" => Common_Compiler_Options := Common_Compiler_Options & Style_Checks_1;
+      when "Level_2" => Common_Compiler_Options := Common_Compiler_Options & Style_Checks_1 & Style_Checks_2;
    end case;
 
    package Compiler is
@@ -128,4 +128,3 @@ project Mathpaqs is
    end Ide;
 
 end Mathpaqs;
-
