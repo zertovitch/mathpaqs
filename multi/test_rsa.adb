@@ -36,7 +36,7 @@ procedure Test_RSA is
 
   type RSA_Message is array (Integer range <>) of RSA_block;
 
-  -- Encode or decode:
+  --  Encode or decode:
 
   procedure Code (msg : in out RSA_Message; expo, modu : Multi_Int) is
     ipn : RSA_block;
@@ -51,7 +51,7 @@ procedure Test_RSA is
   begin
     for i in msg'Range loop
       Put (i); Put (" ]-> ");
-      Put_in_blocks (msg (i));
+      Put_in_Blocks (msg (i));
       New_Line;
     end loop;
   end Put_in_blocks;
@@ -63,13 +63,13 @@ procedure Test_RSA is
       Put_Line ("    - Original RSA message");
       Put_in_blocks (msg);
     end if;
-    -- Encode
+    --  Encode
     Code (msg, e, n);
     if show_contents then
       Put_Line ("    - Encoded RSA message");
       Put_in_blocks (msg);
     end if;
-    -- Decode
+    --  Decode
     Code (msg, d, n);
     if show_contents then
       Put_Line ("    - Decoded RSA message");
@@ -82,7 +82,7 @@ procedure Test_RSA is
     r : String (s'Range);
   begin
     New_Line;
-    -- Translate String into RSA blocks
+    --  Translate String into RSA blocks
     Put_Line (s);
     for i in msg'Range loop
       Fill (msg (i), (Character'Pos (s (i * 2 - 1)) - 65) * 100 +
@@ -91,7 +91,7 @@ procedure Test_RSA is
 
     Codec (msg, e, d, n);
 
-    -- Translate RSA blocks into String
+    --  Translate RSA blocks into String
     for i in msg'Range loop
       r (i * 2 - 1) := Character'Val (65 + Basic (msg (i))  /  100);
       r (i * 2)     := Character'Val (65 + Basic (msg (i)) mod 100);
@@ -143,7 +143,7 @@ procedure Test_RSA is
 
     Code (msg, d, n);
 
-    -- Translate RSA blocks into String
+    --  Translate RSA blocks into String
     for i in msg'Range loop
       r (i * 2 - 1) := Character'Val (ASCRF (Basic (msg (i))  / 100));
       r (i * 2)     := Character'Val (ASCRF (Basic (msg (i)) rem 100));
@@ -156,7 +156,7 @@ procedure Test_RSA is
     r : String (s'Range);
   begin
     New_Line;
-    -- Translate String into RSA blocks
+    --  Translate String into RSA blocks
     Put_Line (s);
     for i in msg'Range loop
       Fill (msg (i), Character'Pos (s (i)));
@@ -164,7 +164,7 @@ procedure Test_RSA is
 
     Codec (msg, e, d, n);
 
-    -- Translate RSA blocks into String
+    --  Translate RSA blocks into String
     for i in msg'Range loop
       r (i) := Character'Val (Basic (msg (i)));
     end loop;

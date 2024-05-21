@@ -6,36 +6,36 @@ with Ada.Numerics; use Ada.Numerics;
 
 package body Gamma_function is
 
-  package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
+  package REF is new Ada.Numerics.Generic_Elementary_Functions (Real);
   use REF;
 
   --  This uses Stirling's approximation of n!
   --  http://en.wikipedia.org/wiki/Stirling%27s_approximation
   --
-  function GammaStirF(x : Real) return Real is
-    y, w, v: Real;
-    Stir: Real;
+  function GammaStirF (x : Real) return Real is
+    y, w, v : Real;
+    Stir : Real;
   begin
     w := 1.0 / x;
     Stir :=  7.87311395793093628397E-4;
-    Stir := -2.29549961613378126380E-4 + w*Stir;
-    Stir := -2.68132617805781232825E-3 + w*Stir;
-    Stir :=  3.47222221605458667310E-3 + w*Stir;  --  1/288
-    Stir :=  8.33333333333482257126E-2 + w*Stir;  --  1/12
-    w := 1.0 + w*Stir;
-    y := Exp(x);
+    Stir := -2.29549961613378126380E-4 + w * Stir;
+    Stir := -2.68132617805781232825E-3 + w * Stir;
+    Stir :=  3.47222221605458667310E-3 + w * Stir;  --  1/288
+    Stir :=  8.33333333333482257126E-2 + w * Stir;  --  1/12
+    w := 1.0 + w * Stir;
+    y := Exp (x);
     if x > 143.01608 then
-      v := x ** (0.5*x-0.25);
-      y := v * (v/y);
+      v := x ** (0.5 * x - 0.25);
+      y := v * (v / y);
     else
-      y := x ** (x-0.5) / y;
+      y := x ** (x - 0.5) / y;
     end if;
-    return 2.50662827463100050242*y*w;
+    return 2.50662827463100050242 * y * w;
   end GammaStirF;
 
   subtype Integer_for_Gamma is Integer;
 
-  function Almost_zero (x: Real) return Boolean is
+  function Almost_zero (x : Real) return Boolean is
   begin
     return abs x <= Real'Base'Model_Small;
   end Almost_zero;
@@ -62,13 +62,13 @@ package body Gamma_function is
   --  Translated on 10-Nov-2015 by (New) P2Ada v. 28-Oct-2009
   --  ************************************************************************
 
-  function Gamma(x : Real) return Real is
-    xv: Real:= x;
-    p, PP, q, QQ, z, Sign_Gamma_x: Real;
-    i: Integer_for_Gamma;
+  function Gamma (x : Real) return Real is
+    xv : Real := x;
+    p, PP, q, QQ, z, Sign_Gamma_x : Real;
+    i : Integer_for_Gamma;
   begin
     Sign_Gamma_x := 1.0;
-    q := abs(xv);
+    q := abs (xv);
     if q > 33.0 then
       if xv < 0.0 then
         p := Real'Floor(q);

@@ -45,7 +45,7 @@ package Phi_function is
   --  package body (implementation) in numerics/phi_function.adb.
   --  See random/test_normal.adb for a test.
 
-  function Phi (x: Real) return Real;
+  function Phi (x : Real) return Real;
 
   function Inverse_Phi (y : Real) return Real;
 

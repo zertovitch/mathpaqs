@@ -5,40 +5,40 @@ with Error_function;
 
 package body Phi_function is
 
-  -- Ada 95 Quality and Style Guide, 7.2.7:
-  -- Tests for
+  --  Ada 95 Quality and Style Guide, 7.2.7:
+  --  Tests for
   --
-  -- (1) absolute "equality" to 0 in storage,
-  -- (2) absolute "equality" to 0 in computation,
-  -- (3) relative "equality" to 0 in storage, and
-  -- (4) relative "equality" to 0 in computation:
+  --  (1) absolute "equality" to 0 in storage,
+  --  (2) absolute "equality" to 0 in computation,
+  --  (3) relative "equality" to 0 in storage, and
+  --  (4) relative "equality" to 0 in computation:
   --
   --  abs X <= Float_Type'Model_Small                      -- (1)
   --  abs X <= Float_Type'Base'Model_Small                 -- (2)
   --  abs X <= abs X * Float_Type'Model_Epsilon            -- (3)
   --  abs X <= abs X * Float_Type'Base'Model_Epsilon       -- (4)
 
-  package GEF is new Ada.Numerics.Generic_Elementary_Functions(Real);
+  package GEF is new Ada.Numerics.Generic_Elementary_Functions (Real);
   use GEF;
 
-  -- Algorithm 26.2.17 <http://www.math.sfu.ca/~cbm/aands/page_932.htm>
-  -- from Abromowitz and Stegun, Handbook of Mathematical Functions.
-  -- It has a maximum absolute error of 7.5e-8.
+  --  Algorithm 26.2.17 <http://www.math.sfu.ca/~cbm/aands/page_932.htm>
+  --  from Abromowitz and Stegun, Handbook of Mathematical Functions.
+  --  It has a maximum absolute error of 7.5e-8.
 
-  function Phi_Single_Precision (x: Real) return Real is
-    t, poly, y: Real;
-    b1 : constant:=  0.31938_1530;
-    b2 : constant:= -0.35656_3782;
-    b3 : constant:=  1.78147_7937;
-    b4 : constant:= -1.82125_5978;
-    b5 : constant:=  1.33027_4429;
-    p  : constant:=  0.23164_19;
-    c  : constant:=  0.398942280401433; -- ~= 1/Sqrt(2*pi)
-    mh : constant:=  -1.0 / 2.0;
+  function Phi_Single_Precision (x : Real) return Real is
+    t, poly, y : Real;
+    b1 : constant :=  0.31938_1530;
+    b2 : constant := -0.35656_3782;
+    b3 : constant :=  1.78147_7937;
+    b4 : constant := -1.82125_5978;
+    b5 : constant :=  1.33027_4429;
+    p  : constant :=  0.23164_19;
+    c  : constant :=  0.398942280401433; -- ~= 1/Sqrt(2*pi)
+    mh : constant :=  -1.0 / 2.0;
   begin
     t := 1.0 / (1.0 + p * abs x);
-    poly:= t * (t * (t * (t * (t * b5 + b4) + b3) + b2) + b1);
-    y:= c * Exp(x * x * mh) * poly;
+    poly := t * (t * (t * (t * (t * b5 + b4) + b3) + b2) + b1);
+    y := c * Exp (x * x * mh) * poly;
     if x >= 0.0 then
       return 1.0 - y;
     else
@@ -78,7 +78,7 @@ package body Phi_function is
   --  Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
   --  ************************************************************************
 
-  function Phi (x: Real) return Real is
+  function Phi (x : Real) return Real is
   begin
     return 0.5 * (Erf_pkg.Erf (x * 0.70710678118654752440084436210485) + 1.0);
   end Phi;
@@ -110,11 +110,11 @@ package body Phi_function is
   --  ************************************************************************
 
   function Inverse_Phi (y : Real) return Real is
-    Expm2: constant:= 0.13533528323661269189;
-    S2Pi : constant:= 2.50662827463100050242;
-    x, y_var, z, y2, x0, x1:Real;
-    code: Integer:= 1;
-    P0, Q0, P1, Q1, P2, Q2:Real;
+    Expm2 : constant := 0.13533528323661269189;
+    S2Pi  : constant := 2.50662827463100050242;
+    x, y_var, z, y2, x0, x1 : Real;
+    code : Integer := 1;
+    P0, Q0, P1, Q1, P2, Q2 : Real;
   begin
     if y <= 0.0 then  --  was < in the Pascal code -> causes a Log(0.0) later...
       return Real'First;

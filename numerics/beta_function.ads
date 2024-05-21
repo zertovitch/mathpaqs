@@ -72,7 +72,7 @@ package Beta_function is
   --                -
   --                0
   --
-  function Beta (a, b: Real) return Real;
+  function Beta (a, b : Real) return Real;
 
   --  Incomplete Beta integral, with x in [0;1]
   --                  x
@@ -83,7 +83,7 @@ package Beta_function is
   --                -
   --                0
   --
-  function Beta (x, a, b: Real) return Real;
+  function Beta (x, a, b : Real) return Real;
 
   --  Regularized Beta function, sometimes written as I_x(a,b).
   --  It is defined as: I_x(a,b) = Beta(x,a,b) / Beta(a,b).
@@ -91,7 +91,7 @@ package Beta_function is
   --  It is also the cumulative distribution function (CDF) of the Beta probability law.
   --  Excel: BETA.DIST(x,a,b,TRUE)
   --
-  function Regularized_Beta (x, a, b: Real) return Real;
+  function Regularized_Beta (x, a, b : Real) return Real;
 
   --  Find x such as y = Beta(x, a, b).
   --

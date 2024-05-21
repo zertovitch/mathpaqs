@@ -7,9 +7,9 @@ with Gamma_function, Phi_function;
 
 package body Beta_function is
 
-  package REF is new Ada.Numerics.Generic_Elementary_Functions(Real);
+  package REF is new Ada.Numerics.Generic_Elementary_Functions (Real);
   package RPhF is new Phi_function (Real);
-  package RGF is new Gamma_function(Real);
+  package RGF is new Gamma_function (Real);
 
   use REF, RGF;
 
@@ -36,21 +36,21 @@ package body Beta_function is
   --  Copyright 1984, 1987 by Stephen L. Moshier
   --  ************************************************************************
 
-  function Beta (a, b: Real) return Real is
-    a_b, lg_a, lg_b, lg_a_b, sg_a, sg_b, sg_a_b, g_a_b: Real;
+  function Beta (a, b : Real) return Real is
+    a_b, lg_a, lg_b, lg_a_b, sg_a, sg_b, sg_a_b, g_a_b : Real;
   begin
     a_b := a + b;
-    if abs(a_b) > 171.624376956302725 then
-      Log_Gamma(a_b, lg_a_b, sg_a_b);
-      Log_Gamma(b, lg_b, sg_b);
-      Log_Gamma(a, lg_a, sg_a);
-      return sg_a_b * sg_a * sg_b * Exp(lg_a + lg_b - lg_a_b);
+    if abs (a_b) > 171.624376956302725 then
+      Log_Gamma (a_b, lg_a_b, sg_a_b);
+      Log_Gamma (b, lg_b, sg_b);
+      Log_Gamma (a, lg_a, sg_a);
+      return sg_a_b * sg_a * sg_b * Exp (lg_a + lg_b - lg_a_b);
     end if;
-    g_a_b := Gamma(a_b);
+    g_a_b := Gamma (a_b);
     if a > b then
-      return (Gamma(a) / g_a_b) * Gamma(b);
+      return (Gamma (a) / g_a_b) * Gamma (b);
     else
-      return (Gamma(b) / g_a_b) * Gamma(a);
+      return (Gamma (b) / g_a_b) * Gamma (a);
     end if;
   end Beta;
 
@@ -64,7 +64,7 @@ package body Beta_function is
   MaxRealNumber : constant Real :=  1.0E300;
   MinRealNumber : constant Real :=  1.0E-300;
 
-  function Almost_zero (x: Real) return Boolean is
+  function Almost_zero (x : Real) return Boolean is
   begin
     return abs x <= Real'Base'Model_Small;
   end Almost_zero;
@@ -77,8 +77,8 @@ package body Beta_function is
   --  ************************************************************************
 
   function IncompleteBetaFE (a, b, x, big, biginv : Real) return Real is
-    xk, pk, pkm1, pkm2, qk, qkm1, qkm2, k1, k2, k3, k4, k5, k6, k7, k8, r, t, ans, thresh: Real;
-    n: Integer_for_Beta;
+    xk, pk, pkm1, pkm2, qk, qkm1, qkm2, k1, k2, k3, k4, k5, k6, k7, k8, r, t, ans, thresh : Real;
+    n : Integer_for_Beta;
   begin
     k1 := a;
     k2 := a + b;

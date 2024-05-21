@@ -4,60 +4,62 @@
 --  Date/version:    2006 ; 15-Feb-2002 / 22.XI.1999 / 22.12.1996
 --  Author:          Gautier de Montmollin
 ------------------------------------------------------------------------------
-with Text_IO;     use Text_IO;
+with Ada.Text_IO;
 
 package Multi_Precision_Integers.IO is
 
-  Default_Base: Number_Base := 10;
+  use Ada.Text_IO;
 
-  -- Returns the number of digits in the specified base:
-  function Number_of_digits(i: Multi_Int; base: Number_Base:= 10) return Natural;
+  Default_Base : Number_Base := 10;
 
-  -- Returns the image of i in the specified base:
-  function Str(i: Multi_Int; base: Number_Base:= 10) return String;
+  --  Returns the number of digits in the specified base:
+  function Number_of_Digits (i : Multi_Int; base : Number_Base := 10) return Natural;
 
-  -- Returns the value of number in string:
-  function Val(s: String) return Multi_Int;
+  --  Returns the image of i in the specified base:
+  function Str (i : Multi_Int; base : Number_Base := 10) return String;
 
-  -- Output to file, in block format:
-  procedure Put_in_blocks(File  : in File_Type;
-                          Item  : in Multi_Int);
+  --  Returns the value of number in string:
+  function Val (s : String) return Multi_Int;
 
-  -- Output to standard input, in block format:
-  procedure Put_in_blocks(Item  : in Multi_Int);
+  --  Output to file, in block format:
+  procedure Put_in_Blocks (File  : in File_Type;
+                           Item  : in Multi_Int);
+
+  --  Output to standard input, in block format:
+  procedure Put_in_Blocks (Item  : in Multi_Int);
 
   ---- The following mimic the Text_IO.Integer_IO
 
-  -- Get from file:
-  procedure Get(File  : in  File_Type;
-                Item  : out Multi_Int;
-                Width : in Field := 0);
+  --  Get from file:
+  procedure Get (File  : in  File_Type;
+                 Item  : out Multi_Int;
+                 Width : in Field := 0);
 
-  -- Get from standard input:
-  procedure Get(Item  : out Multi_Int;
-                Width : in  Field := 0);
+  --  Get from standard input:
+  procedure Get (Item  : out Multi_Int;
+                 Width : in  Field := 0);
 
-  -- Put to file:
-  procedure Put(File  : in File_Type;
-                Item  : in Multi_Int;
-                Width : in Field := 0;
-                Base  : in Number_Base := Default_Base);
-  -- Width=0 : no default formatting, since inpredicatble length
+  --  Put to file:
+  procedure Put (File  : in File_Type;
+                 Item  : in Multi_Int;
+                 Width : in Field := 0;
+                 Base  : in Number_Base := Default_Base);
+  --  Width=0 : no default formatting, since inpredicatble length
 
-  -- Put to standard output:
-  procedure Put(Item  : in Multi_Int;
-                Width : in Field := 0;
-                Base  : in Number_Base := Default_Base);
-  -- Width=0 : no default formatting, since inpredicatble length
+  --  Put to standard output:
+  procedure Put (Item  : in Multi_Int;
+                 Width : in Field := 0;
+                 Base  : in Number_Base := Default_Base);
+  --  Width=0 : no default formatting, since inpredicatble length
 
-  -- Get from string:
-  procedure Get(From : in  String;
-                Item : out Multi_Int;
-                Last : out Positive);
+  --  Get from string:
+  procedure Get (From : in  String;
+                 Item : out Multi_Int;
+                 Last : out Positive);
 
-  -- Put to string:
-  procedure Put(To   : out String;
-                Item : in Multi_Int;
-                Base : in Number_Base := Default_Base);
+  --  Put to string:
+  procedure Put (To   : out String;
+                 Item : in Multi_Int;
+                 Base : in Number_Base := Default_Base);
 
 end Multi_Precision_Integers.IO;

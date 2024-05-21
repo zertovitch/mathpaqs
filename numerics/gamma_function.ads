@@ -42,10 +42,10 @@ generic
 package Gamma_function is
   --  History and notes about accuracy can be found in the implementation
 
-  function Gamma(x : Real) return Real;
+  function Gamma (x : Real) return Real;
 
   --  Natural logarithm of the gamma function
-  function Log_Gamma(x : Real) return Real;
-  procedure Log_Gamma(x : Real; Log_Gamma_x, Sign_Gamma_x: out Real);
+  function Log_Gamma (x : Real) return Real;
+  procedure Log_Gamma (x : Real; Log_Gamma_x, Sign_Gamma_x : out Real);
 
 end Gamma_function;

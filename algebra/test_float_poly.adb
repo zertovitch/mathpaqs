@@ -30,7 +30,6 @@ procedure Test_Float_Poly is
 
   procedure Show_Bezout (a, b : Float_Polynomials.Polynomial) is
 
-
     subtype Polyfix is
       Polynomial (0 .. Integer'Max (Deg (a), Deg (b)));
 
