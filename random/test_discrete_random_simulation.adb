@@ -20,24 +20,24 @@ procedure Test_Discrete_Random_Simulation is
   --  Prob_Value: we can also use the Real type as well, but the
   --  range constraint adds automatic checks when enabled:
   subtype Prob_Value is Real range 0.0 .. 1.0;
-  type Pb_array is array(Integer range <>) of Prob_Value;
+  type Pb_array is array (Integer range <>) of Prob_Value;
 
-  package DRS is new Discrete_Random_Simulation(Prob_Value, Pb_array); use DRS;
-  package REF is new Ada.Numerics.Generic_Elementary_Functions(Real); use REF;
-  package RG is new Gamma_function(Real); use RG;
+  package DRS is new Discrete_Random_Simulation (Prob_Value, Pb_array); use DRS;
+  package REF is new Ada.Numerics.Generic_Elementary_Functions (Real); use REF;
+  package RG is new Gamma_function (Real); use RG;
   package RUR is new U_Rand (Real); use RUR;
 
-  package RIO is new Float_IO(Real); use RIO;
+  package RIO is new Float_IO (Real); use RIO;
 
   type Simulation_mode is (linear, dichotomic, alias);
 
-  procedure Test_CDF_by_mode(F: Pb_array; s_mode: Simulation_mode; comment: String) is
-    sample: array(F'Range) of Integer := (others => 0);
-    g: Generator;
-    n: constant := 50_000_000;
-    u, pxi: Prob_Value;
-    ii, x: Integer:= 0;
-    t0, t1, t2: Time;
+  procedure Test_CDF_by_mode (F : Pb_array; s_mode : Simulation_mode; comment : String) is
+    sample : array (F'Range) of Integer := (others => 0);
+    g : Generator;
+    n : constant := 50_000_000;
+    u, pxi : Prob_Value;
+    ii, x : Integer := 0;
+    t0, t1, t2 : Time;
     aliases: Alias_table (F'Range);
     probs: constant Pb_array (F'Range) := To_probs (F);
     diff, max_diff: Real := 0.0;

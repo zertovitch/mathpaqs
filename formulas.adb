@@ -1,10 +1,13 @@
-with Ada.Characters.Handling;           use Ada.Characters.Handling;
-with Ada.Exceptions;                    use Ada.Exceptions;
-with Ada.Numerics.Generic_Elementary_Functions;
-with Ada.Strings.Fixed;                 use Ada.Strings.Fixed, Ada.Strings;
-with Ada.Unchecked_Deallocation;
+with Ada.Characters.Handling,
+     Ada.Exceptions,
+     Ada.Numerics.Generic_Elementary_Functions,
+     Ada.Strings.Fixed,
+     Ada.Unchecked_Deallocation;
 
 package body Formulas is
+
+  use Ada.Characters.Handling,
+      Ada.Strings, Ada.Strings.Fixed, Ada.Strings.Unbounded;
 
   package REF is new Ada.Numerics.Generic_Elementary_Functions (Real);
   package RIO is new Ada.Text_IO.Float_IO (Real);
@@ -472,7 +475,7 @@ package body Formulas is
   exception
     when E : Parse_Error =>
       Deep_delete (f.root);
-      raise Parse_Error with Exception_Message (E);
+      raise Parse_Error with Ada.Exceptions.Exception_Message (E);
   end Parse;
 
   function Parse (s : String) return Formula is
@@ -482,12 +485,12 @@ package body Formulas is
     return f;
   end Parse;
 
-  procedure Parse (f : out Formula; u : Unbounded_String) is
+  procedure Parse (f : out Formula; u : Ada.Strings.Unbounded.Unbounded_String) is
   begin
     Parse (f, To_String (u));
   end Parse;
 
-  function Parse (u : Unbounded_String) return Formula is
+  function Parse (u : Ada.Strings.Unbounded.Unbounded_String) return Formula is
     f : Formula;
   begin
     Parse (f, u);

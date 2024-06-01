@@ -16,7 +16,7 @@
 --      project page:  http://sf.net/projects/mathpaqs/
 --      mirror:        https://github.com/zertovitch/mathpaqs
 
---  Copyright (c) Gautier de Montmollin 2015 .. 2023
+--  Copyright (c) Gautier de Montmollin 2015 .. 2024
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@
 --   - (never-ending) improve Simplify (see misses at Test_Formulas)
 
 with Ada.Finalization;
-with Ada.Strings.Unbounded;             use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 generic
@@ -68,9 +68,9 @@ package Formulas is
   ---------------------------------------------------
 
   procedure Parse (f : out Formula; s : String);
-  function Parse (s : String) return Formula;  --  NB: a bit slower than the procedure
-  procedure Parse (f : out Formula; u : Unbounded_String);
-  function Parse (u : Unbounded_String) return Formula;  --  NB: a bit slower than the procedure
+  function Parse (s : String) return Formula;
+  procedure Parse (f : out Formula; u : Ada.Strings.Unbounded.Unbounded_String);
+  function Parse (u : Ada.Strings.Unbounded.Unbounded_String) return Formula;
 
   function Evaluate (f : Formula; payload : Payload_type) return Real;
 
@@ -156,7 +156,7 @@ private
     case s is
       when nb  =>  n : Real;
       when pi  =>  null;
-      when var =>  v : Unbounded_String;
+      when var =>  v : Ada.Strings.Unbounded.Unbounded_String;
       when Unary | Binary => left, right : p_Formula_Rec;
     end case;
   end record;
