@@ -1,15 +1,28 @@
---  Draft of a specification for an universal matrix package.
+--  Universal matrix package.
+--
+--  This package and its children defines matrices for any kind of elements
+--  and with various kind of storage (full, sparse, band, ...).
 
 --  The elements of the vectors and matrices can be of any algebraic ring
 --  and their implementation, possibly approximate:
 --
 --    - integers (stored as Integer, Integer_n or Big_Integer)
 --    - modular integers
---    - real numbers (approximated as floating-point, fixed-point or Big_Real)
+--    - real numbers (approximated for instance as floating-point,
+--        fixed-point or Big_Real)
 --    - complex numbers
 --    - rational numbers
---    - polynomials (of real, complex, rational, ...)
---    - other matrices
+--    - polynomials (with coefficients being real, complex, rational,...)
+--    - other matrices!
+--    - ...
+
+--  The concrete derivations of the abstract type Matrix below
+--  can define various kinds of storage:
+--
+--    - plain, dense matrices, but resizable and allocated on the heap
+--    - band matrices (only the diagonal and some of the upper/lower
+--        diagonal are non-zero)
+--    - sparse matrices
 --    - ...
 
 with Ada.Containers.Vectors;
@@ -55,7 +68,8 @@ package Universal_Matrices is
   --  v := v + w :
   procedure Add (v : in out Vector; w : Vector);
   --  v := v + factor * w :
-  procedure Add_Left_Scaled (v : in out Vector; factor : Ring_Element; w : Vector);
+  procedure Add_Left_Scaled
+    (v : in out Vector; factor : Ring_Element; w : Vector);
 
   function "-" (v, w : Vector) return Vector;
   --  v := v - w :
@@ -68,11 +82,14 @@ package Universal_Matrices is
   function Square_L2_Distance (v, w : Vector) return Ring_Element;
 
   -------------------------------------------------------------------
-  --  Root matrix type.                                            --
+  --  The root matrix type.                                        --
   --  Possible derivations: dense, sparse, band storage matrices.  --
   -------------------------------------------------------------------
 
   type Matrix is abstract new Ada.Finalization.Controlled with null record;
+
+  procedure Set_Identity (A : in out Matrix; order : Positive) is abstract;
+  procedure Transpose (A : in out Matrix) is abstract;
 
   -------------------------
   --  Matrix operations  --
@@ -85,6 +102,10 @@ package Universal_Matrices is
   function "*" (A, B : Matrix) return Matrix is abstract;
   function "+" (A, B : Matrix) return Matrix is abstract;
   function "-" (A, B : Matrix) return Matrix is abstract;
+
+  procedure Set (A : in out Matrix; i, j : in Positive; value : in Ring_Element) is abstract;
+  procedure Get (A : in out Matrix; i, j : in Positive; value : out Ring_Element) is abstract;
+  function  Get (A : in out Matrix; i, j : in Positive) return Ring_Element is abstract;
 
   --  Matrix-Vector operations
 

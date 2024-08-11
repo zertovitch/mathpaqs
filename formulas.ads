@@ -41,6 +41,10 @@
 
 --  TO DO:
 --   - implement user functions
+--   - replace the recursion with right operands on each priority level
+--       (term, factor, ...) by a WHILE loop; remove `Left_assoc`
+--       that becomes consequently unnecessary. See for instance the
+--       HAC compiler for a correct implementation. 
 --   - (never-ending) improve Simplify (see misses at Test_Formulas)
 
 with Ada.Finalization;
