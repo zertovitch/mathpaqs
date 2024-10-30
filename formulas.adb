@@ -198,22 +198,22 @@ package body Formulas is
 
   procedure Dispose is new Ada.Unchecked_Deallocation (Formula_Rec, p_Formula_Rec);
 
-  procedure Deep_delete (f : in out p_Formula_Rec) is
+  procedure Deep_Delete (f : in out p_Formula_Rec) is
   begin
     if f /= null then
       case f.s is
         when Unary =>
-          Deep_delete (f.left);
+          Deep_Delete (f.left);
         when Binary =>
-          Deep_delete (f.left);
-          Deep_delete (f.right);
+          Deep_Delete (f.left);
+          Deep_Delete (f.right);
         when others =>
           null;
       end case;
       Dispose (f);
       f := null;
     end if;
-  end Deep_delete;
+  end Deep_Delete;
 
   Closing : constant array (Character) of Character :=
     ('(' => ')',
@@ -464,17 +464,17 @@ package body Formulas is
 
   begin
     i := 1;
-    Deep_delete (f.root);
+    Deep_Delete (f.root);
     f.root := Expression;
     Left_Assoc_Minus (f.root);
     Left_Assoc_Divide (f.root);
     if str (i) /= c_fin then
-      Deep_delete (f.root);
+      Deep_Delete (f.root);
       raise Parse_Error with "Unexpected end in formula (extra symbols)";
     end if;
   exception
     when E : Parse_Error =>
-      Deep_delete (f.root);
+      Deep_Delete (f.root);
       raise Parse_Error with Ada.Exceptions.Exception_Message (E);
   end Parse;
 
@@ -784,7 +784,7 @@ package body Formulas is
     begin
       aux := f.left;
       f.left := null; --  empˆeche destruction
-      Deep_delete (f);
+      Deep_Delete (f);
       f := aux;
     end left_replaces_f;
 
@@ -792,13 +792,13 @@ package body Formulas is
     begin
       aux := f.right;
       f.right := null; --  empˆeche destruction
-      Deep_delete (f);
+      Deep_Delete (f);
       f := aux;
     end right_replaces_f;
 
     procedure cst_replaces_f (cst : Real) is
     begin
-      Deep_delete (f);
+      Deep_Delete (f);
       f := new Formula_Rec (nb);
       f.n := cst;
     end cst_replaces_f;
@@ -942,18 +942,18 @@ package body Formulas is
           f := aux;
         elsif Equivalent (f.left, f.right) then
           aux := Build_2X (f.left);                     --  X + X  ->  2*X
-          Deep_delete (f.right);
+          Deep_Delete (f.right);
           Dispose (f);
           f := aux;
         elsif f.right.s = plus and then Equivalent (f.left, f.right.left) then
           f.left := Build_2X (f.left);                  --  X + {X + Y}  ->  2*X + Y
-          Deep_delete (f.right.left);   -- destroy 2nd occurence of X
+          Deep_Delete (f.right.left);   -- destroy 2nd occurrence of X
           aux := f.right.right;         -- keep Y
           Dispose (f.right);
           f.right := aux;
         elsif f.right.s = plus and then Equivalent (f.left, f.right.right) then
           f.left := Build_2X (f.left);                  --  X + {Y + X}  ->  2*X + Y
-          Deep_delete (f.right.right);  -- destroy 2nd occurence of X
+          Deep_Delete (f.right.right);  -- destroy 2nd occurrence of X
           aux := f.right.left;          -- keep Y
           Dispose (f.right);
           f.right := aux;
@@ -999,7 +999,7 @@ package body Formulas is
         elsif Is_constant (f.left, 0.0) then
           aux := new Formula_Rec (moins_una);           --  0 - X   ->   -X
           aux.left := f.right;
-          Deep_delete (f.left);
+          Deep_Delete (f.left);
           Dispose (f);
           f := aux;
         elsif Is_constant (f.right, 0.0) then
@@ -1009,18 +1009,18 @@ package body Formulas is
       when fois =>
         if Equivalent (f.left, f.right) then            --  X*X -> X^2
           aux := Build_X_pow_2 (f.left);
-          Deep_delete (f.right);        -- destroy 2nd occurence of X
+          Deep_Delete (f.right);        -- destroy 2nd occurrence of X
           Dispose (f);
           f := aux;
         elsif f.right.s = fois and then Equivalent (f.left, f.right.left) then
           f.left := Build_X_pow_2 (f.left);              --  X * {X * Y}  ->  X^2 * Y
-          Deep_delete (f.right.left);   -- destroy 2nd occurence of X
+          Deep_Delete (f.right.left);   -- destroy 2nd occurrence of X
           aux := f.right.right;         -- keep Y
           Dispose (f.right);
           f.right := aux;
         elsif f.right.s = fois and then Equivalent (f.left, f.right.right) then
           f.left := Build_X_pow_2 (f.left);              --  X * {Y * X}  ->  X^2 * Y
-          Deep_delete (f.right.right);  -- destroy 2nd occurence of X
+          Deep_Delete (f.right.right);  -- destroy 2nd occurrence of X
           aux := f.right.left;          -- keep Y
           Dispose (f.right);
           f.right := aux;
@@ -1037,14 +1037,14 @@ package body Formulas is
           nexp := new Formula_Rec (puiss);
           nexp.left := f.left.left;
           nexp.right := aux;                 --  nexp= "X^(m+n)"
-          Deep_delete (f.right.left);
+          Deep_Delete (f.right.left);
           Dispose (f.left);
           Dispose (f.right);
           Dispose (f);                --  dissoudre ancienne expr
           f := nexp;
         elsif f.right.s = puiss and then Equivalent (f.left, f.right.left) then
           aux := f.right;                                --  X * X^n   ->   X^(n+1)
-          Deep_delete (f.left);
+          Deep_Delete (f.left);
           Dispose (f);
           f := aux;            --  got rid of *
           aux := new Formula_Rec (par);
@@ -1055,7 +1055,7 @@ package body Formulas is
           f.right := aux;
         elsif f.left.s = puiss and then Equivalent (f.left.left, f.right) then
           aux := f.left;                                --  X^n * X   ->   X^(n+1)
-          Deep_delete (f.right);
+          Deep_Delete (f.right);
           Dispose (f);
           f := aux;            --  got rid of *
           aux := new Formula_Rec (par);
@@ -1137,7 +1137,7 @@ package body Formulas is
 
   overriding procedure Finalize (f : in out Formula) is
   begin
-    Deep_delete (f.root);
+    Deep_Delete (f.root);
   end Finalize;
 
 end Formulas;
