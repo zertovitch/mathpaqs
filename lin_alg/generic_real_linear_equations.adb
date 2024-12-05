@@ -1,17 +1,17 @@
-with Ada.Text_IO; use Ada.Text_IO; -- for debug
--- with INTEGER_ARRAYS_IO;  -- for debug
--- with REAL_ARRAYS_IO; -- for debug
+with Ada.Text_IO;  -- for debug
+--  with INTEGER_ARRAYS_IO;  -- for debug
+--  with REAL_ARRAYS_IO; -- for debug
 with Ada.Numerics.Generic_Elementary_Functions;
 
 package body Generic_Real_Linear_Equations is
 
-  function Almost_zero(x: Real) return Boolean is
+  function Almost_Zero (x : Real) return Boolean is
   begin
     return abs x <= Real'Base'Model_Small;
-  end Almost_zero;
+  end Almost_Zero;
 
   package Elementary_Functions is new
-    Ada.Numerics.Generic_Elementary_Functions ( Real ) ;
+    Ada.Numerics.Generic_Elementary_Functions (Real);
 
 --  package REAL_IO is new REAL_ARRAYS_IO
 --                            (REAL, Real_Arrays); -- for debug
@@ -20,8 +20,8 @@ package body Generic_Real_Linear_Equations is
 --                            (Integer, Integer_Arrays); -- for debug
 --  use INT_IO; -- for debug
 
-  function Linear_Equations ( A : Real_Matrix ;
-                              Y : Real_Vector ) return Real_Vector is
+  function Solve_JS (A : Real_Matrix;
+                     Y : Real_Vector) return Real_Vector is
 
     --      PURPOSE : SOLVE THE LINEAR SYSTEM OF EQUATIONS WITH REAL
     --                COEFFICIENTS   [A] * |X| = |Y|
@@ -44,55 +44,55 @@ package body Generic_Real_Linear_Equations is
     --      revised 10/8/88 for nested generics
     --      revised 8/8/90 for ISO NRG proposed standard packages interface
 
-    N : constant Integer := A'Length(1) ; -- NUMBER OF EQUATIONS
-    X : Real_Vector ( 1 .. N ) ;          -- RESULT BEING COMPUTED
-    B : Real_Matrix ( 1 .. N , 1 .. N + 1 ) ;  -- WORKING MATRIX
-    ROW : array ( 1 .. N ) of Integer ;   -- ROW INTERCHANGE INDICIES
-    HOLD , I_PIVOT : Integer ;            -- PIVOT INDICIES
-    PIVOT : Real ;                        -- PIVOT ELEMENT VALUE
-    ABS_PIVOT : Real ;                    -- ABS OF PIVOT ELEMENT
-    NORM1 : Real := 0.0 ;                 -- 1 NORM OF MATRIX
+    N : constant Integer := A'Length (1);  --  NUMBER OF EQUATIONS
+    X : Real_Vector (1 .. N);              --  RESULT BEING COMPUTED
+    B : Real_Matrix (1 .. N, 1 .. N + 1);  --  WORKING MATRIX
+    ROW : array (1 .. N) of Integer;       --  ROW INTERCHANGE INDICES
+    HOLD, I_PIVOT : Integer;               --  PIVOT INDICIES
+    PIVOT : Real;                          --  PIVOT ELEMENT VALUE
+    ABS_PIVOT : Real;                      --  ABS OF PIVOT ELEMENT
+    NORM1 : Real := 0.0;                   --  1 NORM OF MATRIX
   begin
-    if A'Length ( 1 ) /= A'Length ( 2 ) then
+    if A'Length (1) /= A'Length (2) then
       raise Constraint_Error with "Matrix A is not square";
-    end if ;
-    if A'Length ( 1 ) /= Y'Length then
+    end if;
+    if A'Length (1) /= Y'Length then
       raise Constraint_Error with "Matrix A row count is different than vector Y's";
-    end if ;
+    end if;
 
     --                               BUILD WORKING DATA STRUCTURE
     for I in 1 .. N loop
       for J in 1 .. N loop
-        B ( I , J ) := A ( I - 1 + A'First( 1 ) , J - 1 + A'First ( 2 )) ;
-        if abs B ( I , J ) > NORM1 then
-          NORM1 := abs B ( I , J ) ;
+        B (I, J) := A (I - 1 + A'First (1), J - 1 + A'First (2));
+        if abs B (I, J) > NORM1 then
+          NORM1 := abs B (I, J);
         end if;
-      end loop ;
-      B ( I , N + 1 ) := Y ( I - 1 + Y'First ) ;
-    end loop ;
+      end loop;
+      B (I, N + 1) := Y (I - 1 + Y'First);
+    end loop;
 
     --                               SET UP ROW  INTERCHANGE VECTORS
     for K in 1 .. N loop
-      ROW ( K ) := K ;
-    end loop ;
+      ROW (K) := K;
+    end loop;
 
     --                               BEGIN MAIN REDUCTION LOOP
     for K in 1 .. N loop
 
       --                             FIND LARGEST ELEMENT FOR PIVOT
-      PIVOT := B ( ROW( K ) , K) ;
-      ABS_PIVOT := abs ( PIVOT ) ;
-      I_PIVOT := K ;
+      PIVOT := B (ROW (K), K);
+      ABS_PIVOT := abs (PIVOT);
+      I_PIVOT := K;
       for I in K .. N loop
-        if abs ( B( ROW( I ) , K)) > ABS_PIVOT then
-          I_PIVOT := I ;
-          PIVOT := B ( ROW( I ) , K) ;
-          ABS_PIVOT := abs ( PIVOT ) ;
-        end if ;
-      end loop ;
+        if abs (B (ROW (I), K)) > ABS_PIVOT then
+          I_PIVOT := I;
+          PIVOT := B (ROW (I), K);
+          ABS_PIVOT := abs (PIVOT);
+        end if;
+      end loop;
 
       --                             CHECK FOR NEAR SINGULAR
-      if ABS_PIVOT < Real'Epsilon * NORM1 then
+      if ABS_PIVOT < Real'Model_Epsilon * NORM1 then
         raise Matrix_Data_Error with "Matrix is near singular";
       end if;
 
@@ -124,10 +124,10 @@ package body Generic_Real_Linear_Equations is
       X ( I ) := B ( ROW( I ) , N + 1) ;
     end loop ;
     return X ;
-  end Linear_Equations ;
+  end Solve_JS;
 
-  function Linear_Equations ( A : Real_Matrix ;
-                              Y : Real_Matrix ) return Real_Matrix is
+  function Solve_JS (A : Real_Matrix ;
+                     Y : Real_Matrix) return Real_Matrix is
 
     --      PURPOSE : SOLVE THE LINEAR SYSTEM OF EQUATIONS WITH REAL
     --                COEFFICIENTS   [A] * [X] = [Y]
@@ -197,7 +197,7 @@ package body Generic_Real_Linear_Equations is
       end loop ;
 
       --                             CHECK FOR NEAR SINGULAR
-      if ABS_PIVOT < Real'Epsilon * NORM1 then
+      if ABS_PIVOT < Real'Model_Epsilon * NORM1 then
         raise Matrix_Data_Error with "Matrix is near singular";
       end if;
 
@@ -230,7 +230,7 @@ package body Generic_Real_Linear_Equations is
       end loop ;
     end loop ;
     return X ;
-  end Linear_Equations ;
+  end Solve_JS;
 
   function Determinant_JS ( A : Real_Matrix ) return Real is
 
@@ -382,7 +382,7 @@ package body Generic_Real_Linear_Equations is
       end loop ;
 
       --                            TEST FOR SINGULAR
-      if ABS_PIVOT < Real'Epsilon * NORM1 then
+      if ABS_PIVOT < Real'Model_Epsilon * NORM1 then
         raise Matrix_Data_Error with "Matrix is singular";
       end if ;
 
@@ -505,7 +505,7 @@ package body Generic_Real_Linear_Equations is
       end loop ;
 
       --                            CHECK FOR SINGULAR
-      if ABS_PIVOT < Real'Epsilon * NORM1 then
+      if ABS_PIVOT < Real'Model_Epsilon * NORM1 then
         raise Matrix_Data_Error;
       end if ;
 
@@ -639,8 +639,8 @@ package body Generic_Real_Linear_Equations is
       end loop ;
 
       --                                CHECK FOR NEAR SINGULAR
-      if ABS_PIVOT < Real'Epsilon * NORM1 then -- degeneration
-        raise Matrix_Data_Error ;
+      if ABS_PIVOT < Real'Model_Epsilon * NORM1 then  --  degeneration
+        raise Matrix_Data_Error;
       end if ;
 
       --                                HAVE PIVOT, INTERCHANGE ROW POINTERS
@@ -665,7 +665,7 @@ package body Generic_Real_Linear_Equations is
         end loop ;
         B(ROW(I),J) := (B(ROW(I),J)-SUM)/B(ROW(J),J) ;
       end loop ;
-      Put_Line("finished col " & Integer'Image(J));
+      Ada.Text_IO.Put_Line ("finished col " & Integer'Image(J));
     end loop ;
 
     -- back substitute, first part
@@ -676,7 +676,7 @@ package body Generic_Real_Linear_Equations is
       end loop ;
       Z(I) := YY(I) - SUM ;
     end loop ;
-    Put_Line("Finished back sub, part 1");
+    Ada.Text_IO.Put_Line ("Finished back sub, part 1");
     -- back substitute, second part
     for I in reverse 1..N loop
       SUM := 0.0 ;
@@ -685,7 +685,7 @@ package body Generic_Real_Linear_Equations is
       end loop;
       X(I) := (Z(I)-SUM)/B(ROW(I),I) ;
     end loop;
-    Put_Line("Finished back sub, part 2");
+    Ada.Text_IO.Put_Line ("Finished back sub, part 2");
     return X ;
   end Crout_Solve ;
 
@@ -719,7 +719,7 @@ package body Generic_Real_Linear_Equations is
       for J in A'First(2)-A'First(1)+I+1 .. A'Last(2) loop
         if not Almost_zero (A(I,J) - A(A'First(1)-A'First(2)+J, A'First(2)-A'First(1)+I)) then
           if abs(A(I,J)-A(A'First(1)-A'First(2)+J, A'First(2)-A'First(1)+I)) >
-            2.0 * Real'Epsilon * abs(A(I,J))
+            2.0 * Real'Model_Epsilon * abs(A(I,J))
           then
             raise Matrix_Data_Error with "Matrix is not symmetric";
           end if;
