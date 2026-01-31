@@ -4,45 +4,46 @@
 --      Home page:       http://mathpaqs.sf.net/
 --      Project page 1:  http://sf.net/projects/mathpaqs/
 --      Project page 2:  https://github.com/zertovitch/mathpaqs
+--      Alire crate:     https://alire.ada.dev/crates/mathpaqs
 --
 --  Build me with "gnatmake -P mathpaqs", "gprbuild -P mathpaqs", or open me with GNAT Studio.
---
+
 project Mathpaqs is
 
-   for Source_Dirs use (
-     ".",
-     "algebra",
-     "diff_eq/pde", "diff_eq/sde", "diff_eq/ode",  --  Differential Equations (partial / stochastic / ordinary)
-     "lin_alg", "lin_alg/sparse",                  --  Linear Algebra / sparse matrices
-     "multi",                                      --  Multi-precision integers
-     "numerics",
-     "probas", "random", "stats",
-     "graph"
-   );
+   for Source_Dirs use
+     (".",
+      "algebra",
+      "diff_eq/pde", "diff_eq/sde", "diff_eq/ode",  --  Differential Equations (partial / stochastic / ordinary)
+      "lin_alg", "lin_alg/sparse",                  --  Linear Algebra / sparse matrices
+      "multi",                                      --  Multi-precision integers
+      "numerics",
+      "probas", "random", "stats",
+      "graph");                                     --  Graphic output (some demos / main programs use it)
+
    for Exec_Dir use ".";
-   for Create_Missing_Dirs use "True";  --  Flips by default the "-p" switch
+   for Create_Missing_Dirs use "True";  --  Flips the "-p" switch
 
    type Mathpaqs_Build_Mode_Type is ("Debug", "Fast");
    Mathpaqs_Build_Mode : Mathpaqs_Build_Mode_Type := external ("Mathpaqs_Build_Mode", "Fast");
 
-   for Main use (
+   for Main use
        --
        --  For tests, see Mathpaqs_Test[_*]
        --
-       "arenstorf.adb",
+      ("arenstorf.adb",
        "arithmetic_compression.adb",
        "biomorph.adb",
        "champ_vt.adb",
        "covid_19.adb",
        "cr_demo.adb",
+       "eds_1.adb",
        "fractal.adb",
        "heat.adb",
        "pi_digits.adb",
        "ppm2func.adb",
        "sim_alea.adb",
        "show_floats_limits.adb",
-       "three_lakes.adb"
-     );
+       "three_lakes.adb");
 
    case Mathpaqs_Build_Mode is
      when "Fast" => for Object_Dir use "obj_fast";
@@ -52,8 +53,8 @@ project Mathpaqs is
    type Mathpaqs_Styles_Checks_Type is
       ("Off",
        "Level_1",
-       "Level_2"
-      );
+       "Level_2");
+
    Mathpaqs_Styles_Checks : Mathpaqs_Styles_Checks_Type := external ("Mathpaqs_Styles_Checks", "Off");
 
    Common_Compiler_Options :=
