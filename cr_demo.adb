@@ -7,7 +7,7 @@
 --     Ada version: 23.I.1999, G. de Montmollin
 
 --  with Ada.Text_IO;              use Ada.Text_IO;
-with Graph;                    use Graph;
+with PDF_Out;
 with Contours;
 
 procedure CR_Demo is
@@ -21,21 +21,22 @@ procedure CR_Demo is
   ny : constant := 80;   --  Number of y values - 1 (zero-based)
   nc : constant := 130;  --  Number of contour levels (z-axis)
 
-  --  pala: constant:= 16; palz: constant:= 255; palaz: constant:=palz-pala;
+  use PDF_Out;
 
-  zmax, zmin : Float;
+  pdf : PDF_Out_File;
 
-  procedure col_vecout (x1, y1, x2, y2, z : Float) is
-    zz : constant Float := (z - zmin) / (zmax - zmin);
+  zmax, zmin : Real;
+
+  procedure col_vecout (x1, y1, x2, y2, z : Real) is
+    zz : constant Real := (z - zmin) / (zmax - zmin);
   begin
-    --  SetColor( integer(float(palaz)*(z-zmin)/(zmax-zmin)) + pala );  -- indexed colors
-    SetColor (zz, 0.0, 1.0 - zz);
-    Line (x1, y1, x2, y2);
+    pdf.Stroking_Color ((zz, 0.0, 1.0 - zz));
+    pdf.Single_Line ((x1, y1), (x2, y2));
   end col_vecout;
 
-  x1, y1, x2, y2 : Float;
+  x1, y1, x2, y2 : Real;
 
-  package CRG is new Contours (Float, col_vecout);
+  package CRG is new Contours (Real, col_vecout);
 
   use CRG;
 
@@ -53,9 +54,9 @@ begin
   zmax := -1.0e30;
   for i in 0 .. nx loop
     for j in 0 .. ny loop
-      d (i, j) := Float ((i - nx / 2) * (j - ny / 2));
-      zmin := Float'Min (zmin, d (i, j));
-      zmax := Float'Max (zmax, d (i, j));
+      d (i, j) := Real ((i - nx / 2) * (j - ny / 2));
+      zmin := Real'Min (zmin, d (i, j));
+      zmax := Real'Max (zmax, d (i, j));
     end loop;
   end loop;
   --
@@ -63,42 +64,35 @@ begin
   --     automatic plotting on the graphics screen
   --
   for j in 0 .. ny loop
-    y (j) := Float (j * (pymax - pymin)) / Float (ny) + Float (pymin);
+    y (j) := Real (j * (pymax - pymin)) / Real (ny) + Real (pymin);
   end loop;
   --
   --     Set coordinates in X array suitable for
   --     automatic plotting on the graphics screen
   --
   for i in 0 .. nx loop
-    x (i) := Float (i * (pxmax - pxmin)) / Float (nx) + Float (pxmin);
+    x (i) := Real (i * (pxmax - pxmin)) / Real (nx) + Real (pxmin);
   end loop;
   --
   --     Set a full contingent of contour levels
   --
   for i in 1 .. nc loop
-    z (i) := Float (i) * (zmax - zmin) / Float (nc + 1);
+    z (i) := Real (i) * (zmax - zmin) / Real (nc + 1);
   end loop;
 
   --     Init. graphics
-  current_device := PostScript;
-  InitGraph (PostScript, "CR_Demo.ps");
-
-  --  current_device:= VESA;
-  --  InitGraph(VESA, VESA_800x600);
-  --  for i in 0..palaz loop          -- d‚grad‚
-  --    p:= float(i)/float(palaz);
-  --    SetRGBPalette(i+pala, integer(p*63.0), 0, 63-integer(p*63.0));
-  --  end loop;
+  pdf.Create ("cr_demo.pdf");
+  pdf.Page_Setup (PDF_Out.A4_portrait);
 
   --
   --     Draw a border around the contour plot
   --
-  x1 := Float (pxmin);
-  y1 := Float (pymin);
-  x2 := Float (pxmax);
-  y2 := Float (pymax);
+  x1 := Real (pxmin);
+  y1 := Real (pymin);
+  x2 := Real (pxmax);
+  y2 := Real (pymax);
 
-  Set_math_plane (x1, y1, x2, y2);
+  pdf.Set_Math_Plane ((x1, y1, x2 - x1, y2 - y1));
 
   col_vecout (x1, y1, x1, y2, 0.0);
   col_vecout (x1, y2, x2, y2, 0.0);
@@ -115,7 +109,6 @@ begin
   --     Call the contouring routine
   --
   ConRec (d, x, y, z);
-  --     Wait and close graphics
-  --  Skip_Line;
-  CloseGraph;
+
+  pdf.Close;
 end CR_Demo;

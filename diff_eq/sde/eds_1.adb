@@ -134,7 +134,7 @@ procedure EDS_1 is
     end if;
 
     current_device := PostScript;
-    txt_fact := 1;
+    txt_fact := 5;
     Set_math_plane (Float (T0) - 0.1, -0.2, Float (T1) + 0.1, Float (X1));
     SetTextJustify (LeftText, TopText);
     SetUserCharSize (GetMaxX, 1500, GetMaxY, 2000);

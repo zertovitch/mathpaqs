@@ -13,7 +13,7 @@ with Ada.Text_IO,
      Ada.Numerics.Generic_Real_Arrays;
 
 with Dormand_Prince_8;
-with Graph;
+with PDF_Out;
 
 with System;
 
@@ -28,15 +28,12 @@ procedure Arenstorf is
   package LFM is new Ada.Numerics.Generic_Real_Arrays (Prec_Float);
   use LFM;
 
---  package PFMM is new Min_Max(prec_float,">");
---  use PFMM;
-
 --  Restricted three body problem
 
   mu :  constant := 0.012277471;   --  moon
   mup : constant := 1.0 - mu;      --  earth
 
-  t_end_1_tour : constant := 17.0652165601579625588917206249;
+  t_end_1_orbit : constant := 17.0652165601579625588917206249;
 
   h, t, t_end : Prec_Float;
 
@@ -48,19 +45,25 @@ procedure Arenstorf is
 
   type T_Meth is
     (Euler1,
-     Runge_Kutta_class4, Runge_Kutta_3_8_4,
+     Runge_Kutta_class4,
+     Runge_Kutta_3_8_4,
      Butcher6,
-     DoPriF7, DoPriF8,  --  F : fixed step size
-     DoPriV8);          --  V : variable step size
+     DoPriF7,   --  F : fixed step size
+     DoPriF8,   --  F : fixed step size
+     DoPriV8);  --  V : variable step size
 
   n_meth : constant := 1 + T_Meth'Pos (T_Meth'Last) - T_Meth'Pos (T_Meth'First);
 
-  ntours : constant array (T_Meth) of Positive :=
+  orbits : constant array (T_Meth) of Positive :=
     (1, 1, 1, 4, 4, 4, 5);
 
-  niter_1_tour : constant array (T_Meth) of Positive :=
-    (200_000,  6_000, 6_000,
-     50_000,  20_000, 20_000,
+  iteration_per_orbit : constant array (T_Meth) of Positive :=
+    (200_000,
+     6_000,
+     6_000,
+     50_000,
+     20_000,
+     20_000,
      600);
 
   niter : array (T_Meth) of Positive;
@@ -85,7 +88,7 @@ procedure Arenstorf is
   eps : constant := 1.0E-13;   --  Entre E-7 et E-13
   uround : constant := Prec_Float'Model_Epsilon;
   hnew : Prec_Float;
-  hprem, hdern, hmin, hmax : Prec_Float;
+  h_first, h_last, h_min, hmax : Prec_Float;
   it : Natural;
 
   procedure Evolution (meth : T_Meth) is
@@ -217,25 +220,6 @@ procedure Arenstorf is
     end case;
   end Evolution;
 
---  !! Old Palette stuff, unused;
---     To do: add colors to PostScript output.
-
-  pala : constant := 16; palz : constant := 255; palaz : constant := palz - pala;
-  spal : constant := (palaz + 1) / n_meth;
-
-  procedure Degrade is
-    p, q : Float; c : Natural;
-  begin
-    for i in 0 .. n_meth - 1 loop
-      for j in 0 .. spal - 1 loop
-        c := pala + spal * i + j;
-        p := Float (i) / Float (n_meth - 1);
-        q := Float (j) / Float (spal - 1);
-        Graph.SetRGBPalette (c, Integer (p * 63.0), Integer (q * 63.0), 63 - Integer (p * 63.0));
-      end loop;
-    end loop;
-  end Degrade;
-
   dessine : constant array (T_Meth) of Boolean :=
     (Euler1   => True,
      Runge_Kutta_class4 | Runge_Kutta_3_8_4 => False,
@@ -244,72 +228,83 @@ procedure Arenstorf is
      DoPriF8  => False,
      DoPriV8  => True);
 
-  rapXY : Float;
-
   package PFIO is new Ada.Text_IO.Float_IO (Prec_Float);
   use Ada.Text_IO, PFIO;
 
-  use Graph;
+  use PDF_Out;
+
+  pdf : PDF_Out_File;
+
+  meth_val, it_val : Real;
+  p_old, p_new : Point;
 
 begin
 
   for i in niter'Range loop
-    niter (i) := ntours (i) * niter_1_tour (i);
+    niter (i) := orbits (i) * iteration_per_orbit (i);
   end loop;
 
-  current_device := PostScript;
-  InitGraph (PostScript, "Arenstorf.ps");
+  pdf.Create ("arenstorf.pdf");
+  pdf.Page_Setup (PDF_Out.A4_portrait);
 
-  --  DOS:
-  --  current_device:= VESA;
-  --  InitGraph(VESA, VESA_1280x1024);
-  Degrade;
-
-  rapXY := Float (GetMaxY) / Float (GetMaxX);
-  Set_math_plane (-1.5, -1.5 * rapXY, 1.5, 1.5 * rapXY);
-  Draw_axes;
+  pdf.Set_Math_Plane ((-1.5, -1.5, 3.0, 3.0));
+  --  Draw_axes;
 
   for meth in T_Meth loop
+
+    meth_val := Real (T_Meth'Pos (meth) - T_Meth'Pos (T_Meth'First)) / Real (n_meth);
+
     if dessine (meth) then
-      t_end := Prec_Float (ntours (meth)) * t_end_1_tour;
+      t_end := Prec_Float (orbits (meth)) * t_end_1_orbit;
       x := x0;
-      h := t_end / Prec_Float (niter_1_tour (meth));
-      hmin := h;
+      h := t_end / Prec_Float (iteration_per_orbit (meth));
+      h_min := h;
       hmax := h;
-      hprem := h;
+      h_first := h;
       t := 0.0;
       it := 0;
       accepted := True;
-      MoveTo (Float (x (1)), Float (x (2)));
+
+      p_new := (Real (x (1)), Real (x (2)));
 
       while t < t_end * (1.0 - Prec_Float (niter (meth)) * uround) loop
+
         Evolution (meth);
+
         if accepted then
-        LineTo (Float (x (1)), Float (x (2)));
---         SetColor( pala + (t_meth'Pos(meth) - t_meth'Pos(t_meth'First)) * spal
---                        + (it*(spal-1)/niter(meth)) );
+          it_val := Real'Min (1.0, Real (t / t_end));
+
+          pdf.Stroking_Color
+            ((red   => it_val,
+              green => it_val * meth_val,
+              blue  => it_val * (1.0 - meth_val)));
+
+          p_old := p_new;
+          p_new := (Real (x (1)), Real (x (2)));
+
+          pdf.Single_Line (p_old, p_new);
         end if;
-        if hmin > h then hmin := h; end if;
+
+        if h_min > h then h_min := h; end if;
         if hmax < h then hmax := h; end if;
         it := it + 1;
       end loop;
-      SetTextJustify (LeftText, CenterText);
-      OutText (T_Meth'Image (meth));
-      MoveRel (-TextWidth ('0') / 2, TextHeight ('8'));
-      OutText (Integer'Image (it) & " points");
-      MoveRel (0, TextHeight ('8'));
-      OutText (Integer'Image (ntours (meth)) & " orbits");
-      MoveRel (0, TextHeight ('8'));
-      OutText (Integer'Image (it / ntours (meth)) & " p/o");
-      hdern := h;
+
+      pdf.Text_XY (Real (x (1)), Real (x (2)));
+      pdf.Put_Line (T_Meth'Image (meth));
+      pdf.Put_Line (Integer'Image (it) & " points");
+      pdf.Put_Line (Integer'Image (orbits (meth)) & " orbits");
+      pdf.Put_Line (Integer'Image (it / orbits (meth)) & " points / orbit");
+      h_last := h;
     end if; -- dessine
+
   end loop; -- meth
 
-  CloseGraph;
+  pdf.Close;
 
-  Put ("hprem= "); Put (hprem);    New_Line;
-  Put ("hmin=  "); Put (hmin);     New_Line;
-  Put ("hmax=  "); Put (hmax);     New_Line;
-  Put ("hdern= "); Put (hdern);    New_Line;
+  Put ("h_first= "); Put (h_first);   New_Line;
+  Put ("h_min=   "); Put (h_min);     New_Line;
+  Put ("h_max=   "); Put (hmax);      New_Line;
+  Put ("h_last=  "); Put (h_last);    New_Line;
 
 end Arenstorf;
