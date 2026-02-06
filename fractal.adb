@@ -109,16 +109,21 @@ procedure Fractal is
     width  : constant := 1.0 + 2.0 * margin;
     height : constant Real := width * Sqrt (2.0);  --  Proportions of the A* papers.
   begin
+
     pdf.Create (n);
     pdf.Page_Setup (PDF_Out.A4_portrait);
     pdf.Set_Math_Plane ((-margin, -margin, width, height));
+
     for level in Level_Range loop
+      pdf.Line_Width (1.0 / Real (1 + level));
       Draw (f, a, level);
       if level < Level_Range'Last then
         pdf.New_Page;
       end if;
     end loop;
+
     pdf.Close;
+
   end Plot;
 
   triangle : constant Figure := ((0.0, 0.0), (0.5, Sqrt (3.0) / 2.0), (1.0, 0.0), (0.0, 0.0));
