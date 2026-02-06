@@ -4,9 +4,9 @@
 
 package body Contours is
 
-  procedure ConRec (d    : Contour_data;
-                    x, y : Contour_pos;
-                    z    : Contour_level)
+  procedure Con_Rec (d    : Contour_Data;
+                     x, y : Contour_Pos;
+                     z    : Contour_Level)
   is
     h, xh, yh  : array (0 .. 4) of Real;
     sh : array (0 .. 4) of Integer;  --  Sign of relative height.
@@ -193,7 +193,7 @@ package body Contours is
                         x2 := xsect (m1, m2);
                         y2 := ysect (m1, m2);
                     end case;
-                    Vecout (x1, y1, x2, y2, z (k));
+                    Vec_Out (x1, y1, x2, y2, z (k));
                 end case;
               end loop Triangle_Scan;
             end if;
@@ -201,6 +201,6 @@ package body Contours is
         end if;
       end loop Left_Right;
     end loop Top_Down;
-  end ConRec;
+  end Con_Rec;
 
 end Contours;

@@ -48,17 +48,17 @@ generic
   --  Any floating-point type:
   type Real is digits <>;
   --  User-defined line drawing procedure:
-  with procedure Vecout (x1, y1, x2, y2, z : Real);
+  with procedure Vec_Out (x1, y1, x2, y2, z : Real);
 
 package Contours is
 
-  type Contour_data  is array (Integer range <>, Integer range <>) of Real;
-  type Contour_pos   is array (Integer range <>) of Real;
-  type Contour_level is array (Integer range <>) of Real;
+  type Contour_Data  is array (Integer range <>, Integer range <>) of Real;
+  type Contour_Pos   is array (Integer range <>) of Real;
+  type Contour_Level is array (Integer range <>) of Real;
 
-  procedure ConRec (d    : Contour_data;
-                    x, y : Contour_pos;
-                    z    : Contour_level);
+  procedure Con_Rec (d    : Contour_Data;
+                     x, y : Contour_Pos;
+                     z    : Contour_Level);
   --  d (i, j) represents the data value at point (x (i), y (j)).
   --
   --  Assumption: x'Range = d'Range (1), y'Range = d'Range (2).

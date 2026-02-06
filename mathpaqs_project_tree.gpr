@@ -65,8 +65,8 @@ project Mathpaqs_Project_Tree is
        "champ_vt.adb",
        "cr_demo.adb",        --  PDF_Out
        "eds_1.adb",
-       "fractal.adb"
-       );
+       "fractal.adb");       --  PDF_Out
+
 
    case Mathpaqs_Build_Mode is
      when "Fast" => for Object_Dir use "obj_fast";
