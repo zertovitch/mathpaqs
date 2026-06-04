@@ -63,7 +63,7 @@ begin
       when others => raise Unknown_Format;
     end case;
 
-    --  Eventual comment like: # Created by Paint Shop Pro
+    --  Possible comment like: # Created by Paint Shop Pro
     Get_Line (i, s, l);
     if l > 0 and then s (1) = '#' then
       null;  --  just go on

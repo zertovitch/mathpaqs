@@ -1,4 +1,4 @@
--- Test Pareto, eventually truncated
+-- Test Pareto, possibly truncated
 
 with Generic_Random_Functions;
 with U_Rand;

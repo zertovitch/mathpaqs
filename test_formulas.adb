@@ -1,4 +1,4 @@
---  Run "test_formulas >nul" to see eventual errors only
+--  Run "test_formulas >nul" to see possible errors only
 
 with Test_Formulas_Pkg; use Test_Formulas_Pkg;
 

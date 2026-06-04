@@ -46,7 +46,7 @@ package body Discrete_Random_Simulation is
     return i;
   end Index_Dichotomic_Search;
 
-  subtype Real is Probability_Value'Base;  --  Actually, a supertype (remove eventual bounds)
+  subtype Real is Probability_Value'Base;  --  Actually, a supertype (remove possible bounds)
 
   procedure Prepare_Aliases (
     Fx      : in  Probability_Array;  --  Fx is the Cumulative distribution function (CDF), F(x).
